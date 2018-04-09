@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} 这里是title {% endblock %}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" type="text/css" href="/static/common/layui/css/layui.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/static/common/bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/static/common/global.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/static/css/personal.css" media="all"> {% block header %}
+    <!-- before head -->
+    {% endblock %}
+</head>
+
+<body>
+    <section class="layui-larry-box">
+        <div class="larry-personal">
+            <div class="layui-tab">
+                <blockquote class="layui-elem-quote news_search">
+                    {% block menubox %}
+                    <!-- 菜单区域 -->
+                    {% endblock %}
+                </blockquote>
+
+                <div class="layui-form news_list">
+                    {% block table %}
+                    <!-- 列表区域 -->
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <script type="text/javascript" src="/static/common/layui/layui.js"></script>
+
+    {% block footer %}
+    <!-- 底部区域 -->
+    {% endblock %}
+</body>
+
+</html>
