@@ -3,7 +3,7 @@
 
 '公共函数库'
 
-import time, re, json, logging, hashlib, base64, asyncio, sys, os
+import time, re, json, logging, hashlib, base64, asyncio, sys, os, datetime
 from lib.models import User
 from lib.apis import APIValueError, APIError, APIPermissionError
 
@@ -59,7 +59,6 @@ def check_admin(request):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError()
 
-
 def datetime_filter(t):
     delta = int(time.time() - t)
     if delta < 60:
@@ -72,3 +71,16 @@ def datetime_filter(t):
         return u'%s天前' % (delta // 86400)
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
+
+
+def obj2str(arr):
+    """对象转字符串"""
+    
+    for item in arr:
+        for field in item:
+            if isinstance(field, datetime.datetime):  
+                field = field.strftime('%Y-%m-%d %H:%M:%S')  
+            elif isinstance(field, datetime.date):  
+                field = field.strftime("%Y-%m-%d")  
+    
+    return arr

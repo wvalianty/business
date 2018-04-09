@@ -22,13 +22,13 @@
     <section class="layui-larry-box">
         <div class="larry-personal">
             <div class="layui-tab">
-                <blockquote class="layui-elem-quote news_search">
+                <blockquote class="layui-elem-quote menubox">
                     {% block menubox %}
                     <!-- 菜单区域 -->
                     {% endblock %}
                 </blockquote>
 
-                <div class="layui-form news_list">
+                <div class="layui-form tablebox">
                     {% block table %}
                     <!-- 列表区域 -->
                     {% endblock %}
@@ -38,6 +38,9 @@
 
     </section>
     <script type="text/javascript" src="/static/common/layui/layui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+
 
     {% block footer %}
     <!-- 底部区域 -->

@@ -5,10 +5,23 @@
 
 import time, uuid
 
-from core.orm import Model, StringField, BooleanField, FloatField, TextField
+from core.orm import *
 
 def next_id():
     return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
+
+def curr_datetime():
+    return time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+
+class Client(Model):
+    __table__ = 'client'
+
+    id = IntegerField(primary_key=True)
+    name = StringField()
+    indate = DateField()
+    invoice = StringField()
+    add_date = DateTimeField(default=curr_datetime)
+
 
 class User(Model):
     __table__ = 'users'

@@ -1333,9 +1333,52 @@ body .layui-layout-admin .layui-larry-foot .p-admin a {
     content: "\e6b4";
 }
 
+.layui-input-1,
+.layui-input-2,
+.layui-input-3,
+.layui-input-4,
+.layui-input-5,
+.layui-input-6 {
+    margin-left: -1px;
+    float: left;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+}
+
+.layui-input-1 {
+    width: 10%;
+}
+
+.layui-input-2 {
+    width: 20%;
+}
+
+.layui-input-3 {
+    width: 30%;
+}
+
+.layui-input-4 {
+    width: 40%;
+}
+
+.layui-inpu t-5 {
+    width: 50%;
+}
+
+.layui-input-6 {
+    width: 60%;
+}
+
 
 /*  后台菜单样式*/
 
 .my-nav-more-top {
     border-color: transparent transparent #c2c2c2 !important;
+}
+
+.admin-main {
+    padding: 15px;
+    background-color: #fff;
 }

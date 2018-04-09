@@ -29,8 +29,8 @@ def init_jinja2(app, **kw):
         autoescape = kw.get('autoescape', True),
         block_start_string = kw.get('block_start_string', '{%'),
         block_end_string = kw.get('block_end_string', '%}'),
-        variable_start_string = kw.get('variable_start_string', '{{'),
-        variable_end_string = kw.get('varialbe_end_string', '}}'),
+        variable_start_string = kw.get('variable_start_string', '<%'),
+        variable_end_string = kw.get('varialbe_end_string', '%>'),
         auto_reload = kw.get('auto_reload', True)
     )
     path = kw.get('path', None)
@@ -57,7 +57,7 @@ async def data_factory(app, handler):
             if request.content_type.startswith('application/json'):
                 request.__data__ = await request.json()
                 logging.debug('request json: %s' % str(request.__data__))
-            elif request>content_type.startswith('application/x-www-form-urlencoded'):
+            elif request.content_type.startswith('application/x-www-form-urlencoded'):
                 request.__data__ = await request.post()
                 logging.info('request form:%s' % str(request.__data__))
         return (await handler(request))

@@ -132,6 +132,14 @@ class TextField(Field):
     def __init__(self, name=None, default=None):
         super().__init__(name, 'text', False, default)
 
+class DateField(Field):
+    def __init__(self, name=None, default=None):
+        super().__init__(name, 'date', False, default)
+
+class DateTimeField(Field):
+    def __init__(self, name=None, default=None):
+        super().__init__(name, 'datetime', False, default)
+
 class ModelMetaClass(type):
     """这是一个元类，用来创建类的类， 闯将model的子类时，自动增加以下参数信息到类中
     """
@@ -283,6 +291,7 @@ class Model(dict, metaclass=ModelMetaClass):
         rows = await execute(self.__insert__, args)
         if rows != 1:
             logging.warn('failed to insert record:affected rows: %s' % rows)
+        return rows
 
     async def update(self):
         args = list(map(self.getValue, self.__fields__))
