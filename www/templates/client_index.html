@@ -7,13 +7,15 @@
 {% block menubox %}
 
 <div class="layui-inline">
-    <div class="layui-input-inline">
-        <input value="" placeholder="请输入关键字" class="layui-input search_input" type="text">
-    </div>
-    <a class="layui-btn search_btn">查询</a>
+    <form class="layui-form" id="searchForm" style="padding:0px;">
+        <div class="layui-input-inline">
+            <input name="keyword" placeholder="请输入关键字" class="layui-input search_input" type="text">
+        </div>
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+    </form>
 </div>
 <div class="layui-inline">
-    <a class="layui-btn layui-btn-normal add-btn" data-url="/client_form" data-title="新增客户">新增</a>
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/client/form" data-title="新增客户">新增</a>
 </div>
 {% endblock %}
 
@@ -47,63 +49,10 @@
             <td>20</td>
             <td>{{ item.invoice }}</td>
             <td>
-                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client_form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/client_del?id' + item.id "><i class="layui-icon"></i> 删除</a>
+                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/client/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
             </td>
         </tr>
     </tbody>
 </table>
-<div class="larry-table-page clearfix">
-    <div id="page" class="page"></div>
-</div>
-{% endblock %}
-
-
-<!-- footer -->
-{% block footer %}
-
-<script type="text/javascript">
-    layui.config({
-        base: '/static/js/'
-    }).use(['form', 'layer', 'jquery', 'laypage'], function() {
-        var form = layui.form(),
-            layer = parent.layer === undefined ? layui.layer : parent.layer,
-            laypage = layui.laypage,
-            $ = layui.jquery;
-
-        var app = new Vue({
-            el: '#app',
-            data: {
-                list: []
-            },
-            methods: {
-                getLists: function(page) {
-                    var self = this;
-                    $.get('/apis/client/index?page=' + page, function(data) {
-                        self.list = data.list;
-
-                        laypage({
-                            cont: 'page',
-                            pages: data.p[0], //总页数
-                            curr: data.p[1],
-                            groups: 5, //连续显示分页数
-                            jump: function(obj, first) {
-                                //得到了当前页，用于向服务端请求对应数据
-                                var currPage = obj.curr;
-                                if (!first) {
-
-                                    self.getLists(currPage);
-                                }
-                            }
-                        });
-                    });
-                }
-            },
-            mounted: function() {
-
-                this.getLists(1);
-            }
-        });
-    });
-</script>
 {% endblock %}

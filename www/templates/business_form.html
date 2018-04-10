@@ -1,0 +1,23 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}新增业务{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">业务ID</label>
+        <div class="layui-input-4">
+            <input class="layui-input" name="btype" v-model="info.btype"  placeholder="请输入业务ID" type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

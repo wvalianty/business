@@ -3,8 +3,7 @@
 
 '公共函数库'
 
-import time, re, json, logging, hashlib, base64, asyncio, sys, os, datetime
-from lib.models import User
+import time, re, json, logging, hashlib, base64, sys, os, datetime
 from lib.apis import APIValueError, APIError, APIPermissionError
 
 lib_dir = os.path.dirname(os.path.realpath(__file__))
@@ -75,12 +74,11 @@ def datetime_filter(t):
 
 def obj2str(arr):
     """对象转字符串"""
-    
     for item in arr:
         for field in item:
-            if isinstance(field, datetime.datetime):  
-                field = field.strftime('%Y-%m-%d %H:%M:%S')  
-            elif isinstance(field, datetime.date):  
-                field = field.strftime("%Y-%m-%d")  
+            if isinstance(item[field], datetime.datetime):  
+                item[field] = item[field].strftime('%Y-%m-%d %H:%M:%S')  
+            elif isinstance(item[field], datetime.date):  
+                item[field] = item[field].strftime("%Y-%m-%d") 
     
     return arr

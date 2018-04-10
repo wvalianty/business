@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-"客户管理模块"
+"收入管理模块"
 import math, datetime
 from core.coreweb import get, post
-from lib.models import Client
+from lib.models import Income, Client, Business
 from lib.common import obj2str
 
-@get('/apis/client/index')
+@get('/apis/income/index')
 async def index(*, keyword=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
@@ -16,23 +16,23 @@ async def index(*, keyword=None, page=1, pageSize=10):
     if keyword:
         where = "name like '%%{}%%'".format(keyword)
 
-    total = await Client.findNumber('count(id)', where)
+    total = await Income.findNumber('count(id)', where)
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total = total, page = p, list = ())
-    clients = await Client.findAll(orderBy='id desc', where=where, limit=limit)
+    lists = await Income.findAll(orderBy='id desc', where=where, limit=limit)
 
     # 将获得数据中的日期转换为字符串
-    clients = obj2str(clients)
+    lists = obj2str(lists)
 
     return {
         'total': total,
         'page': p,
-        'list': clients
+        'list': lists
     }
 
-@get('/apis/client/info')
+@get('/apis/income/info')
 async def info(*,id):
     id = int(id)
 
@@ -57,10 +57,25 @@ async def info(*,id):
     res['info'] = obj2str([info])[0]
 
     return res
+
+@get('/apis/income/formInit')
+async def formInit(request):
+    """form表单初始化数据加载
+    """
     
+    # 获得所有公司列表， id,name
+    clientList = await Client.findAll(field='id,name')
+ 
 
+    # 获得所有业务类型，id,type
+    typeList = await Business.findAll(field='id,type')
 
-@post('/apis/client/form')
+    return {
+        'clientList': clientList,
+        'typeList': typeList
+    }
+
+@post('/apis/income/form')
 async def form(*, id, name, indate, invoice):
 
     action = '添加'
@@ -89,7 +104,7 @@ async def form(*, id, name, indate, invoice):
         }
 
 
-@get('/apis/client/del')
+@get('/apis/income/del')
 async def delete(*, id):
     
     if not id.isdigit() or int(id) <= 0:

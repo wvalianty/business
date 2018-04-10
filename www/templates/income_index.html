@@ -1,0 +1,53 @@
+{% extends 'layout_table.html' %}
+
+<!-- title -->
+{% block title %} 收入管理 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+<div class="layui-inline">
+    <form class="layui-form" id="searchForm" style="padding:0px;">
+        <div class="layui-input-inline">
+            <input name="keyword" placeholder="请输入关键字" class="layui-input search_input" type="text">
+        </div>
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+    </form>
+</div>
+<div class="layui-inline">
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/income/form" data-title="新增客户" data-area="700px,700px">新增</a>
+</div>
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table" id="app">
+    <thead>
+        <tr>
+            <th style="text-align:left;">收入ID</th>
+            <th>公司名称</th>
+            <th>业务名称</th>
+            <th>归属时间</th>
+            <th>收入金额</th>
+            <th>结束进度</th>
+            <th>媒体类型</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="item in list">
+            <td align="left">{{ item.income_id }}</td>
+            <td>{{ item.company_name }}</td>
+            <td>{{ item.business_name }}</td>
+            <td>20</td>
+            <td>0</td>
+            <td>0</td>
+            <td>
+                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/income/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

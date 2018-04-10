@@ -13,7 +13,11 @@ def next_id():
 def curr_datetime():
     return time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
 
+
 class Client(Model):
+    """客户表
+    """
+
     __table__ = 'client'
 
     id = IntegerField(primary_key=True)
@@ -22,38 +26,29 @@ class Client(Model):
     invoice = StringField()
     add_date = DateTimeField(default=curr_datetime)
 
+class Business(Model):
+    """业务类型表
+    """
+    
+    __table__ = 'business_type'
 
-class User(Model):
-    __table__ = 'users'
+    id = IntegerField(primary_key=True)
+    type = StringField()
 
-    id = StringField(primary_key=True, default=next_id)
-    email = StringField()
-    passwd = StringField()
-    admin = BooleanField()
+class Income(Model):
+    """收入管理表
+    """
+    
+    __table__ = 'income'
+
+    id = IntegerField(primary_key=True)
+    income_id = StringField()
+    client_id = IntegerField()
+    business_type = StringField(ddl=6)
     name = StringField()
-    image = StringField(ddl="varchar(500)")
-    created_at = FloatField(default=time.time)
-
-class Blog(Model):
-    __table__ = 'blogs'
-
-    id = StringField(primary_key=True, default=next_id)
-    user_id = StringField()
-    user_name = StringField()
-    user_image = StringField(ddl="varchar(500)")
-    name = StringField()
-    summary = StringField(ddl="varchar(200)")
-    content = TextField()
-    created_at = FloatField(default=time.time)
-
-
-class Comment(Model):
-    __table__ = 'comments'
-
-    id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
-    blog_id = StringField(ddl='varchar(50)')
-    user_id = StringField(ddl='varchar(50)')
-    user_name = StringField(ddl='varchar(50)')
-    user_image = StringField(ddl='varchar(500)')
-    content = TextField()
-    created_at = FloatField(default=time.time)
+    aff_date = DateField()
+    money = FloatField()
+    status = IntegerField()
+    media_type = IntegerField()
+    cost = StringField()
+    add_date = DateTimeField(default=curr_datetime)

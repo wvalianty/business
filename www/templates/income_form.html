@@ -1,0 +1,97 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}新增客户{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">收入ID</label>
+        <div class="layui-input-4">
+            <input class="layui-input" v-model="info.income_id" readonly type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">公司名称</label>
+        <div class="layui-input-4">
+            <select name="client_id" v-model="info.client_id" lay-verify="required" >
+                <option value=""></option>
+                <option  value="1" v-for="item in other.clientList" :value="item.id">{{item.name}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">业务类型</label>
+        <div class="layui-input-4">
+            <select name="business_type" v-model="info.business_type" lay-verify="required" >
+                <option value=""></option>
+                <option v-for="item in other.typeList" :value="item.id">{{item.type}}</option>
+            </select>
+    
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">业务名称</label>
+        <div class="layui-input-6">
+            <input class="layui-input"  name="name" v-model="info.name" lay-verify="required" type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">归属时间</label>
+        <div class="layui-input-6">
+            <input class="layui-input" name="aff_date" v-model="info.aff_date" lay-verify="date" placeholder="请输入归属时间" onClick="layui.laydate({elem:this})"
+                type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">收入金额</label>
+        <div class="layui-input-6">
+            <input class="layui-input" name="money" v-model="info.money" lay-verify="required" type="number">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结算进度</label>
+        <div class="layui-input-6">
+            <input type="radio" name="status" value="0" title="待开票" checked>
+            <input type="radio" name="status" value="1" title="未回款" >
+            <input type="radio" name="status" value="2" title="已回款" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">媒体类型</label>
+        <div class="layui-input-6">
+            <input type="radio" name="media_type" value="0" title="自媒体" checked>
+            <input type="radio" name="media_type" value="1" title="外媒">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">渠道成本</label>
+        <div class="layui-input-6">
+            <input class="layui-input" name="cost" v-model="info.cost" lay-verify="required" type="number">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+<!-- footer -->
+{% block footer%}
+<script type="text/javascript">
+
+// 初始化时数据加载
+function hook_init(vueObj) {
+    
+    $.get('/apis/income/formInit', function(data) {
+        
+        vueObj.other = data;
+    });
+}
+</script>
+{% endblock %}

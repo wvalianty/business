@@ -5,58 +5,31 @@
 
 <!-- form -->
 {% block form %}
-<form class="layui-form layui-form-pane">
+<form class="layui-form layui-form-pane" id="form">
     <div class="layui-form-item">
         <label class="layui-form-label">客户名称</label>
         <div class="layui-input-4">
-            <input class="layui-input" name="name" lay-verify="required" placeholder="请输入客户名称" type="text">
+            <input class="layui-input" name="name" v-model="info.name" lay-verify="required" placeholder="请输入客户名称" type="text">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">合同有效期</label>
         <div class="layui-input-4">
-            <input class="layui-input" name="indate" lay-verify="date" placeholder="请输入合同有效期" onClick="layui.laydate({elem:this})" type="text">
+            <input class="layui-input" name="indate" v-model="info.indate" lay-verify="date" placeholder="请输入合同有效期" onClick="layui.laydate({elem:this})" type="text">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">开票信息</label>
         <div class="layui-input-6">
-            <textarea placeholder="请输入内容摘要" name="invoice" class="layui-textarea" lay-verify="required"></textarea>
+            <textarea placeholder="请输入内容摘要" name="invoice" v-model="info.invoice" class="layui-textarea" lay-verify="required"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="client">立即提交</button>
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
 </form>
-{% endblock %}
-
-
-<!-- footer -->
-{% block footer %}
-<script type="text/javascript">
-    layui.config({
-        base: "/static/js/"
-    }).use(['form', 'layer', 'jquery', 'laydate'], function() {
-        var form = layui.form(),
-            layer = parent.layer === undefined ? layui.layer : parent.layer,
-            laydate = layui.laydate,
-            $ = layui.jquery;
-
-        form.on("submit(client)", function(data) {
-
-            $.post('/apis/client/add', data.field, function(data, textStatus, xhr) {
-
-                layer.msg(data.msg);
-                if (data.status) {
-                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-                    parent.layer.close(index); //再执行关闭
-                }
-            });
-            return false;
-        });
-    });
-</script>
 {% endblock %}

@@ -229,7 +229,12 @@ class Model(dict, metaclass=ModelMetaClass):
     @classmethod
     async def findAll(cls, where=None, args=None, **kw):
         '查询所有值'
-        sql = [cls.__select__]
+        
+        selectField = kw.get('field', None)
+        if selectField:
+            sql = ['select %s from `%s`' % (selectField, cls.__table__)]
+        else:
+            sql = [cls.__select__]
         if where:
             sql.append('where')
             sql.append(where)
@@ -299,6 +304,7 @@ class Model(dict, metaclass=ModelMetaClass):
         rows = await execute(self.__update__, args)
         if rows != 1:
             logging.warn('failed to update by primary key: affected rows：%s' % rows)
+        return rows
         
     async def remove(self):
         args = [self.getValue(self.__primary_key__)]
@@ -306,3 +312,15 @@ class Model(dict, metaclass=ModelMetaClass):
 
         if rows != 1:
             logging.warn('failed to remove by primary key : affected rows: %s' % rows)
+        
+        return rows
+        
+    @classmethod
+    async def delete(self, pk=None):
+        args = [pk]
+        rows = await execute(self.__delete__, args)
+
+        if rows != 1:
+            logging.warn('failed to remove by primary key : affected rows: %s' % rows)
+        
+        return rows
