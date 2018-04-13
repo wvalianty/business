@@ -82,8 +82,8 @@ $(function(){
                 });
 
                 // 确定事件
-                $('.identify-btn').unbind('click').click(function () {
-                    if (!confirm('确定吗？')) {
+                $('.identify-btn').unbind('click').click(function(){
+                     if (!confirm('确定吗？')) {
                         return;
                     }
 

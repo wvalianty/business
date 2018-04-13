@@ -4,3 +4,6 @@
 *.egg
 *.egg-info
 *.txt
+*.pyc
+./conf/config_override.py
+__pycache__/
