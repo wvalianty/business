@@ -1,0 +1,68 @@
+{% extends 'layout_table.html' %}
+
+{% block header %}
+<style type="text/css" >
+    .redline td {  color: red; }
+    .date_ { display:none;}
+</style>
+{% endblock %}
+
+<!-- title -->
+{% block title %} 发票申请 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+<div class="layui-inline">
+    <div class="layui-input-inline">
+        <input value="" style="width:300px;" placeholder="请输入公司名称或归属时间（YYYYmm）" class="layui-input search_input" type="text">
+    </div>
+    <a class="layui-btn search_btn">查询</a>
+</div>
+
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table" id="app">
+    <colgroup>
+        <col width="10%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="30%">
+        <col width="15%">
+    </colgroup>
+    <thead>
+        <tr>
+            <th style="text-align:left;">收入ID</th>
+            <th>公司名称</th>
+            <th>归属时间</th>
+            <th>开票金额</th>
+            <th>开票信息</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+{#        <tr v-for="item in list"  style="color:red">      #}
+        <tr v-for="item in list" v-bind:class="item.finished ? '': 'redline'">
+
+            <td align="left">{{ item.id }}</td>
+            <td>{{ item.client }}</td>
+            <td>{{ item.date }}</td>
+            <td> {{ item.money }} </td>
+            <td>{{ item.info }}</td>
+            <td>
+{#                <a  v-bind:id="item.id" class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/invocieApply/form?id=' + item.id"  data-title="请确认"  data-area="280px,180px">完成</a>#}
+                <a class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.id "><i class="layui-icon"></i> 完成</a>
+                <label v-bind:class="item.finished ?  '' : 'date_'  ">完成时间{{ item.finished_time }}</label>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
+
+<!-- footer -->
+{% block footer %}
+{% endblock %}

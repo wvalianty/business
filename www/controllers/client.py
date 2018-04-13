@@ -25,7 +25,6 @@ async def index(*, keyword=None, page=1, pageSize=10):
 
     # 将获得数据中的日期转换为字符串
     clients = obj2str(clients)
-
     return {
         'total': total,
         'page': p,

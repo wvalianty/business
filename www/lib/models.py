@@ -52,3 +52,13 @@ class Income(Model):
     media_type = IntegerField()
     cost = StringField()
     add_date = DateTimeField(default=curr_datetime)
+
+class Invoice(Model):
+    __table__ = 'invoice'
+    id = IntegerField(primary_key=True)
+    client_id = StringField()
+    income_id = StringField()
+    info = StringField()
+    add_date = DateTimeField()
+    finished = IntegerField(default=0)
+    finished_time = DateTimeField()

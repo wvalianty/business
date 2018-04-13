@@ -95,6 +95,29 @@ layui.config({
                     });
                 });
 
+                // 确定事件
+                $('.identify-btn').unbind('click').click(function(){
+                     if (!confirm('确定吗？')) {
+                        return;
+                    }
+
+                    let url = this.dataset.url;
+                    if (!url) {
+                        layer.msg('缺少链接');
+                        return;
+                    }
+
+                    $.get(url, function (data) {
+                        layer.msg(data.msg);
+                        // 删除成功，刷新页面
+                        if (data.status) {
+                            self.getLists(self.currPage);
+                        }
+                    });
+                });
+
+
+
                 /**
                  * 搜索事件
                  */

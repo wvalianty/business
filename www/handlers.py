@@ -66,3 +66,12 @@ async def income_form(**kw):
         '__template__': 'income_form.html'
     }
 # 收入管理模块 ------ end
+
+
+# 发票申请模块  --sttart
+@get("/invoiceApply_index")
+def invoiceApply_index(request):
+    return {
+        '__template__': 'invoiceApply_index.html'
+    }
+
