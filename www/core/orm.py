@@ -240,6 +240,10 @@ class Model(dict, metaclass=ModelMetaClass):
             sql.append(where)
         if args is None:
             args = []
+        groupBy = kw.get('groupBy', None)
+        if groupBy:
+            sql.append('group by')
+            sql.append(groupBy)
         orderBy = kw.get('orderBy', None)
         if orderBy:
             sql.append('order by')
@@ -259,12 +263,15 @@ class Model(dict, metaclass=ModelMetaClass):
         return [cls(**r) for r in rs]
 
     @classmethod
-    async def findNumber(cls, selectField, where=None, args=None):
+    async def findNumber(cls, selectField, where=None, args=None, groupBy=None):
         'find number by select and where'
         sql = ['select %s _num_ from `%s`' % (selectField, cls.__table__)]
         if where:
             sql.append('where')
             sql.append(where)
+        if groupBy:
+            sql.append('group by')
+            sql.append(groupBy)
         rs = await select(' '.join(sql), args, 1)
         if len(rs) == 0:
             return None
@@ -324,3 +331,12 @@ class Model(dict, metaclass=ModelMetaClass):
             logging.warn('failed to remove by primary key : affected rows: %s' % rows)
         
         return rows
+
+    async def query(sql=None, args=None):
+        """sql查询
+        """
+        if not sql:
+            return None
+        
+        rs = await select(sql, args)
+        return rs

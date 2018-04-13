@@ -45,8 +45,8 @@
         <tr v-for="item in list">
             <td align="left">{{ item.name }}</td>
             <td>{{ item.indate }}</td>
-            <td>{{ item.id }}</td>
-            <td>20</td>
+            <td>{{ item.tfCount }}</td>
+            <td>{{ item.hkCount }}</td>
             <td>{{ item.invoice }}</td>
             <td>
                 <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>

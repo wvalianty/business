@@ -1,8 +1,9 @@
 // 如果存在id，则说明是编辑页面
+var app;
 $(function(){
     
     let id = getQueryStr('id');
-    var app = new Vue({
+    app = new Vue({
         el: '#form',
         data: {
             info: {},
@@ -30,7 +31,6 @@ $(function(){
         updated: function () {
 
             var self = this;
-            
             layui.config({
                 base: "/static/js/"
             }).use(['form', 'layer', 'laydate'], function () {
@@ -38,6 +38,13 @@ $(function(){
                 var form = layui.form(),
                     layer = parent.layer === undefined ? layui.layer : parent.layer,
                     laydate = layui.laydate;
+
+                laydate.render({
+                    elem: '.date',
+                    done: function (value, date, endDate) {
+                        self.info[this.elem[0].name] = value;
+                    }
+                });
 
                 // 表单提交事件
                 form.on("submit(submitForm)", function (data) {
@@ -54,6 +61,11 @@ $(function(){
                     });
                     return false;
                 });
+
+                // 钩子函数，初始化的时候执行
+                if (typeof (hook_init_ui) == 'function') {
+                    hook_init_ui(form, layer)
+                }
             });
             
         }

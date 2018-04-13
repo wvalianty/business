@@ -24,9 +24,7 @@ CREATE TABLE `business_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '业务类型，id',
   `type` char(2) DEFAULT NULL COMMENT '业务类型，大写字母',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Data for the table `business_type` */
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `client` */
 
@@ -39,9 +37,7 @@ CREATE TABLE `client` (
   `invoice` varchar(200) DEFAULT NULL COMMENT '发票信息',
   `add_date` datetime DEFAULT NULL COMMENT '添加日期',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Data for the table `client` */
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `income` */
 
@@ -50,7 +46,7 @@ DROP TABLE IF EXISTS `income`;
 CREATE TABLE `income` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '收入管理，id',
   `income_id` char(6) DEFAULT NULL COMMENT '收入id,生成规则：年份后两位月份比数',
-  `client_id` varchar(50) DEFAULT NULL COMMENT '客户id',
+  `client_id` int(11) DEFAULT NULL COMMENT '客户id',
   `business_type` char(2) DEFAULT NULL COMMENT '业务类型',
   `name` varchar(50) DEFAULT NULL COMMENT '业务名称',
   `aff_date` date DEFAULT NULL COMMENT '归属时间',
@@ -61,8 +57,6 @@ CREATE TABLE `income` (
   `add_date` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Data for the table `income` */
 
 /*Table structure for table `invoice` */
 
@@ -77,7 +71,23 @@ CREATE TABLE `invoice` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `invoice` */
+/*Table structure for table `settlement` */
+
+DROP TABLE IF EXISTS `settlement`;
+
+CREATE TABLE `settlement` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '结算表，id',
+  `income_id` int(11) DEFAULT NULL COMMENT '收入表主键id',
+  `client_id` int(11) DEFAULT NULL COMMENT '客户表主键id',
+  `balance` double DEFAULT NULL COMMENT '结算金额',
+  `status` tinyint(4) DEFAULT NULL COMMENT '结算状态， 0：待处理，1：已处理',
+  `add_date` datetime DEFAULT NULL COMMENT '添加时间',
+  PRIMARY KEY (`id`),
+  KEY `selltement_income_id` (`income_id`),
+  KEY `selltement_client_id` (`client_id`),
+  CONSTRAINT `selltement_income_id` FOREIGN KEY (`income_id`) REFERENCES `income` (`id`),
+  CONSTRAINT `selltement_client_id` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `syslog` */
 
@@ -93,8 +103,6 @@ CREATE TABLE `syslog` (
   `datetime` datetime NOT NULL COMMENT '操作时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4;
-
-/*Data for the table `syslog` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

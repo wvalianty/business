@@ -4,7 +4,7 @@
 "客户管理模块"
 import math, datetime
 from core.coreweb import get, post
-from lib.models import Client
+from lib.models import Client, Income
 from lib.common import obj2str
 
 @get('/apis/client/index')
@@ -25,6 +25,13 @@ async def index(*, keyword=None, page=1, pageSize=10):
 
     # 将获得数据中的日期转换为字符串
     clients = obj2str(clients)
+
+    # 获得每个客户下的投放数和回款数
+    for item in clients:
+        where = 'client_id=%s' % item.id
+        item['tfCount'] = await Income.findNumber('count(id)', where)
+        where = '%s and status = 2' % where
+        item['hkCount'] = await Income.findNumber('count(id)', where)
 
     return {
         'total': total,

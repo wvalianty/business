@@ -9,24 +9,24 @@
     <div class="layui-form-item">
         <label class="layui-form-label">收入ID</label>
         <div class="layui-input-4">
-            <input class="layui-input" v-model="info.income_id" readonly type="text">
+            <input class="layui-input" name="income_id" v-model="info.income_id" readonly type="text">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">公司名称</label>
+        <label class="layui-form-label" >公司名称</label>
         <div class="layui-input-4">
-            <select name="client_id" v-model="info.client_id" lay-verify="required" >
+            <select name="client_id" v-model="info.client_id" lay-verify="required" lay-filter="select">
                 <option value=""></option>
                 <option  value="1" v-for="item in other.clientList" :value="item.id">{{item.name}}</option>
             </select>
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">业务类型</label>
+        <label class="layui-form-label" >业务类型</label>
         <div class="layui-input-4">
-            <select name="business_type" v-model="info.business_type" lay-verify="required" >
+            <select name="business_type" v-model="info.business_type" lay-verify="required" lay-filter="select">
                 <option value=""></option>
-                <option v-for="item in other.typeList" :value="item.id">{{item.type}}</option>
+                <option v-for="item in other.typeList" :value="item.type">{{item.type}}</option>
             </select>
     
         </div>
@@ -34,14 +34,14 @@
     <div class="layui-form-item">
         <label class="layui-form-label">业务名称</label>
         <div class="layui-input-6">
-            <input class="layui-input"  name="name" v-model="info.name" lay-verify="required" type="text">
+            <input class="layui-input" name="name" v-model="info.name" lay-verify="required" type="text">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">归属时间</label>
         <div class="layui-input-6">
-            <input class="layui-input" name="aff_date" v-model="info.aff_date" lay-verify="date" placeholder="请输入归属时间" onClick="layui.laydate({elem:this})"
-                type="text">
+            <input class="layui-input date" v-model="info.aff_date"  name="aff_date"  lay-verify="date" placeholder="请输入归属时间"  type="text">
+             <!-- onClick="layui.laydate({elem:this})" -->
         </div>
     </div>
     <div class="layui-form-item">
@@ -53,22 +53,22 @@
     <div class="layui-form-item">
         <label class="layui-form-label">结算进度</label>
         <div class="layui-input-6">
-            <input type="radio" name="status" value="0" title="待开票" checked>
-            <input type="radio" name="status" value="1" title="未回款" >
-            <input type="radio" name="status" value="2" title="已回款" >
+            <input type="radio" v-model="info.status" lay-filter="radio" name="status" value="0" title="待开票" checked>
+            <input type="radio" v-model="info.status" lay-filter="radio" name="status" value="1" title="未回款" >
+            <input type="radio" v-model="info.status" lay-filter="radio" name="status" value="2" title="已回款" >
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">媒体类型</label>
         <div class="layui-input-6">
-            <input type="radio" name="media_type" value="0" title="自媒体" checked>
-            <input type="radio" name="media_type" value="1" title="外媒">
+            <input type="radio" v-model="info.media_type" name="media_type" value="0" title="自媒体" lay-filter="radio" checked>
+            <input type="radio" v-model="info.media_type" name="media_type" value="1" title="外媒" lay-filter="radio">
         </div>
     </div>
-    <div class="layui-form-item">
+    <div class="layui-form-item" id="cost" v-show="info.media_type">
         <label class="layui-form-label">渠道成本</label>
         <div class="layui-input-6">
-            <input class="layui-input" name="cost" v-model="info.cost" lay-verify="required" type="number">
+            <input class="layui-input" v-model="info.cost" name="cost" type="number">
         </div>
     </div>
     <div class="layui-form-item">
@@ -87,10 +87,38 @@
 
 // 初始化时数据加载
 function hook_init(vueObj) {
-    
-    $.get('/apis/income/formInit', function(data) {
+
+    let id = getQueryStr('id') || 0;
+    $.get('/apis/income/formInit?id=' + id, function(data) {
         
         vueObj.other = data;
+        if( id == 0 ) {
+            vueObj.info.media_type = 0;
+            vueObj.info.status = 0;
+            vueObj.info.income_id = data.income_id
+        }
+    });
+}
+
+// 初始化UI
+function hook_init_ui(form, layer) {
+
+    form.on('radio(radio)', function(data){
+        
+        if(data.elem.name == 'media_type') {
+            if (data.value == "1") {
+                $('#cost').show();
+            } else {
+                $('#cost').hide();
+            }
+        }
+
+        app.info[data.elem.name] = data.value;
+    });
+
+    form.on('select(select)', function(data){
+
+        app.info[data.elem.name] = data.value;
     });
 }
 </script>

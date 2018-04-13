@@ -9,7 +9,12 @@
 <div class="layui-inline">
     <form class="layui-form" id="searchForm" style="padding:0px;">
         <div class="layui-input-inline">
-            <input name="keyword" placeholder="请输入关键字" class="layui-input search_input" type="text">
+            <!-- <input name="keyword" placeholder="请输入关键字" class="layui-input search_input" type="text"> -->
+            <select name="keyword" id="">
+                <option value=""></option>
+                <option value="">全部</option>
+                <option :value="item.type" v-for="item in other.types">{{item.type}}</option>
+            </select>
         </div>
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm">查询</a>
     </form>
@@ -22,7 +27,7 @@
 
 <!-- table start -->
 {% block table %}
-<table class="layui-table" id="app">
+<table class="layui-table">
     <thead>
         <tr>
             <th style="text-align:left;">业务ID</th>
@@ -33,10 +38,10 @@
     </thead>
     <tbody>
         <tr v-for="item in list">
-            <td >{{ item.type }}</td>
-            <td> 0 </td>
-            <td>{{ item.id }}</td>
-            <td>20</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.aff_date }}</td>
+            <td>{{ item.tfCount }}</td>
+            <td>{{ item.hkCount }}</td>
         </tr>
     </tbody>
 </table>
