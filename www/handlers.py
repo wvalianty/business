@@ -68,10 +68,28 @@ async def income_form(**kw):
 # 收入管理模块 ------ end
 
 
-# 发票申请模块  --sttart
+# 发票申请模块  --start
 @get("/invoiceApply_index")
 def invoiceApply_index(request):
     return {
         '__template__': 'invoiceApply_index.html'
     }
+#发票申请模块  --stop
 
+#结算申请 --start
+@get("/settleApply_index")
+def settleApply_index(request):
+    return {
+        '__template__': 'settleApply_index.html'
+    }
+@get("/settleApply_look")
+def settleApply_form(**kv):
+    return {
+        '__template__': 'settleApply_look.html'
+    }
+
+@get("/login/index")
+def login_index(request):
+    return {
+        '__template__': 'login_index.html'
+    }

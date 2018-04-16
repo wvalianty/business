@@ -1,35 +1,53 @@
-var app;
-$(function(){
-    app = new Vue({
+layui.config({
+    base: '/static/js/'
+}).use(['form', 'layer', 'jquery', 'laypage'], function () {
+    var form = layui.form(),
+        layer = parent.layer === undefined ? layui.layer : parent.layer,
+        laypage = layui.laypage,
+        $ = layui.jquery;
+
+    var app = new Vue({
         el: '#app',
         data: {
             list: [],
             currPage: 1,
-            other: [],
-            page: [],
             module: '' // 当前模块
         },
         methods: {
 
-            // 获得数据列表
-            getLists: function (page, keyword = '') {
+            getLists: function (page, keyword='',lujing="") {
                 var self = this;
 
-                let url = '/apis/' + self.module + '/index?page=' + page;
+
+                let url = '/apis/' + self.module +'/index?page=' + page;
                 if (keyword != '') {
                     url += '&keyword=' + keyword;
+                }
+                if (lujing != '') {
+                    url = "";
+                    url = "/apis/" + lujing + "/" +self.module + '/index?page='+page + '&keyword=' + keyword;;
                 }
 
                 $.get(url, function (data) {
                     self.list = data.list;
-                    self.page = data.page;
-                    if (typeof data.other != 'undefined') {
-                        self.other = data.other
-                    }
+                    laypage({
+                        cont: 'page',
+                        pages: data.page[0], //总页数
+                        curr: data.page[1],
+                        groups: 5, //连续显示分页数
+                        jump: function (obj, first) {
+                            //得到了当前页，用于向服务端请求对应数据
+                            self.currPage = obj.curr;
+                            if (!first) {
+
+                                self.getLists(self.currPage);
+                            }
+                        }
+                    });
                 });
             },
             // 添加点击事件
-            addClick: function (layer, form) {
+            addClick: function () {
 
                 var self = this;
                 /**
@@ -95,12 +113,14 @@ $(function(){
 
                     $.get(url, function (data) {
                         layer.msg(data.msg);
-                        // 删除成功，刷新页面
+                        // 成功，刷新页面
                         if (data.status) {
                             self.getLists(self.currPage);
                         }
                     });
                 });
+
+
 
                 /**
                  * 搜索事件
@@ -114,40 +134,24 @@ $(function(){
             }
         },
         mounted: function () {
-
-            this.module = location.pathname.split('/')[1];
-            this.getLists(this.currPage);
+            parm = location.search;
+            if (parm.indexOf("lookid") == 1){
+                console.log(parm);
+                lujing = "look";
+                keyword = getQueryStr("lookid");
+                console.log(keyword);
+                this.module = location.pathname.split('/')[1];
+                this.getLists(1,keyword,lujing);
+            }
+            else {
+                this.module = location.pathname.split('/')[1];
+                this.getLists(this.currPage);
+            }
         },
         updated: function () {
-            var slef = this;
-            layui.config({
-                base: '/static/js/'
-            }).use(['form', 'layer', 'jquery', 'laypage'], function () {
-                var form = layui.form(),
-                    layer = parent.layer === undefined ? layui.layer : parent.layer,
-                    laypage = layui.laypage,
-                    $ = layui.jquery;
 
-                // 等数据渲染完成，再绑定事件
-                slef.addClick(layer, form);
-
-                laypage({
-                    cont: 'page',
-                    pages: page[0], //总页数
-                    curr: page[1],
-                    groups: 5, //连续显示分页数
-                    jump: function (obj, first) {
-                        //得到了当前页，用于向服务端请求对应数据
-                        self.currPage = obj.curr;
-                        if (!first) {
-
-                            self.getLists(self.currPage);
-                        }
-                    }
-                });
-            });
+            // 等数据渲染完成，再绑定事件
+            this.addClick();
         }
     });
 });
-
-

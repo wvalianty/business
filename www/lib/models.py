@@ -42,7 +42,7 @@ class Income(Model):
     __table__ = 'income'
 
     id = IntegerField(primary_key=True)
-    income_id = StringField()
+    income_id = StringField(ddl=6)
     client_id = IntegerField()
     business_type = StringField(ddl=6)
     name = StringField()
@@ -56,9 +56,29 @@ class Income(Model):
 class Invoice(Model):
     __table__ = 'invoice'
     id = IntegerField(primary_key=True)
-    client_id = StringField()
-    income_id = StringField()
+    client_id = IntegerField()
+    income_id = IntegerField()
     info = StringField()
     add_date = DateTimeField()
     finished = IntegerField(default=0)
     finished_time = DateTimeField()
+
+class Settlement(Model):
+    __table__ = 'settlement'
+    id = IntegerField(primary_key=True)
+    income_id = IntegerField()
+    client_id = IntegerField()
+    balance = FloatField()
+    status = IntegerField()
+    add_date = DateTimeField()
+
+class Syslog(Model):
+    __table__ = 'syslog'
+    id = IntegerField(primary_key=True)
+    username = StringField()
+    passwd = StringField()
+    operate =  StringField()
+    table = StringField()
+    module = StringField()
+    sql = StringField()
+    datetime = DateTimeField()

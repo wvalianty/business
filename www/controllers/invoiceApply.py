@@ -45,6 +45,7 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
         'list':rs
     }
 
+
 @get('/apis/finish')
 async def apis_finish(*,id):
     if not id.isdigit() or int(id) <= 0:
