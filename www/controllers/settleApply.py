@@ -43,8 +43,8 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
 
 
 #keyword 就是lookid  income.id
-@get('/apis/look/settleApply_look/index')
-async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
+@get('/apis/settleApply_look/look')
+async def settleApply_formIndex(*,keyword=None,action=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
