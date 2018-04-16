@@ -1,0 +1,69 @@
+{% extends 'layout_table.html' %}
+
+{% block header %}
+<style type="text/css" >
+    .redline td {  color: red; }
+    .date_ { display:none;}
+</style>
+{% endblock %}
+
+<!-- title -->
+{% block title %} 结算申请 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table" id="app">
+    <colgroup>
+        <col width="10%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+    </colgroup>
+    <thead>
+        <tr>
+            <th style="text-align:left;">收入ID</th>
+            <th>公司名称</th>
+            <th>归属时间</th>
+            <th>收入金额</th>
+            <th>收入状态</th>
+            <th>结算比例</th>
+            <th>结算金额</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+{#        <tr v-for="item in list"  style="color:red">      #}
+         <tr v-for="item in list">
+
+            <td align="left">{{ item.lookid }}</td>   {#  收入id#}
+            <td>{{ item.channel }}</td>
+            <td>{{ item.date }}</td>
+            <td> {{ item.income }} </td>
+             <td v-if="item.status == 0"> 代开票 </td>
+             <td v-if="item.status == 1">未回款</td>
+             <td v-if="item.status == 2">已回款</td>
+            <td>{{ item.percentage }}</td>
+            <td>{{ item.incomeM }}</td>
+            <td>
+{#                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>#}
+                <a    v-if="item.status == 0" class="layui-btn layui-btn-normal identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.lookid"   data-area="180px,140px">完成</a>
+                <a   class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/settleApply_look?lookid='+item.lookid" data-title="详细信息" data-area="600px,400px">查看</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
+
+<!-- footer -->
+{% block footer %}
+{% endblock %}

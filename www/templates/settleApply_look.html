@@ -1,0 +1,45 @@
+{% extends 'layout_table.html' %}
+
+
+<!-- title -->
+{% block title %} 详细信息 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table" id="app">
+    <colgroup>
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+    </colgroup>
+    <thead>
+        <tr>
+            <th style="text-align:left;">公司名称</th>
+            <th>结算金额</th>
+            <th>收入状态</th>
+            <th>添加时间</th>
+        </tr>
+    </thead>
+    <tbody>
+{#        <tr v-for="item in list"  style="color:red">      #}
+         <tr v-for="item in list">
+
+             <td align="left">{{ item.name }}</td>
+             <td> {{ item.money }} </td>
+             <td> {{ item.status }}</td>
+             <td>{{ item.date }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
+
+<!-- footer -->
+{% block footer %}
+{% endblock %}
