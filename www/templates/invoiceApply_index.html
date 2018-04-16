@@ -48,7 +48,7 @@
             <td>{{ item.info }}</td>
             <td>
 {#                <a  v-bind:id="item.id" class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/invocieApply/form?id=' + item.id"  data-title="请确认"  data-area="280px,180px">完成</a>#}
-                <a class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.id "><i class="layui-icon"></i> 完成</a>
+                <a v-if="item.finished == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.id "><i class="layui-icon"></i> 完成</a>
                 <label v-bind:class="item.finished ?  '' : 'date_'  ">完成时间{{ item.finished_time }}</label>
             </td>
         </tr>
