@@ -5,5 +5,5 @@
 *.egg-info
 *.txt
 *.pyc
-./conf/config_override.py
 __pycache__/
+conf/config_override.py
