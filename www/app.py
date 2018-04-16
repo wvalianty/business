@@ -141,8 +141,8 @@ async def init(loop):
         break
 
     add_static(app)
-    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 8080)
-    logging.info('server started at http://127.0.0.1:8080')
+    srv = await loop.create_server(app.make_handler(), '127.0.0.1', configs.app.port)
+    logging.info('server started at http://127.0.0.1:%s' % configs.app.port)
     return srv
 
 
