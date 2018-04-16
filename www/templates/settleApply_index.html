@@ -3,7 +3,6 @@
 {% block header %}
 <style type="text/css" >
     .redline td {  color: red; }
-    .date_ { display:none;}
 </style>
 {% endblock %}
 
@@ -18,7 +17,7 @@
 
 <!-- table start -->
 {% block table %}
-<table class="layui-table" id="app">
+<table class="layui-table">
     <colgroup>
         <col width="10%">
         <col width="15%">
@@ -43,7 +42,7 @@
     </thead>
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
-         <tr v-for="item in list">
+         <tr v-for="item in list" v-bind:class="item.status == 2 ? '': 'redline'">
 
             <td align="left">{{ item.lookid }}</td>   {#  收入id#}
             <td>{{ item.channel }}</td>
@@ -56,8 +55,8 @@
             <td>{{ item.incomeM }}</td>
             <td>
 {#                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>#}
-                <a    v-if="item.status == 0" class="layui-btn layui-btn-normal identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.lookid"   data-area="180px,140px">完成</a>
-                <a   class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/settleApply_look?lookid='+item.lookid" data-title="详细信息" data-area="600px,400px">查看</a>
+                <a    v-if="item.status != 2" class="layui-btn layui-btn-normal identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.lookid"   data-area="180px,140px">完成</a>
+                <a   class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.lookid" data-title="详细信息" data-area="600px,400px">查看</a>
             </td>
         </tr>
     </tbody>
