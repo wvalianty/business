@@ -1,17 +1,39 @@
 {% extends 'layout_table.html' %}
 
 <!-- title -->
-{% block title %} 收入管理 {% endblock %}
+{% block title %} 收入报表 {% endblock %}
 
 <!-- menu start -->
 {% block menubox %}
 
 <div class="layui-inline">
     <form class="layui-form" id="searchForm" style="padding:0px;">
+        <div class="layui-input-inline" style="width: 150px;">
+            <input name="keyword" placeholder="可搜索收入id,公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
         <div class="layui-input-inline">
-            <input name="keyword" placeholder="请输入关键字" class="layui-input search_input" type="text">
+            <select name="month">
+                <option value="">全部时间</option>
+                <option value="">全部时间</option>
+                <option v-for="month in 12" :value="month">{{month}}月</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="status">
+                <option value="">全部状态</option>
+                <option value="">全部状态</option>
+                <option v-for="status,index in other.statusMap" :value="index">{{status}}</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="mediaType">
+                <option value="">媒体类型</option>
+                <option value="">媒体类型</option>
+                <option v-for="type,index in other.mediaTypeMap" :value="index">{{type}}</option>
+            </select>
         </div>
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn search_btn" id="selectAll" >查询全部</a>
     </form>
 </div>
 <div class="layui-inline">

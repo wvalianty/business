@@ -22,22 +22,29 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, page=1, pageSize=10):
+async def index(*, keyword=None, month=None, status=None, mediaType=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
     where = '1 = 1'
     if keyword:
-        where = "name like '%%{}%%'".format(keyword)
-
-    total = await Income.findNumber('count(id)', where)
+        where = "income_id like '%%{}%%' or c.name like '%%{}%%'".format(keyword, keyword)
+    if month and month.isdigit():
+        year = time.strftime('%Y')
+        month = month.zfill(2)
+        where = "{} and aff_date like '{}-{}-%%'".format(where, year, month)
+    if status and status.isdigit():
+        where = "{} and status = {}".format(where, status)
+    if mediaType and mediaType.isdigit():
+        where = "{} and media_type = {}".format(where, mediaType)
+    
+    sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
+    rs = await Income.query(sql)
+    total = rs[0]['c']
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total = total, page = p, list = ())
-    
-    if keyword:
-        where = 'i.%s' % where
 
     sql = "SELECT i.*,c.name company_name FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where %s order by %s limit %s" % (where, 'id desc', limit)
 
@@ -53,7 +60,11 @@ async def index(*, keyword=None, page=1, pageSize=10):
     return {
         'total': total,
         'page': p,
-        'list': lists
+        'list': lists,
+        'other': {
+            'statusMap': statusMap,
+            'mediaTypeMap': mediaTypeMap
+        }
     }
 
 @get('/apis/income/info')

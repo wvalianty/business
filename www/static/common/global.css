@@ -1382,3 +1382,7 @@ body .layui-layout-admin .layui-larry-foot .p-admin a {
     padding: 15px;
     background-color: #fff;
 }
+
+#searchForm .layui-input-inline{
+    width: 120px;
+}

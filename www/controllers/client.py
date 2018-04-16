@@ -2,19 +2,28 @@
 # -*- coding:utf-8 -*-
 
 "客户管理模块"
-import math, datetime
+import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Client, Income
 from lib.common import obj2str
 
 @get('/apis/client/index')
-async def index(*, keyword=None, page=1, pageSize=10):
+async def index(*, keyword=None, status=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
+
+    # 当前日期
+    currDate = time.strftime('%Y-%m-%d')
 
     where = '1 = 1'
     if keyword:
         where = "name like '%%{}%%'".format(keyword)
+    if status and status.isdigit():
+        op = '>='
+        if int(status) == 0:
+            op = '<'
+
+        where = "%s and indate %s '%s'" % (where, op, currDate)
 
     total = await Client.findNumber('count(id)', where)
     limit = ((page - 1) * pageSize, pageSize)

@@ -9,14 +9,21 @@
 <div class="layui-inline">
     <form class="layui-form" id="searchForm" style="padding:0px;">
         <div class="layui-input-inline">
-            <!-- <input name="keyword" placeholder="请输入关键字" class="layui-input search_input" type="text"> -->
-            <select name="keyword" id="">
-                <option value=""></option>
-                <option value="">全部</option>
+            <select name="keyword">
+                <option value="">全部ID</option>
+                <option value="">全部ID</option>
                 <option :value="item.type" v-for="item in other.types">{{item.type}}</option>
             </select>
         </div>
+        <div class="layui-input-inline">
+            <select name="month">
+                <option value="">全部时间</option>
+                <option value="">全部时间</option>
+                <option v-for="month in 12" :value="month">{{month}}月</option>
+            </select>
+        </div>
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm">查询</a>
+        <a class="layui-btn search_btn" id="selectAll">查询全部</a>
     </form>
 </div>
 <div class="layui-inline">

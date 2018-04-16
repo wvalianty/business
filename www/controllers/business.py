@@ -8,7 +8,7 @@ from lib.models import Business, Income
 from lib.common import obj2str
 
 @get('/apis/business/index')
-async def index(*, keyword=None, page=1, pageSize=10):
+async def index(*, keyword=None, month=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
@@ -16,6 +16,11 @@ async def index(*, keyword=None, page=1, pageSize=10):
     where = '1=1'
     if keyword and keyword.strip() != '':
         where = "`business_type` like '%%{}%%'".format(keyword)
+    if month and month.isdigit():
+        month = month.zfill(2)
+        year = time.strftime('%Y')
+        where = "{} and aff_date like '{}-{}-%%'".format(where, year, month)
+
 
     groupBy = 'aff_date,business_type'
     sql = 'SELECT COUNT(*) c FROM (SELECT id FROM `income` where %s GROUP BY %s) t' % (where, groupBy)
