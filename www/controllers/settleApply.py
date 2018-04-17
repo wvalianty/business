@@ -26,11 +26,16 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     if total == 0:
         return dict(total=total, page=p, list=())
     sql_res = 'select inc.id,inc.income_id,c.name,inc.aff_date,inc.money,inc.status,settle.balance,settle.status sstatus from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on settle.client_id = c.id order by settle.id desc limit %s,%s' %(limit[0],limit[1])
-    res = await Settlement.query(sql_res)
+    try:
+        res = await Settlement.query(sql_res)
+    except:
+        return dict(total=total, page=p, list=())
     res = obj2str(res)
-    for i in range(len(res)):
-        res[i]["percentage"] = '%3.3f' %(res[i]["balance"]/res[i]["money"])
-
+    try:
+        for i in range(len(res)):
+            res[i]["percentage"] = '%3.3f' %(res[i]["balance"]/res[i]["money"])
+    except:
+        return dict(total=total, page=p, list=())
     return {
         "total":total,
         "page":p,
