@@ -16,9 +16,9 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     try:
         total = rs[0]["c"]
     except:
-        return dict(total=total, page=p, list=())
+        return dict(total=total, page=(0,0), list=())
     if total == 0:
-        return dict(total=total, page=p, list=())
+        return dict(total=total, page=(0,0), list=())
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:
