@@ -15,7 +15,10 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     count_id = '%s' %("settle.id")
     sql_total = 'select count(%s) c  from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on settle.client_id = c.id' %(count_id)
     re = await Settlement.query(sql_total)
-    total = re[0]["c"]
+    try:
+        total = re[0]["c"]
+    except:
+        return dict(total=total, page=p, list=())
     if total == 0:
         return dict(total=total, page=p, list=())
     limit = ((page - 1) * pageSize, pageSize)
@@ -45,7 +48,10 @@ async def settleApply_formIndex(*,keyword=None,action=None, page=1, pageSize=10)
     income_id = int(keyword)
     sql_total = 'select count(*) co  from client c inner join settlement settle on c.id = settle.client_id inner join income inc on c.id = inc.client_id where c.id in (select client_id  cid from income where id =%s)' %(income_id)
     re = await  Client.query(sql_total)
-    total = re[0]["co"]
+    try:
+        total = re[0]["co"]
+    except:
+        return dict(total=total, page=p, list=())
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total=total, page=p, list=())
