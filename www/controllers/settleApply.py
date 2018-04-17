@@ -16,7 +16,8 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     sql_total = 'select count(%s) c  from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on settle.client_id = c.id' %(count_id)
     re = await Settlement.query(sql_total)
     total = re[0]["c"]
-
+    if total == 0:
+        return dict(total=total, page=p, list=())
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:

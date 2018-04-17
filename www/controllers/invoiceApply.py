@@ -14,6 +14,8 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     sql_total = 'select count(inv.id) c  from invoice inv inner join client c  on inv.client_id = c.id inner join income inc on inv.income_id = inc.id'
     rs = await Invoice.query(sql_total)
     total = rs[0]["c"]
+    if total == 0:
+        return dict(total=total, page=p, list=())
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:
