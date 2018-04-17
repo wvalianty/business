@@ -3,8 +3,10 @@
 
 '公共函数库'
 
-import time, re, json, logging, hashlib, base64, sys, os, datetime
+import time, re, json, logging, hashlib, base64, sys, os, datetime, xlwt
 from lib.apis import APIValueError, APIError, APIPermissionError
+from io import BytesIO
+from aiohttp import web
 
 lib_dir = os.path.dirname(os.path.realpath(__file__))
 conf_dir = os.path.join(lib_dir, '..','..', 'conf')
@@ -71,7 +73,6 @@ def datetime_filter(t):
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 
-
 def obj2str(arr):
     """对象转字符串"""
     for item in arr:
@@ -82,3 +83,40 @@ def obj2str(arr):
                 item[field] = item[field].strftime("%Y-%m-%d") 
     
     return arr
+
+def exportExcel(name, fields, lists):
+    """导出excle报表
+    
+    Arguments:
+        name {[type]} -- [文件名]
+        fields {[type]} -- [导出字段名]
+        lists {[type]} -- [数据列表]
+    """
+
+    boldStyle = xlwt.easyxf('font: name Times New Roman, color-index black, bold on', num_format_str='#,##0.00')
+
+    workbook = xlwt.Workbook()
+    sheet = workbook.add_sheet(name, cell_overwrite_ok=True)
+
+    colIndex = 0
+    for field in fields:
+        sheet.write(0, colIndex, fields[field], boldStyle)
+        colIndex += 1
+
+    rowIndex = 1
+    colIndex = 0
+
+    for item in lists:
+        for field in fields:
+            sheet.write(rowIndex, colIndex, item[field])
+            colIndex += 1
+        rowIndex += 1
+        colIndex = 0
+    sio = BytesIO()
+    workbook.save(sio)
+    sio.seek(0)
+
+    resp = web.Response(body=sio.getvalue())
+    resp.content_type = 'applicattion/vnd.ms-excel'
+    resp.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % name
+    return resp

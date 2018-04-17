@@ -1386,3 +1386,11 @@ body .layui-layout-admin .layui-larry-foot .p-admin a {
 #searchForm .layui-input-inline{
     width: 120px;
 }
+
+.layui-table td.redGrid {
+    color: red !important;
+}
+
+.layui-table tr.redline td {
+    color: red !important;
+}

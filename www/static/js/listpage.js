@@ -8,15 +8,15 @@ $(function(){
             other: [],
             page: [],
             params: {}, // 当前页面查询参数
-            module: '' // 当前模块
+            module: '', // 当前模块
+            isExport: 0, // 标志是否是导出报表操作
         },
         methods: {
-            
-            // 获得数据列表
-            getLists: function (page, params = '', action = "index") {
-                var self = this;
 
-                let url = '/apis/' + self.module + '/' + action +'?page=' + page;
+            // 获得url
+            getUrl: function(page, params, action) {
+
+                let url = '/apis/' + this.module + '/' + action + '?page=' + page;
 
                 if (params == '' && JSON.stringify(this.params) != "{}") {
                     params = this.params;
@@ -29,13 +29,21 @@ $(function(){
                     for (const ele in params) {
                         if (params.hasOwnProperty(ele)) {
                             const val = params[ele];
-                            if(val != '') {
+                            if (val != '') {
                                 url += '&' + ele + '=' + val;
                                 this.params[ele] = val;
                             }
                         }
                     }
                 }
+
+                return url;
+            },
+            // 获得数据列表
+            getLists: function (page, params = '', action = "index") {
+
+                var self = this;
+                var url = this.getUrl(page, params, action);
 
                 $.get(url, function (data) {
                     self.list = data.list;
@@ -129,26 +137,44 @@ $(function(){
                     self.getLists(1);
                 });
 
+                // 导出数据报表
+                $('#exportExcel').unbind('click').click(function(){
+
+                    self.isExport = 1;
+                    // 提交表单
+                    $('.search_btn[lay-submit]').click()
+                });
+
                 /**
                  * 搜索事件
                  */
                 form.on("submit(searchForm)", function (data) {
 
-                    self.getLists(1, data.field)
+                    if (self.isExport == 1) {
 
+                        data.field.isExport = 1;
+                        var url = self.getUrl(1, data.field, 'index');
+                        window.location.href = url;
+                        self.isExport = 0;
+                        self.params.isExport = 0;
+                        return false;
+                    }
+
+                    self.getLists(1, data.field)
+                    
                     return false;
                 });
             }
         },
         mounted: function () {
-            
+
             keyword = getQueryStr("keyword") || '';
             action = getQueryStr("action") || 'index';
             this.module = location.pathname.split('/')[1];
             this.getLists(this.currPage, keyword, action);
         },
         updated: function () {
-            var slef = this;
+            var self = this;
             layui.config({
                 base: '/static/js/'
             }).use(['form', 'layer', 'jquery', 'laypage'], function () {
@@ -158,12 +184,15 @@ $(function(){
                     $ = layui.jquery;
 
                 // 等数据渲染完成，再绑定事件
-                slef.addClick(layer, form);
+                self.addClick(layer, form);
+
+                // 更新搜索框
+                form.render('select');
 
                 laypage({
                     cont: 'page',
-                    pages: page[0], //总页数
-                    curr: page[1],
+                    pages: self.page[0], //总页数
+                    curr: self.page[1],
                     groups: 5, //连续显示分页数
                     jump: function (obj, first) {
                         //得到了当前页，用于向服务端请求对应数据

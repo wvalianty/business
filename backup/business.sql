@@ -2,7 +2,8 @@
 SQLyog Ultimate v11.33 (64 bit)
 MySQL - 5.5.53 : Database - business
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -104,7 +105,21 @@ CREATE TABLE `syslog` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `income_no`;
+
+CREATE TABLE `income_no` (
+  `income_no` char(6) DEFAULT NULL COMMENT '收入编号',
+  `aff_date` varchar(10) DEFAULT NULL COMMENT '所属日期'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+
+ALTER TABLE `business`.`client`   
+  CHANGE `indate` `indate_start` DATE NULL  COMMENT '合同有效开始日期',
+  ADD COLUMN `indate_end` DATE NULL  COMMENT '合同有效截止日期' AFTER `indate_start`;

@@ -264,7 +264,7 @@ class Model(dict, metaclass=ModelMetaClass):
         return [cls(**r) for r in rs]
 
     @classmethod
-    async def findNumber(cls, selectField, where=None, args=None, groupBy=None):
+    async def findNumber(cls, selectField, where=None, args=None, groupBy=None, orderBy=None):
         'find number by select and where'
         sql = ['select %s _num_ from `%s`' % (selectField, cls.__table__)]
         if where:
@@ -273,6 +273,9 @@ class Model(dict, metaclass=ModelMetaClass):
         if groupBy:
             sql.append('group by')
             sql.append(groupBy)
+        if orderBy:
+            sql.append('order by')
+            sql.append(orderBy)
         rs = await select(' '.join(sql), args, 1)
         if len(rs) == 0:
             return None
@@ -324,9 +327,23 @@ class Model(dict, metaclass=ModelMetaClass):
         return rows
         
     @classmethod
-    async def delete(self, pk=None):
-        args = [pk]
-        rows = await execute(self.__delete__, args)
+    async def delete(cls, pk=None, flag=False):
+        """根据主键删除数据
+        
+        Keyword Arguments:
+            pk {[type]} -- [主键] (default: {None})
+            flag {bool} -- [是否软删除，软删除时数据表要有is_delete字段] (default: {False})
+        
+        Returns:
+            [type] -- [description]
+        """
+
+        if not flag:
+            args = [pk]
+            rows = await execute(cls.__delete__, args)
+        else:
+            sql = "UPDATE %s SET is_delete = 1 WHERE id = %s" % (cls.__table__, pk)
+            rows = await execute(sql, None)
 
         if rows != 1:
             logging.warn('failed to remove by primary key : affected rows: %s' % rows)

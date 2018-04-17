@@ -34,9 +34,9 @@
 <table class="layui-table">
     <colgroup>
         <col>
+        <col width="20%">
+        <col width="9%">
         <col width="11%">
-        <col width="9%">
-        <col width="9%">
         <col width="30%">
         <col width="15%">
     </colgroup>
@@ -44,8 +44,8 @@
         <tr>
             <th style="text-align:left;">客户名称</th>
             <th>合同有效期</th>
-            <th>投放数</th>
-            <th>回款数</th>
+            <th>投放数/金额</th>
+            <th>回款数/金额</th>
             <th>开票信息</th>
             <th>操作</th>
         </tr>
@@ -53,10 +53,12 @@
     <tbody>
         <tr v-for="item in list">
             <td align="left">{{ item.name }}</td>
-            <td>{{ item.indate }}</td>
-            <td>{{ item.tfCount }}</td>
-            <td>{{ item.hkCount }}</td>
-            <td>{{ item.invoice }}</td>
+            <td :class="{redGrid: !item.indate_status}">
+                {{ item.indate_start }} - {{ item.indate_end }}
+            </td>
+            <td>{{ item.tfCount }}/{{ item.tfMoney }}</td>
+            <td>{{ item.hkCount }}/{{ item.hkMoney || 0}}</td>
+            <td v-html="item.invoice" style="text-align:left;"></td>
             <td>
                 <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>
                 <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/client/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>

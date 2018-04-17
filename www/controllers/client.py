@@ -4,7 +4,7 @@
 "客户管理模块"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Client, Income
+from lib.models import Client, Income, Settlement
 from lib.common import obj2str
 
 @get('/apis/client/index')
@@ -37,10 +37,25 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
 
     # 获得每个客户下的投放数和回款数
     for item in clients:
+        # 投放数
         where = 'client_id=%s' % item.id
         item['tfCount'] = await Income.findNumber('count(id)', where)
+
+        # 投放金额
+        tfMoney = await Income.findNumber('sum(money)', where)
+        item['tfMoney'] = round(tfMoney, 2) if tfMoney else 0  
+
+        # 回款金额
+        hkMoney = await Settlement.findNumber('sum(balance)', where)
+        item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
+
+        # 回款数
         where = '%s and status = 2' % where
         item['hkCount'] = await Income.findNumber('count(id)', where)
+        item['invoice'] = item['invoice'].replace('\n', '<br/>')
+
+        # 合同是否有效
+        item['indate_status'] = item['indate_end'] >= currDate
 
     return {
         'total': total,
@@ -70,7 +85,12 @@ async def info(*,id):
         res['msg'] = '查询失败'
         return res
 
-    res['info'] = obj2str([info])[0]
+    info = obj2str([info])[0]
+    info['indate'] = "%s - %s" % (info['indate_start'], info['indate_end'])
+    del info['indate_start']
+    del info['indate_end']
+
+    res['info'] = info
 
     return res
     
@@ -80,9 +100,18 @@ async def info(*,id):
 async def form(*, id, name, indate, invoice):
 
     action = '添加'
+
+    indates = indate.split(' - ')
+    if not indates or len(indates) != 2:
+        print(indates)
+        return {
+            'status': 0,
+            'msg': '编辑失败，日期格式错误'
+        }
     clientInfo = dict(
         name = name.strip(),
-        indate = indate.strip(),
+        indate_start = indates[0].strip(),
+        indate_end = indates[1].strip(),
         invoice = invoice.strip()
     )
 

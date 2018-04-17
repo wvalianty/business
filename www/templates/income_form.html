@@ -9,7 +9,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">收入ID</label>
         <div class="layui-input-4">
-            <input class="layui-input" name="income_id" v-model="info.income_id" readonly type="text">
+            <input class="layui-input" name="income_id" v-model="info.income_id" id="income_id" readonly type="text">
         </div>
     </div>
     <div class="layui-form-item">
@@ -40,8 +40,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">归属时间</label>
         <div class="layui-input-6">
-            <input class="layui-input date" v-model="info.aff_date"  name="aff_date"  lay-verify="date" placeholder="请输入归属时间"  type="text">
-             <!-- onClick="layui.laydate({elem:this})" -->
+            <input class="layui-input" id="aff_date" v-model="info.aff_date"  name="aff_date"  lay-verify="required" placeholder="请输入归属时间"  type="text">
         </div>
     </div>
     <div class="layui-form-item">
@@ -119,6 +118,20 @@ function hook_init_ui(form, layer) {
     form.on('select(select)', function(data){
 
         app.info[data.elem.name] = data.value;
+    });
+
+    layui.laydate.render({
+        elem: '#aff_date',
+        type: 'month',
+        done: function (value, date, endDate) {
+            app.info[this.elem[0].name] = value;
+
+            var url = "/apis/income/getIncomeId?aff_date=" + value; 
+            $.get(url, function(data){
+                app.info.income_id = data.income_id;
+                $('#income_id').val(data.income_id);
+            });
+        }
     });
 }
 </script>

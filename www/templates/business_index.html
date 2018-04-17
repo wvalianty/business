@@ -39,16 +39,16 @@
         <tr>
             <th style="text-align:left;">业务ID</th>
             <th>归属时间</th>
-            <th>投放数</th>
-            <th>回款数</th>
+            <th>投放数/金额</th>
+            <th>回款数/金额</th>
         </tr>
     </thead>
     <tbody>
         <tr v-for="item in list">
             <td>{{ item.type }}</td>
             <td>{{ item.aff_date }}</td>
-            <td>{{ item.tfCount }}</td>
-            <td>{{ item.hkCount }}</td>
+            <td>{{ item.tfCount }}/{{ item.tfMoney }}</td>
+            <td>{{ item.hkCount }}/{{ item.hkMoney }}</td>
         </tr>
     </tbody>
 </table>

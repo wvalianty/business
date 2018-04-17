@@ -22,7 +22,8 @@ class Client(Model):
 
     id = IntegerField(primary_key=True)
     name = StringField()
-    indate = DateField()
+    indate_start = DateField()
+    indate_end = DateField()
     invoice = StringField()
     add_date = DateTimeField(default=curr_datetime)
 
@@ -82,3 +83,9 @@ class Syslog(Model):
     module = StringField()
     sql = StringField()
     datetime = DateTimeField()
+
+class IncomeNo(Model):
+    
+    __table__ = 'income_no'
+    income_no = StringField(primary_key=True)
+    aff_date = StringField()

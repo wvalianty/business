@@ -83,9 +83,6 @@ async def response_factory(app, handler):
             template = r.get('__template__')
             if template is None:
                 resp = web.Response(body=json.dumps(r, ensure_ascii=False, default=lambda o: o.__dict__).encode('utf-8'))
-                # resp.headers.access_control_allow_origin = '*'
-                resp.headers['Access-Control-Allow-Origin'] = '*'
-                # print(resp.headers[''])
                 resp.content_type = 'application/json'
                 return resp
             else:
