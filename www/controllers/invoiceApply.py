@@ -10,39 +10,23 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     pageSize = int(pageSize)
 
     where = '1 = 1'
-    if keyword:
-        where = "name like '%%{}%%'".format(keyword)
 
-    total = await Income.findNumber('count(id)',where)
+    sql_total = 'select count(inv.id) c  from invoice inv inner join client c  on inv.client_id = c.id inner join income inc on inv.income_id = inc.id'
+    rs = await Invoice.query(sql_total)
+    total = rs[0]["c"]
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total=total, page=p, list=())
-    incomes = await Income.findAll(orderBy='id desc',where=where,limit=limit)
-    clients = await Client.findAll(orderBy='id desc', where=where, limit=limit)
-    invoices = await Invoice.findAll(orderBy='id desc',where=where,limit=limit)
-    incomes = obj2str(incomes)
-    clients = obj2str(clients)
-    invoices = obj2str(invoices)
-    d = {}
-    rs = []
-
-    for income in incomes:
-        d = {"id":income["id"],"date":income["aff_date"],"money":income["money"]}
-        for client in clients:
-            if  income.client_id == client.id:
-                d["client"] = client["name"]
-                d["info"] = client["invoice"]
-        for invoice in invoices:
-            if income['id'] == invoice["income_id"]:
-                d["finished"] = invoice["finished"]
-                d['finished_time'] = invoice['finished_time']
-        rs.append(d)
+    sql_res = ' select inc.income_id,c.name,inc.aff_date,inc.money,inv.info,inv.finished,inv.finished_time from invoice inv inner join client c  on inv.client_id = c.id inner join income inc on inv.income_id = inc.id order by inc.id desc limit %s ,%s' %(limit[0],limit[1])
+    res = await Invoice.query(sql_res)
+    res = obj2str(res)
+    print(res[0])
 
     return {
         'total':total,
         'page':p,
-        'list':rs
+        'list':res
     }
 
 
@@ -66,7 +50,8 @@ async def apis_finish(*,id):
         rs = await Invoice(**invoices[0]).update()
         if rs == 1:
             return {
-                'msg':'确认成功'
+                'msg':'确认成功',
+                'status':1
             }
         else:
             return {

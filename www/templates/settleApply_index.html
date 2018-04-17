@@ -42,21 +42,21 @@
     </thead>
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
-         <tr v-for="item in list" v-bind:class="item.status == 2 ? '': 'redline'">
+         <tr v-for="item in list" v-bind:class="item.sstatus == 0 ? 'redline' : ''">
 
-            <td align="left">{{ item.lookid }}</td>   {#  收入id#}
-            <td>{{ item.channel }}</td>
-            <td>{{ item.date }}</td>
-            <td> {{ item.income }} </td>
+            <td align="left">{{ item.income_id }}</td>   {#  收入id#}
+            <td>{{ item.name }}</td>
+            <td>{{ item.aff_date }}</td>
+            <td> {{ item.money }} </td>
              <td v-if="item.status == 0"> 代开票 </td>
              <td v-if="item.status == 1">未回款</td>
              <td v-if="item.status == 2">已回款</td>
             <td>{{ item.percentage }}</td>
-            <td>{{ item.incomeM }}</td>
+            <td>{{ item.balance }}</td>
             <td>
 {#                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>#}
-                <a    v-if="item.status != 2" class="layui-btn layui-btn-normal identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.lookid"   data-area="180px,140px">完成</a>
-                <a   class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.lookid" data-title="详细信息" data-area="600px,400px">查看</a>
+                <a    v-if="item.sstatus == 0" class="layui-btn layui-btn-normal identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.id"   data-area="180px,140px">完成</a>
+                <a   class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.id" data-title="详细信息" data-area="600px,400px">查看</a>
             </td>
         </tr>
     </tbody>

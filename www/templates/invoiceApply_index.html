@@ -41,14 +41,14 @@
 {#        <tr v-for="item in list"  style="color:red">      #}
         <tr v-for="item in list" v-bind:class="item.finished ? '': 'redline'">
 
-            <td align="left">{{ item.id }}</td>
-            <td>{{ item.client }}</td>
-            <td>{{ item.date }}</td>
+            <td align="left">{{ item.income_id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.aff_date }}</td>
             <td> {{ item.money }} </td>
             <td>{{ item.info }}</td>
             <td>
 {#                <a  v-bind:id="item.id" class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/invocieApply/form?id=' + item.id"  data-title="请确认"  data-area="280px,180px">完成</a>#}
-                <a v-if="item.finished == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.id "><i class="layui-icon"></i> 完成</a>
+                <a v-if="item.finished == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.income_id "><i class="layui-icon"></i> 完成</a>
                 <label v-bind:class="item.finished ?  '' : 'date_'  ">完成时间{{ item.finished_time }}</label>
             </td>
         </tr>

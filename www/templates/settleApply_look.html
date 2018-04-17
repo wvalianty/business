@@ -32,9 +32,11 @@
          <tr v-for="item in list">
 
              <td align="left">{{ item.name }}</td>
-             <td> {{ item.money }} </td>
-             <td> {{ item.status }}</td>
-             <td>{{ item.date }}</td>
+             <td> {{ item.balance }} </td>
+             <td v-if="item.status == 0"> 代开票 </td>
+             <td v-if="item.status == 1">未回款</td>
+             <td v-if="item.status == 2">已回款</td>
+             <td>{{ item.add_date }}</td>
         </tr>
     </tbody>
 </table>
