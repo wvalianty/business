@@ -160,8 +160,8 @@ $(function(){
                         return false;
                     }
 
-                    self.getLists(1, data.field)
-                    
+                    self.getLists(1, data.field);
+
                     return false;
                 });
             }

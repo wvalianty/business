@@ -93,3 +93,10 @@ def login_index(request):
     return {
         '__template__': 'login_index.html'
     }
+#结算申请 --stop
+
+@get("/board")
+def board_index(request):
+    return {
+        '__template__': 'board.html'
+    }
