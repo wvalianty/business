@@ -95,8 +95,23 @@ def login_index(request):
     }
 #结算申请 --stop
 
+#业务报表  --start
 @get("/board")
 def board_index(request):
     return {
         '__template__': 'board.html'
+    }
+#业务报表   --stop
+
+#用户管理   --start
+
+@get("/manager")
+def manager(request):
+    return {
+        '__template__': 'manager.html'
+    }
+@get("/adminAdd")
+def adminAdd(request):
+    return {
+        '__template__': 'adminAdd.html'
     }

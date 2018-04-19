@@ -65,11 +65,8 @@
             <td>{{ item.cname }}</td>
             <td>{{ item.aff_date }}</td>
             <td> {{ item.money }} </td>
-            <td v-if="item.status ==0 ">代开票</td>
-            <td v-if="item.status ==1 ">未回款</td>
-            <td v-if="item.status ==2 ">已回款</td>
-            <td v-if="item.media_type == 0" >自媒体</td>
-            <td v-if="item.media_type == 1" >外媒</td>
+            <td> {{ item.status }}</td>
+            <td>{{ item.media_type }}</td>
         </tr>
     </tbody>
 </table>
