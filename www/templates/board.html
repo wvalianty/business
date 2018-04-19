@@ -1,0 +1,84 @@
+{% extends 'layout_table.html' %}
+
+<!-- title -->
+{% block title %} 业务报表 {% endblock %}
+
+<!-- menu start -->
+
+{% block menubox %}
+<div class="layui-inline" style="width:100%;">
+    <form class="layui-form" id="searchForm" style="padding:0px; background-color:#f2f2f2; ">
+
+        <div class="layui-input-inline">
+            <select name="month">
+                <option value="">全部时间</option>
+                <option value="">全部时间</option>
+                <option v-for="month in 12" :value="month">{{month}}月</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="status">
+                <option value="">全部状态</option>
+                <option value="">全部状态</option>
+                <option v-for="status,index in other.statusMap" :value="index">{{status}}</option>
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width: 150px;">
+            <input name="keyword" placeholder="可搜索收入id,公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn" id="exportExcel" style="float:right">导出报表</a>
+        <input type="hidden" name="isExport" v-model="isExport">
+    </form>
+</div>
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table" id="app">
+    <colgroup>
+        <col width="10%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+    </colgroup>
+    <thead>
+        <tr>
+            <th style="text-align:left;">收入ID</th>
+            <th>公司名称</th>
+            <th>业务名称</th>
+            <th>归属时间</th>
+            <th>收入金额</th>
+            <th>结算进度</th>
+            <th>媒体类型</th>
+        </tr>
+    </thead>
+    <tbody>
+{#        <tr v-for="item in list"  style="color:red">      #}
+        <tr v-for="item in list">
+
+            <td align="left">{{ item.income_id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.cname }}</td>
+            <td>{{ item.aff_date }}</td>
+            <td> {{ item.money }} </td>
+            <td v-if="item.status ==0 ">代开票</td>
+            <td v-if="item.status ==1 ">未回款</td>
+            <td v-if="item.status ==2 ">已回款</td>
+            <td v-if="item.media_type == 0" >自媒体</td>
+            <td v-if="item.media_type == 1" >外媒</td>
+        </tr>
+    </tbody>
+</table>
+<div class="larry-table-page clearfix">
+    <div id="page" class="page"></div>
+</div>
+{% endblock %}
+
+
+<!-- footer -->
+
+
