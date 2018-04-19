@@ -47,7 +47,7 @@ class Income(Model):
     client_id = IntegerField()
     business_type = StringField(ddl=6)
     name = StringField()
-    aff_date = DateField()
+    aff_date = StringField()
     money = FloatField()
     status = IntegerField()
     media_type = IntegerField()
@@ -57,10 +57,9 @@ class Income(Model):
 class Invoice(Model):
     __table__ = 'invoice'
     id = IntegerField(primary_key=True)
-    client_id = IntegerField()
     income_id = IntegerField()
     info = StringField()
-    add_date = DateTimeField()
+    add_date = DateTimeField(default=curr_datetime)
     finished = IntegerField(default=0)
     finished_time = DateTimeField()
 
@@ -71,7 +70,7 @@ class Settlement(Model):
     client_id = IntegerField()
     balance = FloatField()
     status = IntegerField()
-    add_date = DateTimeField()
+    add_date = DateTimeField(default=curr_datetime)
 
 class Syslog(Model):
     __table__ = 'syslog'
@@ -82,7 +81,7 @@ class Syslog(Model):
     table = StringField()
     module = StringField()
     sql = StringField()
-    datetime = DateTimeField()
+    datetime = DateTimeField(default=curr_datetime)
 
 class IncomeNo(Model):
     

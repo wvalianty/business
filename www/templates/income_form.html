@@ -123,6 +123,7 @@ function hook_init_ui(form, layer) {
     layui.laydate.render({
         elem: '#aff_date',
         type: 'month',
+        max: 0,
         done: function (value, date, endDate) {
             app.info[this.elem[0].name] = value;
 

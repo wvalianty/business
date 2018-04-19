@@ -1,0 +1,86 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}新增客户{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">收入ID</label>
+        <div class="layui-input-6">
+            <select name="income_id" v-model="info.income_id" lay-verify="required" lay-filter="select">
+                <option value=""></option>
+                <option v-for="item in other.incomeIdList" :value="item.id">{{item.income_id}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" >公司名称</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.company_name" lay-verify="required" readonly type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">归属时间</label>
+        <div class="layui-input-6">
+            <input class="layui-input"  v-model="info.aff_date"   lay-verify="required" readonly type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开票金额</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.money" lay-verify="required" type="number" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开票信息</label>
+        <div class="layui-input-6">
+            <textarea placeholder="请输入内容摘要" readonly v-model="info.invoice" class="layui-textarea" lay-verify="required"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+<!-- footer -->
+{% block footer%}
+<script type="text/javascript">
+
+// 初始化时数据加载
+function hook_init(vueObj) {
+
+    let id = getQueryStr('id') || 0;
+    $.get('/apis/invoice/formInit?id=' + id, function(data) {
+        
+        vueObj.other = data;
+    });
+}
+
+// 初始化UI
+function hook_init_ui(form, layer) {
+
+    form.on('select(select)', function(data){
+
+        app.info[data.elem.name] = data.value;
+        
+        if (data.elem.name == 'income_id') {
+
+            $.get('/apis/invoice/incomeInfo?income_id=' + data.value, function(res){
+                app.$set(app.info, 'aff_date', res.info.aff_date)
+                app.$set(app.info, 'money', res.info.money)
+                app.$set(app.info, 'company_name', res.info.company_name)
+                app.$set(app.info, 'invoice', res.info.invoice)
+            });
+        } 
+
+    });
+}
+</script>
+{% endblock %}

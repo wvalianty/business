@@ -1,0 +1,71 @@
+{% extends 'layout_table.html' %}
+
+<!-- title -->
+{% block title %} 发票管理 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+<div class="layui-inline">
+    <form class="layui-form" id="searchForm" style="padding:0px;">
+        <div class="layui-input-inline" style="width: 150px;">
+            <input name="keyword" placeholder="可搜索收入id,公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
+        <div class="layui-input-inline">
+            <select name="month">
+                <option value="">全部时间</option>
+                <option value="">全部时间</option>
+                <option v-for="month in 12" :value="month">{{month}}月</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="status">
+                <option value="">全部状态</option>
+                <option value="">全部状态</option>
+                <option v-for="status,index in other.statusMap" :value="index">{{status}}</option>
+            </select>
+        </div>
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn search_btn" id="selectAll" >查询全部</a>
+    </form>
+</div>
+<div class="layui-inline">
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/invoice/form" data-title="新增客户" data-area="700px,700px">新增</a>
+</div>
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th style="text-align:left;">收入ID</th>
+            <th>公司名称</th>
+            <th>归属时间</th>
+            <th>开票金额</th>
+            <th>开票信息</th>
+            <th>发票状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="item in list">
+            <td align="left">{{ item.income_id }}</td>
+            <td>{{ item.company_name }}</td>
+            <td>{{ item.aff_date }}</td>
+            <td>{{ item.money }}</td>
+            <td v-html="item.info" style="text-align:left;"></td>
+            <td>{{ item.status }}</td>
+            <td>
+                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/invoice/form?id=' + item.id" data-title="编辑发票" data-area="700px,700px" v-show="!item.finished"><i class="iconfont icon-edit"></i> 编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/invoice/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="8" align="left">合计金额: {{ other.totalMoney }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
+

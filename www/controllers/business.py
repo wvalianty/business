@@ -21,7 +21,11 @@ async def index(*, keyword=None, month=None, page=1, pageSize=10):
         month = month.zfill(2)
     else:
         lastDate = await Income.findNumber('aff_date', orderBy='aff_date desc')
-        month = lastDate.split('-')[1]
+        if lastDate:
+            dates = lastDate.split('-')
+            year, month = (dates[0], dates[1])
+        else:
+            month = time.strftime('%m')
         
     where = "{} and aff_date like '{}-{}'".format(where, year, month)
 
@@ -32,8 +36,12 @@ async def index(*, keyword=None, month=None, page=1, pageSize=10):
     total = rs[0]['c']
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
+
+    # 获得所有业务类型
+    types = await Business.findAll()
+
     if total == 0:
-        return dict(total = total, page = p, list = ())
+        return dict(total = total, page = p, list = (), other = {'types': types})
     
     # 查询数据列表
     field='client_id, income_id, business_type type,aff_date,count(*) tfCount'
@@ -59,9 +67,6 @@ async def index(*, keyword=None, month=None, page=1, pageSize=10):
         hkMoney = await Settlement.findNumber('sum(balance)', where)
         item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
 
-
-    # 获得所有业务类型
-    types = await Business.findAll()
     return {
         'total': total,
         'page': p,

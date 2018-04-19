@@ -134,7 +134,8 @@ $(function(){
                         $(ele).val('');
                     });
                     layui.form().render('select');
-                    self.getLists(1);
+                    self.params = {};
+                    self.getLists(1, {isSearch:1});
                 });
 
                 // 导出数据报表
@@ -150,6 +151,8 @@ $(function(){
                  */
                 form.on("submit(searchForm)", function (data) {
 
+                    self.params = {};
+                    data.field.isSearch = 1;
                     if (self.isExport == 1) {
 
                         data.field.isExport = 1;

@@ -52,6 +52,19 @@ async def business_form(**kw):
     }
 # 业务管理模块 ------ end
 
+# 发票管理模块 ------ start
+@get('/invoice')
+async def invoice(request):
+    return {
+        '__template__': 'invoice_index.html'
+    }
+
+@get('/invoice/form')
+async def invoice_form(**kw):
+    return {
+        '__template__': 'invoice_form.html'
+    }
+# 发票管理模块------- end
 
 # 收入管理模块 ----- start
 @get('/income')
@@ -66,6 +79,22 @@ async def income_form(**kw):
         '__template__': 'income_form.html'
     }
 # 收入管理模块 ------ end
+
+
+# 结算单管理模块 ----- start
+@get('/settlement')
+async def settlement(request):
+    return {
+        '__template__': 'settlement_index.html'
+    }
+
+@get('/settlement/form')
+async def settlement_form(**kw):
+    return {
+        '__template__': 'settlement_form.html'
+    }
+# 结算单管理模块 ------ end
+
 
 
 # 发票申请模块  --start

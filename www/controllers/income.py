@@ -22,25 +22,32 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, page=1, pageSize=10):
+async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
     year = time.strftime('%Y')
+    
+    # 合计金额
+    totalMoney = 0
 
     where = '1=1'
     if keyword:
-        where = "%s and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
+        where = "{} and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and status = {}".format(where, status)
     if mediaType and mediaType.isdigit():
         where = "{} and media_type = {}".format(where, mediaType)
     if month and month.isdigit():
         month = month.zfill(2)
-    else:
+    elif not month and not isSearch:
         lastDate = await Income.findNumber('aff_date', orderBy='aff_date desc')
-        month = lastDate.split('-')[1] if lastDate else time.strftime('%m')
-
-    where = "{} and aff_date like '{}-{}'".format(where, year, month)
+        if lastDate:
+            dates = lastDate.split('-')
+            year, month = (dates[0], dates[1])
+        else:
+            month = time.strftime('%m')
+    if month:
+        where = "{} and aff_date like '{}-{}'".format(where, year, month)
 
     sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
     rs = await Income.query(sql)
@@ -48,7 +55,11 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     if total == 0:
-        return dict(total = total, page = p, list = ())
+        return dict(total = total, page = p, list = (), other = {
+            'statusMap': statusMap,
+            'mediaTypeMap': mediaTypeMap,
+            'totalMoney': round(totalMoney, 2)
+        })
 
     sql = "SELECT i.*,c.name company_name FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where %s order by %s" % (where, 'income_id desc')
 
@@ -60,8 +71,6 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     # 将获得数据中的日期转换为字符串
     lists = obj2str(lists)
 
-    # 合计金额
-    totalMoney = 0
     for item in lists:
         item['status'] = statusMap[item['status']]
         item['media_type'] = mediaTypeMap[item['media_type']]

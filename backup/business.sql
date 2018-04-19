@@ -123,3 +123,6 @@ CREATE TABLE `income_no` (
 ALTER TABLE `business`.`client`   
   CHANGE `indate` `indate_start` DATE NULL  COMMENT '合同有效开始日期',
   ADD COLUMN `indate_end` DATE NULL  COMMENT '合同有效截止日期' AFTER `indate_start`;
+
+ALTER TABLE `business`.`business_type`   
+  ADD  UNIQUE INDEX `business_type_unique` (`type`);
