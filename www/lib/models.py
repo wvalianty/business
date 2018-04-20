@@ -76,8 +76,7 @@ class Settlement(Model):
 class Syslog(Model):
     __table__ = 'syslog'
     id = IntegerField(primary_key=True)
-    username = StringField()
-    passwd = StringField()
+    uid = StringField()
     operate =  StringField()
     table = StringField()
     module = StringField()
@@ -89,3 +88,14 @@ class IncomeNo(Model):
     __table__ = 'income_no'
     income_no = StringField(primary_key=True)
     aff_date = StringField()
+
+class Users(Model):
+    __table__ = 'users'
+    id = StringField(primary_key=True)
+    phoneN = StringField()
+    email = StringField()
+    passwd = StringField()
+    role = IntegerField()
+    name = StringField()
+    created_at =  DateTimeField()
+    admin = IntegerField()

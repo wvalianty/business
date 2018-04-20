@@ -88,12 +88,18 @@ def settleApply_form(**kv):
         '__template__': 'settleApply_look.html'
     }
 
+#结算申请 --stop
+
+#登陆模块  --start
 @get("/login/index")
 def login_index(request):
     return {
         '__template__': 'login_index.html'
     }
-#结算申请 --stop
+
+
+
+
 
 #业务报表  --start
 @get("/board")
