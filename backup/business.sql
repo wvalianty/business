@@ -3,7 +3,8 @@
 SQLyog Ultimate v11.33 (64 bit)
 MySQL - 5.5.53 : Database - business
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -196,16 +197,33 @@ CREATE TABLE `settlement` (
 
 
 
+create table users (
+    `id` varchar(50) not null,
+    `phoneN` varchar(50) not null,
+    `email` varchar(50) not null,
+    `passwd` varchar(50) not null,
+    `role` tinyint(4) not null,
+    `name` varchar(50) not null,
+    `created_at` datetime not null,
+    `admin`  tinyint(4)  DEFAULT 0 COMMENT '是否为管理员',
+    unique key `idx_email` (`email`),
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;
+
 CREATE TABLE `syslog` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(200) DEFAULT NULL,
+  `uid`  varchar(50)  NOT NULL  COMMENT '用户id',
   `operate` varchar(10) NOT NULL DEFAULT '' COMMENT '管理员行为:add,update,delete',
   `table` varchar(50) NOT NULL COMMENT '管理员操作的表名，也可以理解为模块',
   `module` varchar(50) DEFAULT '' COMMENT '操作模块',
   `sql` text NOT NULL COMMENT '管理员操作的SQL',
   `datetime` datetime NOT NULL COMMENT '操作时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4;
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`uid`),
+  CONSTRAINT `syslog_user_id` FOREIGN KEY (`uid`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `income_no` (
