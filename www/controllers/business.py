@@ -5,43 +5,39 @@
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Business, Income, Settlement
-from lib.common import obj2str
+from lib.common import obj2str, returnData, addAffDateWhere, totalLimitP
 
 @get('/apis/business/index')
-async def index(*, keyword=None, month=None, page=1, pageSize=10):
+async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
-    year = time.strftime('%Y')
     currDate = time.strftime('%Y-%m-%d')
     where = '1=1'
     if keyword and keyword.strip() != '':
         where = "`business_type` like '%%{}%%'".format(keyword)
-    if month and month.isdigit():
-        month = month.zfill(2)
-    else:
-        lastDate = await Income.findNumber('aff_date', orderBy='aff_date desc')
-        month = lastDate.split('-')[1]
-        
-    where = "{} and aff_date like '{}-{}'".format(where, year, month)
+    
+    where = await addAffDateWhere(where, month, isSearch)
 
     # 查询数据总数
     groupBy = 'aff_date,business_type'
-    sql = 'SELECT COUNT(*) c FROM (SELECT id FROM `income` where %s GROUP BY %s) t' % (where, groupBy)
+    sql = 'SELECT COUNT(*) c FROM ( \
+                SELECT id FROM `income` where %s GROUP BY %s \
+            ) t' % (where, groupBy)
+ 
     rs = await Income.query(sql)
-    total = rs[0]['c']
-    limit = ((page - 1) * pageSize, pageSize)
-    p = (math.ceil(total / pageSize), page)
+    
+    total, limit, p = totalLimitP(rs, page, pageSize, True)
+   
+    # 获得所有业务类型
+    types = await Business.findAll()
+
     if total == 0:
-        return dict(total = total, page = p, list = ())
+        return dict(total = total, page = p, list = (), other = {'types': types})
     
     # 查询数据列表
     field='client_id, income_id, business_type type,aff_date,count(*) tfCount'
     lists = await Income.findAll(field=field, orderBy="aff_date desc",groupBy=groupBy, where=where, limit=limit)
-
-    # 将获得数据中的日期转换为字符串
-    # lists = obj2str(lists)
-
    
     for item in lists:
 
@@ -59,9 +55,6 @@ async def index(*, keyword=None, month=None, page=1, pageSize=10):
         hkMoney = await Settlement.findNumber('sum(balance)', where)
         item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
 
-
-    # 获得所有业务类型
-    types = await Business.findAll()
     return {
         'total': total,
         'page': p,
@@ -73,9 +66,12 @@ async def index(*, keyword=None, month=None, page=1, pageSize=10):
 
 
 @post('/apis/business/form')
-async def form(*,id, btype):
+async def form(*,id, btype=None):
 
     action = '添加'
+    if not btype or btype.strip() == '':
+        return returnData(0, action, '业务ID不能为空')
+
     info = dict(
         type = btype.strip().upper(),
     )
@@ -83,24 +79,9 @@ async def form(*,id, btype):
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info['id'] = id
-        rows = await Business(**info).update()
-    else:
-        try:
-            rows = await Business(**info).save()
-        except Exception as e:
-            return {
-                'status': 0,
-                'msg': '%s失败，%s' % (action, '业务ID已存在')
-            }
-        
 
-    if rows == 1:
-        return {
-            'status': 1,
-            'msg': '%s成功' % action
-        }
-    else:
-        return {
-            'status': 0,
-            'msg': '%s失败' % action
-        }
+    try:
+        rows = await Business(**info).save()
+        return returnData(rows, action)
+    except Exception as e:
+        return returnData(0, action, '业务ID已存在')

@@ -5,7 +5,7 @@
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Income, Client, Business, IncomeNo
-from lib.common import obj2str, exportExcel
+from lib.common import obj2str, exportExcel, totalLimitP, returnData, addAffDateWhere
 
 
 # 结算状态
@@ -22,33 +22,34 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, page=1, pageSize=10):
+async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
+    
     page = int(page)
     pageSize = int(pageSize)
-    year = time.strftime('%Y')
+    
+    # 合计金额
+    totalMoney = 0
 
     where = '1=1'
     if keyword:
-        where = "%s and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
+        where = "{} and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and status = {}".format(where, status)
     if mediaType and mediaType.isdigit():
         where = "{} and media_type = {}".format(where, mediaType)
-    if month and month.isdigit():
-        month = month.zfill(2)
-    else:
-        lastDate = await Income.findNumber('aff_date', orderBy='aff_date desc')
-        month = lastDate.split('-')[1] if lastDate else time.strftime('%m')
-
-    where = "{} and aff_date like '{}-{}'".format(where, year, month)
+    
+    where = await addAffDateWhere(where, month, isSearch)
 
     sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
     rs = await Income.query(sql)
-    total = rs[0]['c']
-    limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
-    p = (math.ceil(total / pageSize), page)
+    
+    total, limit, p = totalLimitP(rs, page, pageSize)
     if total == 0:
-        return dict(total = total, page = p, list = ())
+        return dict(total = total, page = p, list = (), other = {
+            'statusMap': statusMap,
+            'mediaTypeMap': mediaTypeMap,
+            'totalMoney': round(totalMoney, 2)
+        })
 
     sql = "SELECT i.*,c.name company_name FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where %s order by %s" % (where, 'income_id desc')
 
@@ -60,8 +61,6 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     # 将获得数据中的日期转换为字符串
     lists = obj2str(lists)
 
-    # 合计金额
-    totalMoney = 0
     for item in lists:
         item['status'] = statusMap[item['status']]
         item['media_type'] = mediaTypeMap[item['media_type']]
@@ -83,26 +82,18 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
 
 @get('/apis/income/info')
 async def info(*,id):
+    
+    action = '查询'
     id = int(id)
 
-    res = {
-        'status': 1,
-        'msg': '查询成功',
-        'info': []
-    }
-
     if not id:
-        res['status'] = 0
-        res['msg'] = 'id不存在'
-        return res
+        return returnData(0, action, 'ID不存在')
 
     info = await Income.find(id)
-
     if not info:
-        res['status'] = 0
-        res['msg'] = '查询失败'
-        return res
+        return returnData(0, action)
 
+    res = returnData(1, action)
     res['info'] = obj2str([info])[0]
 
     return res
@@ -141,55 +132,35 @@ async def form(**kw):
     )
 
     if info['client_id'] == 0 or info['business_type'] == '':
-        return {
-            'status': 0,
-            'msg': '公司名称或业务类型不能为空'
-        }
+        return returnData(0, action, '公司名称或业务类型不能为空')
 
     id = kw.get('id', 0)
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info['id'] = id
         info['income_id'] = kw.get('income_id', '')
-        rows = await Income(**info).update()
     else:
+        # 获得收入编号
         info['income_id'] = await getIncomeNo(info['aff_date'])
         await IncomeNo(income_no=info['income_id'], aff_date=info['aff_date']).save()
-        rows = await Income(**info).save()
+    
+    rows = await Income(**info).save()
 
-    if rows == 1:
-        return {
-            'status': 1,
-            'msg': '%s成功' % action
-        }
-    else:
-        return {
-            'status': 0,
-            'msg': '%s失败' % action
-        }
-
+    return returnData(rows, action)
 
 @get('/apis/income/del')
 async def delete(*, id):
 
+    action = '删除'
     if not id.isdigit() or int(id) <= 0:
-        return {
-            'status': 0,
-            'msg': '删除失败,缺少请求参数'
-        }
+        return returnData(0, action, '缺少请求参数')
 
-    rows = await Income.delete(id)
+    try:
+        rows = await Income.delete(id)
+    except Exception as e:
+        returnData(0, action, '删除失败,请先删除发票管理中该收入ID条目')
 
-    if rows == 1:
-        return {
-            'status': 1,
-            'msg': '删除成功'
-        }
-    else:
-        return {
-            'status': 0,
-            'msg': '删除失败'
-        }
+    return returnData(rows, action)
 
 @get('/apis/income/getIncomeId')
 async def getIncomeId(*, aff_date=None):
@@ -200,6 +171,37 @@ async def getIncomeId(*, aff_date=None):
         'status': 1,
         'income_id': income_id
     }
+
+@get('/apis/income/detail')
+async def detail(*, id=0):
+    """获得收入报表详情
+    """
+
+    res = {
+        'status': 1,
+        'msg': '查询成功',
+        'info': []
+    }
+
+    if not id:
+        return returnData(0, '查询', '收入ID不存在')
+
+
+    sql = "SELECT i.income_id, i.`aff_date`, i.`money`, i.status, \
+            c.`name` company_name, c.`invoice` FROM income i \
+            INNER JOIN `client` c ON i.`client_id` = c.`id` \
+            where i.id = %s" % id
+
+    info = await Income.query(sql)
+
+    if not info:
+        return returnData(0, '查询')
+    
+    res['info'] = obj2str((info))[0]
+
+    res['info']['status_text'] = statusMap[res['info']['status']]
+    
+    return res
 
 async def export(lists):
     """导出execl表格
@@ -233,5 +235,3 @@ async def getIncomeNo(aff_date=None):
     income_no = '%s%s' % (aff_date.replace('-','')[2:], str(no).zfill(2))
 
     return income_no
-
-

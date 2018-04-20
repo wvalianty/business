@@ -3,10 +3,11 @@
 
 '公共函数库'
 
-import time, re, json, logging, hashlib, base64, sys, os, datetime, xlwt
+import time, re, logging, hashlib, sys, os, datetime, xlwt, math
 from lib.apis import APIValueError, APIError, APIPermissionError
 from io import BytesIO
 from aiohttp import web
+from lib.models import Income
 
 lib_dir = os.path.dirname(os.path.realpath(__file__))
 conf_dir = os.path.join(lib_dir, '..','..', 'conf')
@@ -120,3 +121,62 @@ def exportExcel(name, fields, lists):
     resp.content_type = 'applicattion/vnd.ms-excel'
     resp.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % name
     return resp
+
+
+def returnData(rows, action, other=None):
+    """格式化返回数据
+    """
+    status = 0
+    msg = "%s失败" % action
+
+    if rows == 1:
+        status = 1
+        msg = "%s成功" % action
+    
+    if other:
+        msg = "%s,%s" % (msg, other)
+
+    return {
+        'status': status,
+        'msg': msg
+    }
+
+def totalLimitP(rs, page, pageSize, limitFlag = False):
+    """返回数据总条数，limit，页数
+    
+    Arguments:
+        rs {[type]} -- [description]
+        page {[type]} -- [description]
+        pageSize {[type]} -- [description]
+    """
+
+    if isinstance(rs, int):
+        total = rs
+    else:
+        total = rs[0]['c']
+    limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
+    p = (math.ceil(total / pageSize), page)
+
+    if limitFlag:
+        limit = tuple([int(x) for x in limit.split(',')])
+
+    return total, limit, p
+
+async def addAffDateWhere(where, month, isSearch=None):
+    """where 条件添加归属日期参数
+    """
+    year = time.strftime('%Y')
+    if month and month.isdigit():
+        month = month.zfill(2)
+    elif not month and not isSearch:
+        lastDate = await Income.findNumber('aff_date', orderBy='aff_date desc')
+        if lastDate:
+            dates = lastDate.split('-')
+            year, month = (dates[0], dates[1])
+        else:
+            month = time.strftime('%m')
+    
+    if month:
+        where = "{} and aff_date like '{}-{}'".format(where, year, month)
+    
+    return where

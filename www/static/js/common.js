@@ -15,3 +15,19 @@ function getQueryStr(name) {
     if (r != null) return unescape(r[2]);
     return null;
 }
+
+/**
+ *  获得详细收入信息
+ * @param {*} income_id 
+ */
+function getIncomeDetail(income_id) {
+
+    $.get('/apis/income/detail?id=' + income_id, function (res) {
+        for (let key in res.info) {
+            if(key != 'income_id') {
+
+                app.$set(app.info, key, res.info[key])
+            }
+        }
+    });
+}

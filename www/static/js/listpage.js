@@ -134,7 +134,8 @@ $(function(){
                         $(ele).val('');
                     });
                     layui.form().render('select');
-                    self.getLists(1);
+                    self.params = {};
+                    self.getLists(1, {isSearch:1});
                 });
 
                 // 导出数据报表
@@ -144,12 +145,21 @@ $(function(){
                     // 提交表单
                     $('.search_btn[lay-submit]').click()
                 });
+             
+                $('#searchForm input').unbind('keyup').keyup(function(e){
+                 
+                    if (e.which == 13) {
+                        $('.search_btn[lay-submit]').click()
+                    }
+                });
 
                 /**
                  * 搜索事件
                  */
                 form.on("submit(searchForm)", function (data) {
 
+                    self.params = {};
+                    data.field.isSearch = 1;
                     if (self.isExport == 1) {
 
                         data.field.isExport = 1;

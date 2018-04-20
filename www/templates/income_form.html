@@ -1,7 +1,7 @@
 {% extends 'layout_form.html' %}
 
 <!-- title -->
-{% block title %}新增客户{% endblock %}
+{% block title %}新增收入报表{% endblock %}
 
 <!-- form -->
 {% block form %}
@@ -123,6 +123,7 @@ function hook_init_ui(form, layer) {
     layui.laydate.render({
         elem: '#aff_date',
         type: 'month',
+        max: 0,
         done: function (value, date, endDate) {
             app.info[this.elem[0].name] = value;
 
