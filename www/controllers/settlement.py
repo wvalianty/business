@@ -139,7 +139,7 @@ async def form(*, id=0, income_id=0, balance=0):
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info = await Settlement.find(id)
-        info['income_id'] = income_id,
+        info['income_id'] = income_id
         info['balance'] = balance
     else:
         info = dict(

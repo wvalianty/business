@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-import logging, asyncio, aiomysql
+import logging, asyncio, aiomysql, time
 
 '''
 res = await conroutin or res = yield from coroutine
@@ -10,10 +10,46 @@ res = await conroutin or res = yield from coroutine
 
 '''
 
+async def addsyslog(sql, args=None):
+    """添加系统操作日志
+    """
+    if not sql or not isinstance(sql, str):
+        return False
+   
+    sqls = sql.upper().split(' ')
+    # sql 类型
+    action = sqls[0]
+    # 表名
+    table = ''
+
+    if action == 'SELECT':
+        return False
+    
+    if action in ["INSERT", "DELETE"]:
+        table = sqls[2].strip('`')
+    elif action == "UPDATE":
+        table = sqls[1].strip('`')
+    
+    if table == 'SYSLOG':
+        return False
+   
+    if args and len(args) > 0:
+        try:
+            sql = sql.replace('?', '%s') % tuple(args)
+        except Exception as e:
+            print(sql, args)
+            # exit(0)
+
+    currDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    params = [0, action, table, table, sql, currDate]
+    syslogSql = "INSERT INTO syslog(uid, operate, `table`, module, `sql`, add_date) value(?, '?', '?', '?', '?', '?')"
+ 
+    await execute(syslogSql, params)
+    
+
 def log(sql, args = ()):
     """记录sql语句
     """
-
     logging.info('SQL:%s' % sql)
 
 async def create_pool(loop, **kw):
@@ -55,11 +91,12 @@ async def select(sql, args, size = None):
         logging.info('rows returned: %s' % len(rs))
         return rs
 
-
 async def execute(sql, args, autocommit = True):
     """数据修改
     """
     log(sql, args)
+    # await addsyslog(sql, args)
+
     # 从连接池里获取一个数据库链接
     async with __pool.get() as conn:
         if not autocommit:

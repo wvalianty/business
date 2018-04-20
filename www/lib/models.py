@@ -80,7 +80,7 @@ class Syslog(Model):
     table = StringField()
     module = StringField()
     sql = StringField()
-    datetime = DateTimeField(default=curr_datetime)
+    add_date = DateTimeField(default=curr_datetime)
 
 class IncomeNo(Model):
     

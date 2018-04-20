@@ -122,7 +122,6 @@ def exportExcel(name, fields, lists):
     resp.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % name
     return resp
 
-
 def returnData(rows, action, other=None):
     """格式化返回数据
     """
@@ -177,6 +176,6 @@ async def addAffDateWhere(where, month, isSearch=None):
             month = time.strftime('%m')
     
     if month:
-        where = "{} and aff_date like '{}-{}'".format(where, year, month)
+        where = "{} and aff_date = '{}-{}'".format(where, year, month)
     
     return where
