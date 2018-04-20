@@ -145,10 +145,10 @@ $(function(){
                     // 提交表单
                     $('.search_btn[lay-submit]').click()
                 });
-                
-                $('#searchForm input').keypress(function(e){
+             
+                $('#searchForm input').unbind('keyup').keyup(function(e){
+                 
                     if (e.which == 13) {
-
                         $('.search_btn[lay-submit]').click()
                     }
                 });

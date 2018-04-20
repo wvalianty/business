@@ -161,6 +161,6 @@ async def delete(*, id):
 
     rows = await Settlement.delete(id)
 
-   return returnData(rows, action)
+    return returnData(rows, action)
 
 
