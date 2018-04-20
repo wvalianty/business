@@ -24,7 +24,7 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     if total == 0:
         return dict(total=total, page=p, list=())
     print(limit)
-    sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
+    sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.id invid,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
     print(sql_res)
     res = await Invoice.query(sql_res)
     res = obj2str(res)
