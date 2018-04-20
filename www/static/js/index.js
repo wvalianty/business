@@ -51,6 +51,32 @@ layui.use(['jquery', 'layer'], function() {
                 }
             });
         });
+        // 关闭其他页面操作
+        $('.closePageOther, .closePageAll').click(function(){
+            var _self = this;
+            var isClose = function (ele) {
+                let flag = true;
+                if ($(_self).hasClass('closePageOther') &&
+                    $(ele).hasClass('layui-this')) {
+                    flag = false;
+                }
+
+                if ($(ele).attr('id') == 'admin-home') {
+
+                    flag = false;
+                }
+
+                return flag;
+            }
+
+            $(".layui-tab .layui-tab-title li").each(function () {
+                
+                if (isClose(this)) {
+
+                    $(this).find('.layui-tab-close').click()
+                }
+            });
+        });
         $('#lock').mouseover(function() {
                 layer.tips('请按Alt+L快速锁屏！', '#lock', {
                     tips: [1, '#FF5722'],
@@ -72,7 +98,7 @@ layui.use(['jquery', 'layer'], function() {
             m = m < 10 ? '0' + m : m;
             s = s < 10 ? '0' + s : s;
             $('#time').html(h + ":" + m + ":" + s);
-            t = setTimeout(function() { startTimer() }, 500);
+            var t = setTimeout(function() { startTimer() }, 500);
         }
         // 锁屏状态检测
         function checkLockStatus(locked) {
