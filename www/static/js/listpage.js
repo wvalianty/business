@@ -145,6 +145,13 @@ $(function(){
                     // 提交表单
                     $('.search_btn[lay-submit]').click()
                 });
+                
+                $('#searchForm input').keypress(function(e){
+                    if (e.which == 13) {
+
+                        $('.search_btn[lay-submit]').click()
+                    }
+                });
 
                 /**
                  * 搜索事件

@@ -67,10 +67,10 @@ class Settlement(Model):
     __table__ = 'settlement'
     id = IntegerField(primary_key=True)
     income_id = IntegerField()
-    client_id = IntegerField()
     balance = FloatField()
-    status = IntegerField()
+    status = IntegerField(default=0)
     add_date = DateTimeField(default=curr_datetime)
+    finished_time = DateTimeField()
 
 class Syslog(Model):
     __table__ = 'syslog'

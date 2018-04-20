@@ -1,7 +1,7 @@
 {% extends 'layout_form.html' %}
 
 <!-- title -->
-{% block title %}新增发票{% endblock %}
+{% block title %}新增结算单{% endblock %}
 
 <!-- form -->
 {% block form %}
@@ -28,15 +28,33 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">开票金额</label>
+        <label class="layui-form-label">收入金额</label>
         <div class="layui-input-6">
-            <input class="layui-input" v-model="info.money" lay-verify="required" type="number" readonly>
+            <input class="layui-input" v-model="info.money" readonly lay-verify="required" type="number" >
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">开票信息</label>
+        <label class="layui-form-label">结算金额</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.balance" :max="info.money" lay-verify="required" type="number" name="balance" id="balance">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结算比例</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.rate" lay-verify="required" type="text" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">收款信息</label>
         <div class="layui-input-6">
             <textarea placeholder="请输入内容摘要" readonly v-model="info.invoice" class="layui-textarea" lay-verify="required"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">收入状态</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.status_text" lay-verify="required" type="text" readonly>
         </div>
     </div>
     <div class="layui-form-item">
@@ -57,7 +75,7 @@
 function hook_init(vueObj) {
 
     let id = getQueryStr('id') || 0;
-    $.get('/apis/invoice/formInit?id=' + id, function(data) {
+    $.get('/apis/settlement/formInit?id=' + id, function(data) {
         
         vueObj.other = data;
     });
@@ -67,14 +85,26 @@ function hook_init(vueObj) {
 function hook_init_ui(form, layer) {
 
     form.on('select(select)', function(data){
-        
+
         app.info[data.elem.name] = data.value;
         
         if (data.elem.name == 'income_id') {
 
             getIncomeDetail(data.value);
         } 
+    });
 
+    $('#balance').blur(function(){
+
+        var val = parseInt(this.value);
+        if (val > app.info.money) {
+            layer.msg('结算金额不能大于收入金额，请重新输入');
+            
+            app.info.balance = 0;
+            app.info.rate = 0;
+            return;
+        }
+        app.$set(app.info, 'rate', val / app.info.money * 100 + '%');
     });
 }
 </script>

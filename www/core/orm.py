@@ -302,6 +302,13 @@ class Model(dict, metaclass=ModelMetaClass):
         return rs[0]
 
     async def save(self):
+        id = int(self.getValueOrDefault(self.__primary_key__))
+        if id > 0:
+            if 'add_date' in self.__fields__ and not hasattr(self, 'add_date'):
+                info = await self.__class__.find(id)
+                self.add_date = info['add_date'].strftime('%Y-%m-%d %H:%M:%S')
+            return await self.update()
+
         args = list(map(self.getValueOrDefault, self.__fields__))
         args.insert(0,self.getValueOrDefault(self.__primary_key__))
         rows = await execute(self.__insert__, args)
@@ -320,7 +327,7 @@ class Model(dict, metaclass=ModelMetaClass):
     async def remove(self):
         args = [self.getValue(self.__primary_key__)]
         rows = await execute(self.__delete__, args)
-
+    
         if rows != 1:
             logging.warn('failed to remove by primary key : affected rows: %s' % rows)
         
@@ -357,4 +364,27 @@ class Model(dict, metaclass=ModelMetaClass):
             return None
         
         rs = await select(sql, args)
+        return rs
+
+    @classmethod
+    async def findCols(cls, selectField="*", where=None, args=None, groupBy=None, orderBy=None):
+        
+        rs = await cls.findAll(field=selectField, where=where,args=args,groupBy=groupBy,orderBy=orderBy)
+
+        # 只有一列
+        if selectField.find(',') == -1:
+            lists = []
+            for item in rs:
+                lists.append(item[selectField])
+            
+            return lists
+        elif selectField.count(',') == 1:
+            fa,fb = selectField.split(',')
+            lists = []
+            for item in rs:
+                tmp = dict()
+                tmp[item[fa]] = item[fb]
+                lists.append(tmp)
+            return lists
+        
         return rs
