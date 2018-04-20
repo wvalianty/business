@@ -85,7 +85,8 @@ class Syslog(Model):
 class IncomeNo(Model):
     
     __table__ = 'income_no'
-    income_no = StringField(primary_key=True)
+    id = IntegerField(primary_key=True)
+    income_no = StringField()
     aff_date = StringField()
 
 class Users(Model):
