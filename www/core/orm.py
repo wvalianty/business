@@ -15,35 +15,38 @@ async def addsyslog(sql, args=None):
     """
     if not sql or not isinstance(sql, str):
         return False
+    
+    if args and len(args) > 0:
+        sql = sql.replace('?', "'%s'") % tuple(args)
    
     sqls = sql.upper().split(' ')
     # sql 类型
     action = sqls[0]
     # 表名
-    table = ''
+    table = sqls[2]
 
     if action == 'SELECT':
         return False
+
+    if table.find('('):
+        table = table.split('(')[0]
     
     if action in ["INSERT", "DELETE"]:
-        table = sqls[2].strip('`')
+        table = table.strip('`')
     elif action == "UPDATE":
         table = sqls[1].strip('`')
     
-    if table == 'SYSLOG':
+    if table == 'SYSLOG' or sql.find('syslog') > 0:
+        log('syslog', sql)
+        # exit(0)
         return False
    
-    if args and len(args) > 0:
-        try:
-            sql = sql.replace('?', '%s') % tuple(args)
-        except Exception as e:
-            print(sql, args)
-            # exit(0)
+    
 
     currDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     params = [0, action, table, table, sql, currDate]
-    syslogSql = "INSERT INTO syslog(uid, operate, `table`, module, `sql`, add_date) value(?, '?', '?', '?', '?', '?')"
- 
+    syslogSql = "INSERT INTO syslog(uid, operate, `table`, module, `sql`, add_date) value(?, ?, ?, ?, ?, ?)"
+    print(syslogSql.replace('?', '%s') % tuple(params))
     await execute(syslogSql, params)
     
 
