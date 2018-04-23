@@ -4,7 +4,7 @@
 "系统操作日志"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Syslog
+from lib.models import Syslogs
 from lib.common import obj2str, returnData, totalLimitP
 
 operateMaps = {
@@ -29,7 +29,7 @@ sqlTpl = "SELECT {} FROM syslog s \
 # 搜索字段
 selectField = 's.id, u.name, s.operate, s.module, s.sql, s.add_date'
 
-@get('/apis/syslog/index')
+@get('/apis/syslogs/index')
 async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
@@ -46,7 +46,7 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
         where = "%s and module = '%s'" % (where, module)
     
     sql = sqlTpl.format('count(*) c', where)
-    rs = await Syslog.query(sql)
+    rs = await Syslogs.query(sql)
     total, limit, p = totalLimitP(rs, page, pageSize)
     
     if total == 0:
@@ -57,7 +57,7 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
     
     where = "%s order by %s limit %s" % (where, 'id desc', limit)
     sql = sqlTpl.format(selectField, where)
-    lists = await Syslog.query(sql)
+    lists = await Syslogs.query(sql)
 
     # 将获得数据中的日期转换为字符串
     lists = obj2str(lists)
@@ -78,64 +78,16 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
         }
     }
 
-@get('/apis/syslog/info')
-async def info(*,id):
-    id = int(id)
-
-    if not id:
-        return returnData(0, '查询', 'ID不存在')
-    
-    info = await Client.find(id)
-
-    if not info:
-        return returnData(0, '查询')
-
-    info = obj2str([info])[0]
-    info['indate'] = "%s - %s" % (info['indate_start'], info['indate_end'])
-    del info['indate_start']
-    del info['indate_end']
-
-    res = returnData(1, '查询')
-
-    res['info'] = info
-
-    return res
-    
 
 
-@post('/apis/syslog/form')
-async def form(*, id, name, indate, invoice):
-
-    action = '添加'
-    indates = indate.split(' - ')
-
-    if not indates or len(indates) != 2:
-        return returnData(0, action, '日期格式错误')
-
-    info = dict(
-        name = name.strip(),
-        indate_start = indates[0].strip(),
-        indate_end = indates[1].strip(),
-        invoice = invoice.strip()
-    )
-
-    if id.isdigit() and int(id) > 0:
-        action = '编辑'
-        info['id'] = id
-
-    rows = await Client(**info).save()
-
-    return returnData(rows, action)
-
-
-@get('/apis/syslog/del')
+@get('/apis/syslogs/del')
 async def delete(*, id):
     
     if not id.isdigit() or int(id) <= 0:
         return returnData(0, '删除', '缺少请求参数')
     
     try:
-        rows = await Client.delete(id)
+        rows = await Syslogs.delete(id)
         msg = None
     except Exception as e:
         rows = 0

@@ -97,17 +97,10 @@ async def settlement_form(**kw):
 
 
 # 系统日志管理模块 ----- start
-@get('/syslog')
-async def syslog(request):
+@get('/syslogs')
+async def syslogs(request):
     return {
-        '__template__': 'syslog_index.html'
-    }
-
-
-@get('/syslog/form')
-async def syslog_form(**kw):
-    return {
-        '__template__': 'syslog_form.html'
+        '__template__': 'syslogs_index.html'
     }
 # 系统日志管理模块 ------ end
 

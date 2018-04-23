@@ -1,6 +1,6 @@
 from core.coreweb import get, post
 from lib.common import obj2str
-from lib.models import Syslog,Client,Income,Settlement,Business,curr_datetime,next_id,Users
+from lib.models import Syslogs,Client,Income,Settlement,Business,curr_datetime,next_id,Users
 import hashlib,asyncio,json,time,re,logging
 from aiohttp import web
 #import datetime
