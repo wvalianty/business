@@ -10,7 +10,8 @@ res = await conroutin or res = yield from coroutine
 
 '''
 
-async def addsyslog(sql, args=None):
+
+async def addsyslog(sql, args=None, affetced_id=0):
     """添加系统操作日志
     """
     if not sql or not isinstance(sql, str):
@@ -36,17 +37,27 @@ async def addsyslog(sql, args=None):
     elif action == "UPDATE":
         table = sqls[1].strip('`')
     
+    if action in ["UPDATE", "DELETE"]:
+        try:
+            if sqls[-3].strip('`') == 'ID':
+                # 如果是根据ID修改的获得修改时的ID
+                affetced_id = sqls[-1].strip("'")
+            elif sqls[-1].find("ID") >= 0 and sqls[-1].find('=') >= 0:
+                affetced_id = sqls[-1].split('=')[-1].strip("'")
+        except Exception as e:
+            affetced_id = 0
+        
     if table == 'SYSLOG' or sql.find('syslog') > 0:
         log('syslog', sql)
-        # exit(0)
         return False
-   
     
-
-    currDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    params = [0, action, table, table, sql, currDate]
-    syslogSql = "INSERT INTO syslog(uid, operate, `table`, module, `sql`, add_date) value(?, ?, ?, ?, ?, ?)"
-    print(syslogSql.replace('?', '%s') % tuple(params))
+    if not affetced_id:
+        affetced_id = 0
+    
+    currDate = time.strftime('%Y-%m-%d')
+    params = [0, action, table, table, sql, affetced_id, currDate]
+    syslogSql = "INSERT INTO syslog(uid, operate, `table`, module, `sql`, affetced_id,  add_date) value(?, ?, ?, ?, ?, ?, ?)"
+    
     await execute(syslogSql, params)
     
 
@@ -98,7 +109,6 @@ async def execute(sql, args, autocommit = True):
     """数据修改
     """
     log(sql, args)
-    # await addsyslog(sql, args)
 
     # 从连接池里获取一个数据库链接
     async with __pool.get() as conn:
@@ -109,12 +119,16 @@ async def execute(sql, args, autocommit = True):
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 await cur.execute(sql.replace('?', '%s'), args or ())
                 affetced = cur.rowcount
+                # 此只读属性返回前一个INSERT或UPDATE语句为AUTO_INCREMENT列生成的值
+                lastrowid = cur.lastrowid
                 if not autocommit:
                     await cur.commit()
         except BaseException as e:
             if not autocommit:
                 await cur.commit
             raise
+    
+        await addsyslog(sql, args, lastrowid)
         return affetced  # 返回受影响的行数
 
 

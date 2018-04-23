@@ -96,6 +96,21 @@ async def settlement_form(**kw):
 # 结算单管理模块 ------ end
 
 
+# 系统日志管理模块 ----- start
+@get('/syslog')
+async def syslog(request):
+    return {
+        '__template__': 'syslog_index.html'
+    }
+
+
+@get('/syslog/form')
+async def syslog_form(**kw):
+    return {
+        '__template__': 'syslog_form.html'
+    }
+# 系统日志管理模块 ------ end
+
 
 # 发票申请模块  --start
 @get("/invoiceApply_index")
