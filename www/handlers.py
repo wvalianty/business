@@ -153,8 +153,14 @@ def manager(request):
     return {
         '__template__': 'manager.html'
     }
-@get("/adminAdd")
-def adminAdd(request):
+@get("/manager/form")
+def adminAdd(**kv):
     return {
         '__template__': 'adminAdd.html'
+    }
+
+@get("/manager/edit")
+def  managerEdit(**kv):
+    return {
+        '__template__':'adminEdit.html'
     }

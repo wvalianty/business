@@ -8,7 +8,7 @@ import time, uuid
 from core.orm import *
 
 def next_id():
-    return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
+    return '%1d' % (int(time.time() * 1000))
 
 def curr_datetime():
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -80,7 +80,8 @@ class Settlement(Model):
 class Syslogs(Model):
     __table__ = 'syslog'
     id = IntegerField(primary_key=True)
-    uid = StringField()
+    username = StringField()
+    affetced_id = IntegerField()
     operate =  StringField()
     table = StringField()
     module = StringField()
@@ -97,12 +98,11 @@ class IncomeNo(Model):
 
 class Users(Model):
     __table__ = 'users'
-    id = StringField(primary_key=True)
-    phoneN = StringField()
+    id = IntegerField(primary_key=True)
+    phone = StringField()
     email = StringField()
     passwd = StringField()
     role = IntegerField()
     name = StringField()
     created_at =  DateTimeField()
-    admin = IntegerField()
     is_delete = IntegerField(default=0)

@@ -29,7 +29,7 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     try:
         res = await Settlement.query(sql_res)
     except:
-        return dict(total=total, page=p, list=())
+        return dict(total=total, page=(0,0), list=())
     res = obj2str(res)
     try:
         for i in range(len(res)):
@@ -56,7 +56,7 @@ async def settleApply_formIndex(*,keyword=None,action=None, page=1, pageSize=10)
     try:
         total = re[0]["co"]
     except:
-        return dict(total=total, page=p, list=())
+        return dict(total=total, page=(0,0), list=())
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total=total, page=p, list=())

@@ -46,6 +46,7 @@ $(function(){
                 var url = this.getUrl(page, params, action);
 
                 $.get(url, function (data) {
+
                     self.list = data.list;
                     self.page = data.page;
                     if (typeof data.other != 'undefined') {
@@ -174,6 +175,11 @@ $(function(){
 
                     return false;
                 });
+            },
+            myfun:function (income_id) {
+                id = income_id.toString();
+                $("#"+id).css('display','table-row');
+                $("#"+id).css('width','100%');
             }
         },
         mounted: function () {

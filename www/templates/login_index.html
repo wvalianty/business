@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<title>LarryCMS后台登录</title>
@@ -9,7 +10,6 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="format-detection" content="telephone=no">
-	<!-- load css -->
 
     <link rel="stylesheet" type="text/css" href="/static/common/layui/css/layui.css" media="all">
 	<link rel="stylesheet" type="text/css" href="/static/css/login.css" media="all">
@@ -57,10 +57,10 @@
             var data = {"account":account,"passwd":passwd};
             var url = "/api/login";
             console.log(passwd);
-             $.post(url, data ,function (redata) {
-                        layer.msg(redata.msg);
+             $.post(url, data ,function (user) {
+                        layer.msg(user.msg);
                         // 成功，刷新页面
-                        if (redata.status) {
+                        if (user.status) {
                             location.assign("/");
                             console.log("testing");
                         }
