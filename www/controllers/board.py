@@ -46,9 +46,11 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
     if month and month.isdigit():
         month = month.zfill(2)
         where = "{} and aff_date like '%%{}-{}%%'".format(where, year, month)
+    print(where)
 
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     sql_total = 'select count(*) cc from income inc inner join client c on inc.client_id = c.id %s' %(where)
+    print(sql_total)
     re = await Income.query(sql_total)
     total = re[0]["cc"]
     p = (math.ceil(total / pageSize), page)
