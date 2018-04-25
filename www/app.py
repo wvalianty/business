@@ -22,6 +22,15 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
+#0、管理员
+#1、运营侧
+#2、财务侧
+
+finance = set(["/board","/apis/main/index","/","/apis/board/index","/apis/invoiceApply_index/index","/apis/settleApply_index/index","/apis/settleApply_look/look","/settleApply_identify","/invoiceApply_index","/settleApply_index","/settleApply_look","/login/index","/main"])
+operate = set(["/apis/business/index","/apis/settlement/del","/apis/settlement/form","/apis/settlement/formInit","/apis/settlement/info","/apis/settlement/index","/settlement","/apis/business/index","/apis/business/form","/apis/client/index","/apis/invoice/index","/invoice","/","/client","/client/form","/apis/income/index","/business","/business/form","/income","/income/form","/login/index","/main"])
+manager = set(["/apis/manager/del","/apis/board/index","/syslog","/apis/manager/index","/apis/manager/info","/apis/manager/form","/api/login","/manager/edit","/manager/form","/manager"])
+super_user = finance | operate | manager
+roles = {0:super_user,1:operate,2:finance}
 
 def init_jinja2(app, **kw):
     logging.debug('init jinjia2...')
@@ -102,28 +111,54 @@ async def response_factory(app, handler):
         return resp
     return response
 
+
+
+
 async def auth_factory(app, handler):
-    '''用户权限校验，判断用户是否可以访问管理页面'''
-    async def auth(request):
+    @asyncio.coroutine
+    def auth(request):
         logging.info('check user: %s %s' % (request.method, request.path))
         request.__user__ = None
         cookie_str = request.cookies.get(COOKIE_NAME)
+        #从cookie能解析 用户名
         if cookie_str:
-            user = await cookie2user(cookie_str)
-            if user:
-                logging.info('set current user:%s' % user.email)
-                request.__user__ = user
-        if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
-            return web.HTTPFound('/signin')
-        return (await handler(request))
-    return auth
+            try:
+                user = yield from cookie2user(cookie_str)
+                if user:
+                    if request.path.startswith('/static/'):
+                        return (yield from handler(request))
+                    if request.path.startswith('/api/login'):
+                        return (yield from handler(request))
+                    if request.path.startswith('/apis/main/index'):
+                        return (yield from handler(request))
+                    logging.info('set current user: %s' % user.email)
+                    request.__user__ = user['email']
+                    role = user.role
+                    modules = roles[int(role)]
+                    if request.path in modules:
+                	    return (yield from handler(request))
+            except:
+                return web.HTTPFound('/login/index')
+                #return (yield from handler(request))
 
+            #先放宽一些，其他后续再改
+        elif request.path.startswith('/login/index') and (request.__user__ is None):
+            return (yield from handler(request))
+        elif request.path.startswith('/static/'):
+            return (yield from handler(request))
+        elif request.path.startswith('/api/login'):
+            return (yield from handler(request))
+        else:
+            return web.HTTPFound('/login/index')
+            #return web.HTTPMovedPermanently('/login/index')
+    return auth
 
 async def init(loop):
     await orm.create_pool(loop=loop, host=db.host, port=db.port, user=db.user, password=db.password, db=db.database)
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, data_factory, auth_factory, response_factory
+        auth_factory,logger_factory, data_factory, response_factory
     ])
+    #auth_factory,
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
 
