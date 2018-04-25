@@ -1,103 +1,24 @@
 from core.coreweb import get, post
-from lib.common import obj2str
+from lib.common import obj2str,returnData,user2cookie,cookie2user
 from lib.models import Syslog,Client,Income,Settlement,Business,curr_datetime,next_id,Users
-import hashlib,asyncio,json,time,re,logging
+import hashlib,asyncio,json,time,re,logging,datetime,math
 from aiohttp import web
-#import datetime
 
 COOKIE_NAME = 'business'
 _COOKIE_KEY = 'business'
 
-def user2cookie(user, max_age):
-    '''
-    Generate cookie str by user.
-    '''
-    # build cookie string by: id-expires-sha1
-    expires = str(int(time.time() + max_age))
-    s = '%s-%s-%s-%s' % (user.id, user.passwd, expires, _COOKIE_KEY)
-    L = [user.id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest()]
-    return '-'.join(L)
 
-@asyncio.coroutine
-def cookie2user(cookie_str):
-    '''
-    Parse cookie and load user if cookie is valid.
-    '''
-    if not cookie_str:
-        return None
-    try:
-        L = cookie_str.split('-')
-        if len(L) != 3:
-            return None
-        uid, expires, sha1 = L
-        if int(expires) < time.time():
-            return None
-        user = yield from User.find(uid)
-        if user is None:
-            return None
-        s = '%s-%s-%s-%s' % (uid, user.passwd, expires, _COOKIE_KEY)
-        if sha1 != hashlib.sha1(s.encode('utf-8')).hexdigest():
-            logging.info('invalid sha1')
-            return None
-        user.passwd = '******'
-        return user
-    except Exception as e:
-        logging.exception(e)
-        return None
+# @get('/signout')
+# def signout(request):
+#     referer = request.headers.get('Referer')
+#     r = web.HTTPFound(referer or '/')
+#     r.set_cookie(COOKIE_NAME, '-deleted-', max_age=0, httponly=True)
+#     logging.info('user signed out.')
+#     return r
 
-@post('/api/authenticate')
-def authenticate(*, email, passwd):
-    if not email:
-        raise ValueError('email', 'Invalid email.')
-    if not passwd:
-        raise ValueError('passwd', 'Invalid password.')
-    users = yield from Syslog.findAll('email=?', [email])
-    if len(users) == 0:
-        raise ValueError('email', 'Email not exist.')
-    user = users[0]
-    # check passwd:
-    sha1 = hashlib.sha1()
-    sha1.update(user.id.encode('utf-8'))
-    sha1.update(b':')
-    sha1.update(passwd.encode('utf-8'))
-    if user.passwd != sha1.hexdigest():
-        raise ValueError('passwd', 'Invalid password.')
-    # authenticate ok, set cookie:
-    r = web.Response()
-    r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age=86400, httponly=True)
-    user.passwd = '******'
-    r.content_type = 'application/json'
-    r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
-    return r
+# _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
+# _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
 
-@get('/signout')
-def signout(request):
-    referer = request.headers.get('Referer')
-    r = web.HTTPFound(referer or '/')
-    r.set_cookie(COOKIE_NAME, '-deleted-', max_age=0, httponly=True)
-    logging.info('user signed out.')
-    return r
-
-_RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
-_RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
-
-# @post("/api/login")
-async def login(*,account,passwd):
-    where = "username = '%s'" %(account)
-    accounts = await Syslog.findAll(where=where)
-    inaccount = str(accounts[0]["username"])
-    inpasswd = accounts[0]["passwd"]
-    if passwd == inpasswd:
-        ac = accounts[0]
-        r = web.Response()
-        r.set_cookie(COOKIE_NAME, user2cookie(ac, 86400), max_age=86400, httponly=True)
-        r.content_type = 'application/json'
-        redata = {"msg": "success", "status": 1}
-        r.body = json.dumps(redata, ensure_ascii=False).encode('utf-8')
-        return r
-        # redata = {"msg": "success", "status": 1}
-    else:
-        redata = {"msg":"fail","status":0}
 
 
 @post("/api/login")
@@ -107,38 +28,183 @@ async  def login(*,account,passwd):
         raise ValueError('email', 'Invalid email.')
     if not passwd:
         raise ValueError('passwd', 'Invalid password.')
-    print(email)
     whereu = "email = '%s'" % (email)
     users = await Users.findAll(where=whereu)
     users = obj2str(users)
     if len(users) != 1:
         logging.info("no such user or more than one")
+        return returnData(0, "密码错误，")
     user = users[0]
-
     if user.passwd != passwd:
-        raise ValueError('passwd', 'Invalid password.')
-
-
-    isAdmin = users[0]["admin"]
-    uid = users[0]["id"]
-    whereid = "uid = '%s' " %(uid)
-    syslogs = await  Syslog.findAll(where=whereid)
-    syslogs = obj2str(syslogs)
-    if len(syslogs) != 1:
-        logging.info("no such user or more than one")
-    modules = syslogs[0]["module"]
-
+        return returnData(0,"密码错误，")
     r = web.Response()
     r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age=86400, httponly=True)
-
     user.passwd = "******"
-    user.module = modules
-    user.isAdmin = isAdmin
+    user.msg = "登陆成功"
+    user.status = 1
     r.content_type = 'application/json'
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
+    print(r)
     return r
 
-#返回 是否管理员   用户模块
+#后续在处理，目前密码正确 返回成功
 
-# @post("/api/manager/add")
-# async  def adduser(*,)
+#role处理，下拉选择框
+@post("/apis/manager/form")
+async  def useradd(*,phone=None,email=None,passwd=None,role=None,name=None,id=None):
+    # if not phone or not email or not passwd or not name:
+    #     return returnData(0,"缺少请求参数，")
+    if id :
+        where = " id = %s " %(id)
+        users = await  Users.findAll(where = where)
+        if not users:
+            return returnData(0, "编辑")
+        user = dict(
+            id = int(id),
+            phone=phone.strip(),
+            email=email.strip(),
+            passwd=passwd.strip(),
+            role=role,
+            created_at=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            name=name.strip(),
+        )
+        rows = await  Users(**user).update()
+        if rows == 1:
+            return returnData(1, "管理or用户员编辑，")
+        else:
+            return returnData(0, "添加")
+    else:
+
+        user = dict(
+            phone = phone.strip(),
+            email = email.strip(),
+            passwd = passwd.strip(),
+            role = role,
+            created_at = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            name = name.strip(),
+
+        )
+        rows = await  Users(**user).save()
+        if rows == 1 :
+            return returnData(1,"管理or用户员添加，")
+        else:
+            return returnData(0,"添加")
+
+@get("/apis/manager/info")
+async def managerInfo(*,id):
+    if id :
+        where = " id = %s " %(id)
+        users = await Users.findAll(where=where)
+        users = obj2str(users)
+        if len(users) != 1:
+            return returnData(0,"编辑");
+
+        return {
+            "info":users[0]
+        }
+
+
+# @post("/api/manager/del")
+# async  def userdel(*,email=None):
+#     # if not phone or not email or not passwd or not name:
+#     #     return returnData(0,"缺少请求参数，")
+#     if not email:
+#         return returnData(0, '删除', '缺少请求参数')
+#     email = str(email)
+#     where = "email = '%s' " %(email)
+#     user = await  Users.findAll(where=where)
+#     id = user[0]["id"]
+#     try:
+#         rows = await Users.delete(id)
+#         if rows == 1:
+#             return  returnData(1,"删除，")
+#         else:
+#             return returnData(0, "删除，")
+#     except Exception as e:
+#         return returnData(0, "请求错误")
+#修改,邮箱不能修改，想修改邮箱只能新建
+# @post("/api/manager/modify")
+# async  def usermodify(*,phone=None,email=None,passwd=None,role=None,name=None,admin=None):
+#     admin = int(admin)
+#     email = str(email)
+#     where = "email = '%s' " % (email)
+#     user = await  Users.findAll(where=where)
+#     user_modify = dict(
+#             id=10,
+#             phone=phone.strip(),
+#             email=email.strip(),
+#             passwd=passwd.strip(),
+#             role=role,
+#             created_at=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+#             name=name.strip(),
+#             admin=admin
+#         )
+#     user[0] = user_modify
+#     print(user[0])
+#     rows = await  Users(**user[0]).update()
+#     if rows == 1 and admin == 1:
+#         return returnData(1, "管理员信息修改，")
+#     elif rows == 1 and admin == 0:
+#         return returnData(1, "用户信息修改，")
+#     else:
+#         return returnData(0, "修改")
+
+# @get("/api/manager/look")
+# async def user_look(*,email):
+#     if email:
+#         email = str(email.strip())
+#         where = "email = '%s' " % (email)
+#         print(where)
+#         user = await  Users.findAll(where=where)
+#         user = obj2str(user)
+#         return {
+#             "list" : user
+#         }
+
+@get("/apis/manager/index")
+async  def lookAll(*,page=1,pageSize=30):
+    page = int(page)
+    pageSize = int(pageSize)
+    where = '1 = 1'
+
+    total = await Users.findNumber('count(id)', where)
+    p = (math.ceil(total / pageSize), page)
+    if total == 0:
+        return dict(total=total, page=p, list=())
+    users = await Users.findAll(orderBy='id desc', where=where, limit=pageSize)
+
+
+    users = obj2str(users)
+
+    for item in users:
+        item["passwd"] = "******"
+        if item["role"] == 0:
+            item["role"] = "管理员"
+        elif item["role"] == 1:
+            item["role"] = "运营侧"
+        elif item["role"] == 2:
+            item["role"] = "财务侧"
+        else:
+            item["role"] = "角色错误"
+    return {
+        'total': total,
+        'page': p,
+        'list': users
+    }
+
+
+
+
+@get('/apis/manager/del')
+async def delete(*, id):
+    if not id.isdigit() or int(id) <= 0:
+        return returnData(0, '删除', '缺少请求参数')
+
+    try:
+        rows = await Users.delete(id)
+        msg = None
+    except Exception as e:
+        rows = 0
+        msg = "删除失败"
+
+    return returnData(rows, '删除', msg)
