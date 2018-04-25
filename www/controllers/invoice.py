@@ -53,8 +53,7 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
             'totalMoney': round(totalMoney, 2)
         })
 
-    
-    where = " %s order by %s" % (where, 'income_id desc')
+    where = " %s order by %s limit %s" % (where, 'income_id desc', limit)
     sql = sqlTpl.format(selectField, where)
 
     lists = await Invoice.query(sql)

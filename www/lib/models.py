@@ -11,7 +11,7 @@ def next_id():
     return '%1d' % (int(time.time() * 1000))
 
 def curr_datetime():
-    return time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 
 class Client(Model):
@@ -72,7 +72,7 @@ class Settlement(Model):
     add_date = DateTimeField(default=curr_datetime)
     finished_time = DateTimeField()
 
-class Syslog(Model):
+class Syslogs(Model):
     __table__ = 'syslog'
     id = IntegerField(primary_key=True)
     username = StringField()
@@ -98,4 +98,9 @@ class Users(Model):
     passwd = StringField()
     role = IntegerField()
     name = StringField()
+<<<<<<< HEAD
     created_at =  DateTimeField()
+=======
+    created_at =  DateTimeField()
+    admin = IntegerField()
+>>>>>>> 87514535d1e44cb26540d1a0e9aca698f4b5bc63

@@ -122,7 +122,6 @@ def exportExcel(name, fields, lists):
     resp.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % name
     return resp
 
-
 def returnData(rows, action, other=None):
     """格式化返回数据
     """
@@ -177,9 +176,10 @@ async def addAffDateWhere(where, month, isSearch=None):
             month = time.strftime('%m')
     
     if month:
-        where = "{} and aff_date like '{}-{}'".format(where, year, month)
+        where = "{} and aff_date = '{}-{}'".format(where, year, month)
     
     return where
+<<<<<<< HEAD
 
 
 #cookie处理
@@ -222,3 +222,5 @@ async def cookie2user(cookie_str):
     except Exception as e:
         logging.exception(e)
         return None
+=======
+>>>>>>> 87514535d1e44cb26540d1a0e9aca698f4b5bc63

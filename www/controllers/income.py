@@ -62,7 +62,7 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     lists = obj2str(lists)
 
     for item in lists:
-        item['status'] = statusMap[item['status']]
+        item['status_text'] = statusMap[item['status']]
         item['media_type'] = mediaTypeMap[item['media_type']]
         totalMoney += item['money']
 
@@ -158,7 +158,7 @@ async def delete(*, id):
     try:
         rows = await Income.delete(id)
     except Exception as e:
-        returnData(0, action, '删除失败,请先删除发票管理中该收入ID条目')
+        return returnData(0, action, '删除失败,请先删除发票管理中该收入ID条目')
 
     return returnData(rows, action)
 

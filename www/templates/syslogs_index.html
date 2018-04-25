@@ -1,0 +1,57 @@
+{% extends 'layout_table.html' %}
+
+<!-- title -->
+{% block title %} 系统操作日志管理 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+<div class="layui-inline">
+    <form class="layui-form" id="searchForm" style="padding:0px;">
+        <div class="layui-input-inline">
+            <input name="keyword" placeholder="请输入管理员名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
+        <div class="layui-input-inline">
+            <select class="layui-input" name="operate">
+                <option value="">操作类型</option>
+                <option value="">操作类型</option>
+                <option :value="key" v-for="(val,key) in other.operateMaps">{{val}}</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select class="layui-input" name="module">
+                <option value="">操作模块</option>
+                <option value="">操作模块</option>
+                <option :value="key" v-for="(val,key) in other.moduleMaps">{{val}}</option>
+            </select>
+        </div>
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn search_btn" id="selectAll">查询全部</a>
+    </form>
+</div>
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th style="text-align:left;">管理员</th>
+            <th>操作</th>
+            <th>模块</th>
+            <!-- <th>SQL</th> -->
+            <th>操作时间</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="item in list">
+            <td align="left">{{ item.name }}</td>
+            <td>{{ item.operate_text }}</td>
+            <td>{{ item.module_text }}</td>
+            <!-- <td>{{ item.sql }}</td> -->
+            <td>{{ item.add_date }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

@@ -53,7 +53,7 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
         })
 
     # 查询列表数据
-    where = " %s order by %s" % (where, 'income_id desc')
+    where = " %s order by %s limit %s" % (where, 'income_id desc', limit)
     sql = sqlTpl.format(selectField, where)
     lists = await Settlement.query(sql)
 
@@ -139,7 +139,7 @@ async def form(*, id=0, income_id=0, balance=0):
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info = await Settlement.find(id)
-        info['income_id'] = income_id,
+        info['income_id'] = income_id
         info['balance'] = balance
     else:
         info = dict(
