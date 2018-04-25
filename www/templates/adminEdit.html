@@ -1,18 +1,18 @@
 {% extends 'layout_form.html' %}
 
 <!-- title -->
-{% block title %}新增用户{% endblock %}
+{% block title %}编辑用户{% endblock %}
 {% block header %}
 <script src="/static/js/sha1.min.js" ></script>
 {% endblock %}
 <!-- form -->
 {% block form %}
-    <h2>添加用户</h2>
+    <h2>编辑用户</h2>
 <form class="layui-form layui-form-pane" id="form">
     <div class="layui-form-item">
         <label class="layui-form-label">角色</label>
         <div class="layui-input-3">
-              <select name="role" lay-verify="required">
+              <select v-model="info.role"  name="role" lay-verify="required">
                 <option value=""></option>
                 <option value="0">管理员</option>
                 <option value="1">运营侧</option>
@@ -56,6 +56,7 @@
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
+    <div style="display: none"><p>{{ info.id }}</p></div>
 </form>
 {% endblock %}
 
