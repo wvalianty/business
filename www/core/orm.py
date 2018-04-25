@@ -55,8 +55,8 @@ async def addsyslog(sql, args=None, affetced_id=0):
         affetced_id = 0
     
     currDate = time.strftime('%Y-%m-%d')
-    params = [0, action, table, table, sql, affetced_id, currDate]
-    syslogSql = "INSERT INTO syslog(uid, operate, `table`, module, `sql`, affetced_id,  add_date) value(?, ?, ?, ?, ?, ?, ?)"
+    params = ['admin', action, table, table, sql, affetced_id, currDate]
+    syslogSql = "INSERT INTO syslog(username, operate, `table`, module, `sql`, affetced_id,  add_date) value(?, ?, ?, ?, ?, ?, ?)"
     
     await execute(syslogSql, params)
     

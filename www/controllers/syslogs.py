@@ -16,19 +16,18 @@ operateMaps = {
 moduleMaps = {
     'CLIENT': '客户管理',
     'BUSINESS_TYPE': '业务管理',
-    'INVIOCE': '发票管理',
+    'INVOICE': '发票管理',
     'INCOME': '收入报表',
     'SETTLEMENT': '结算单',
     'USERS': '用户管理'
 }
 
 # sql模板
-sqlTpl = "SELECT {} FROM syslog s \
-       INNER JOIN users u ON s.uid = u.id \
-       WHERE table != 'INCOME_NO' and {}"
+sqlTpl = "SELECT {} FROM syslog \
+       WHERE module != 'INCOME_NO' and {}"
 
 # 搜索字段
-selectField = 's.id, u.name, s.operate, s.module, s.sql, s.add_date'
+selectField = 'id, username, `operate`, `module`, `sql`, `add_date`'
 
 @get('/apis/syslogs/index')
 async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10):
@@ -38,9 +37,9 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
     # 当前日期
     # currDate = time.strftime('%Y-%m-%d')
 
-    where = '1 = 1'
+    where = 'is_delete=0'
     if keyword:
-        where = "u.name like '%%{}%%'".format(keyword)
+        where = "username like '%%{}%%'".format(keyword)
     if operate and operate in operateMaps.keys():
         where = "%s and operate = '%s'" % (where, operate)
     if module and module in moduleMaps.keys():
