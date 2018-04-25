@@ -127,8 +127,12 @@ async def execute(sql, args, autocommit = True):
             if not autocommit:
                 await cur.commit
             raise
-    
-        await addsyslog(sql, args, lastrowid)
+
+        try:
+            await addsyslog(sql, args, lastrowid)
+        except Exception as e:
+            logging.error('addsyslog faild: %s' % str(e) )
+        
         return affetced  # 返回受影响的行数
 
 
