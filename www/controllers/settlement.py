@@ -16,7 +16,7 @@ statusMap = (
 )
 
 # sql模板
-sqlTpl = "SELECT {} FROM settlement s INNER JOIN income i ON s.`income_id`=i.`id` INNER JOIN `client` c ON i.`client_id` = c.`id`  where {}"
+sqlTpl = "SELECT {} FROM settlement s INNER JOIN income i ON s.`income_id`=i.`id` INNER JOIN `client` c ON s.`client_id` = c.`id`  where {}"
 
 # 查询字段
 selectField = "s.id,s.balance, s.status, s.add_date,s.finished_time, c.name company_name, c.invoice, i.income_id, i.money, i.aff_date"
@@ -32,14 +32,14 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
     # 合计结算金额
     totalBalance = 0
 
-    where = '1=1'
+    where = 's.is_delete = 0'
     if keyword:
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and s.status = {}".format(where, status)
     
     # 添加归属时间参数
-    where = await addAffDateWhere(where, month, isSearch)
+    # where = await addAffDateWhere(where, month, isSearch)
 
     # 获得总条数和分页数
     sql = sqlTpl.format('count(*) c', where)
@@ -53,7 +53,7 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
         })
 
     # 查询列表数据
-    where = " %s order by %s limit %s" % (where, 'income_id desc', limit)
+    where = " %s order by %s limit %s" % (where, 's.status asc, s.id desc', limit)
     sql = sqlTpl.format(selectField, where)
     lists = await Settlement.query(sql)
 
@@ -90,10 +90,10 @@ async def info(*,id=0):
     if not id:
         return returnData(0, '查询', 'ID不存在')
 
-    sql = "SELECT s.id, s.income_id,s.balance, i.aff_date,i.money,i.status, c.invoice,c.name company_name \
+    sql = "SELECT s.id,s.client_id, s.income_id,s.balance, i.aff_date,i.money,i.status, c.invoice,c.name company_name \
             FROM settlement s \
             INNER JOIN income i ON s.`income_id` = i.`id` \
-            INNER JOIN `client` c ON i.`client_id` = c.`id` \
+            INNER JOIN `client` c ON s.`client_id` = c.`id` \
             WHERE s.id= %s" % id
 
     info = await Settlement.query(sql)
@@ -122,14 +122,18 @@ async def formInit(*, id=0):
     # 获得所有收入ID，id,income_id
     incomeIdList = await Income.findAll(field="id,income_id")
 
+    # 获得所有客户信息, id, name
+    clientList = await Client.findAll(field="id, name")
+
     res = {
-        'incomeIdList': incomeIdList
+        'incomeIdList': incomeIdList,
+        'clientList': clientList
     }
 
     return res
 
 @post('/apis/settlement/form')
-async def form(*, id=0, income_id=0, balance=0):
+async def form(*, id=0, income_id=0, client_id=0, balance=0):
 
     action = '添加'
 
@@ -140,13 +144,15 @@ async def form(*, id=0, income_id=0, balance=0):
         action = '编辑'
         info = await Settlement.find(id)
         info['income_id'] = income_id
+        info['client_id'] = client_id
         info['balance'] = balance
     else:
         info = dict(
             income_id = income_id,
+            client_id = client_id,
             balance = balance
         )
-
+    
     # 存在id则修改，不能存在id则添加
     rows = await Settlement(**info).save()
 

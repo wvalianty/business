@@ -12,7 +12,7 @@ async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
-    currDate = time.strftime('%Y-%m-%d')
+    currDate = time.strftime('%Y-%m')
     where = '1=1'
     if keyword and keyword.strip() != '':
         where = "`business_type` like '%%{}%%'".format(keyword)
@@ -24,7 +24,7 @@ async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
     sql = 'SELECT COUNT(*) c FROM ( \
                 SELECT id FROM `income` where %s GROUP BY %s \
             ) t' % (where, groupBy)
- 
+    
     rs = await Income.query(sql)
     
     total, limit, p = totalLimitP(rs, page, pageSize, True)
@@ -36,7 +36,7 @@ async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
         return dict(total = total, page = p, list = (), other = {'types': types})
     
     # 查询数据列表
-    field='client_id, income_id, business_type type,aff_date,count(*) tfCount'
+    field='client_id, income_id, business_type type,aff_date,count(*) tfCount, sum(money) tfMoney'
     lists = await Income.findAll(field=field, orderBy="aff_date desc",groupBy=groupBy, where=where, limit=limit)
    
     for item in lists:
@@ -45,14 +45,9 @@ async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
         where = "business_type = '%s' and aff_date = '%s' and status = 2" % (item.type, currDate)
         item['hkCount'] = await Income.findNumber('count(id)', where)
 
-        # 投放金额
-        where = "client_id = %s" % item.client_id
-        tfMoney = await Income.findNumber('sum(money)', where)
-        item['tfMoney'] = round(tfMoney, 2) if tfMoney else 0  
-
         # 回款金额
-        where = 'income_id = %s' % item.income_id
-        hkMoney = await Settlement.findNumber('sum(balance)', where)
+        where = "business_type = '%s' and status=2" % item.type
+        hkMoney = await Income.findNumber('sum(money)', where)
         item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
 
     return {

@@ -18,13 +18,14 @@ moduleMaps = {
     'BUSINESS_TYPE': '业务管理',
     'INVIOCE': '发票管理',
     'INCOME': '收入报表',
-    'SETTLEMENT': '结算单'
+    'SETTLEMENT': '结算单',
+    'USERS': '用户管理'
 }
 
 # sql模板
 sqlTpl = "SELECT {} FROM syslog s \
        INNER JOIN users u ON s.uid = u.id \
-       WHERE {}"
+       WHERE table != 'INCOME_NO' and {}"
 
 # 搜索字段
 selectField = 's.id, u.name, s.operate, s.module, s.sql, s.add_date'

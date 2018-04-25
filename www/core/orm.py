@@ -143,6 +143,21 @@ def create_args_string(num):
         L.append('?')
     return ', '.join(L)
 
+def addSoftDeleteWhere(cls, where=None, isDelete=True):
+    """添加软删除条件
+    """
+    if isinstance(cls, ModelMetaClass) and 'is_delete' not in cls.__fields__:
+        return where
+
+    if isDelete:
+        softDelete = "is_delete = 0"
+
+    if where:
+        where = "%s and %s" % (softDelete, where)
+    else:
+        where = softDelete
+
+    return where
 
 class Field(object):
     """数据表字段基类
@@ -281,8 +296,9 @@ class Model(dict, metaclass=ModelMetaClass):
         return value
 
     @classmethod
-    async def findAll(cls, where=None, args=None, **kw):
+    async def findAll(cls, where=None, args=None, isDelete=True, **kw):
         '查询所有值'
+        where = addSoftDeleteWhere(cls, where, isDelete)
         
         selectField = kw.get('field', None)
         if selectField:
@@ -313,14 +329,17 @@ class Model(dict, metaclass=ModelMetaClass):
                 args.extend(limit)
             else:
                 raise ValueError('Invalid limit value: %s' % str(limit))
-
+       
         rs = await select(' '.join(sql), args)
         return [cls(**r) for r in rs]
 
     @classmethod
-    async def findNumber(cls, selectField, where=None, args=None, groupBy=None, orderBy=None):
+    async def findNumber(cls, selectField, where=None, args=None, groupBy=None, orderBy=None, isDelete=True):
         'find number by select and where'
         sql = ['select %s _num_ from `%s`' % (selectField, cls.__table__)]
+        
+        where = addSoftDeleteWhere(cls, where, isDelete)
+        
         if where:
             sql.append('where')
             sql.append(where)
@@ -371,6 +390,8 @@ class Model(dict, metaclass=ModelMetaClass):
         return rows
 
     async def update(self):
+        if 'is_delete' in self.__fields__ and not hasattr(self, 'is_delete'):
+            self.is_delete = 0
         args = list(map(self.getValue, self.__fields__))
         args.append(self.getValue(self.__primary_key__))
         rows = await execute(self.__update__, args)
@@ -388,7 +409,7 @@ class Model(dict, metaclass=ModelMetaClass):
         return rows
         
     @classmethod
-    async def delete(cls, pk=None, flag=False):
+    async def delete(cls, pk=None, flag=True):
         """根据主键删除数据
         
         Keyword Arguments:
@@ -398,7 +419,9 @@ class Model(dict, metaclass=ModelMetaClass):
         Returns:
             [type] -- [description]
         """
-
+        if 'is_delete' not in cls.__fields__:
+            flag = False
+        
         if not flag:
             args = [pk]
             rows = await execute(cls.__delete__, args)
@@ -411,12 +434,13 @@ class Model(dict, metaclass=ModelMetaClass):
         
         return rows
 
-    async def query(sql=None, args=None):
+    @classmethod
+    async def query(cls, sql=None, args=None):
         """sql查询
         """
         if not sql:
             return None
-        
+            
         rs = await select(sql, args)
         return rs
 
