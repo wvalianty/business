@@ -115,11 +115,8 @@ async def formInit(*, id=0):
     """
     
     # 获得所有收入ID，id,income_id
-    if int(id) == 0:
-        sql = "SELECT id, income_id FROM income WHERE id NOT IN (SELECT income_id FROM invoice where is_delete = 0)"
-        incomeIdList = await Income.query(sql)
-    else:
-        incomeIdList = await Income.findAll(field="id,income_id")
+    sql = "SELECT id, income_id FROM income WHERE id NOT IN (SELECT income_id FROM invoice where is_delete = 0)"
+    incomeIdList = await Income.query(sql)
 
     if not incomeIdList:
         incomeIdList = [
