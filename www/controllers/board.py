@@ -46,10 +46,8 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
     if month and month.isdigit():
         month = month.zfill(2)
         where = "{} and aff_date like '%%{}-{}%%'".format(where, year, month)
-    print(where)
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     sql_total = 'select count(*) cc from income inc inner join client c on inc.client_id = c.id %s' %(where)
-    print(sql_total)
 
     re = await Income.query(sql_total)
     total = re[0]["cc"]
@@ -57,7 +55,6 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
     if total == 0:
         return dict(total = total, page = (0,0), list = ())
     sql_re = 'select inc.income_id,c.name,inc.name cname,inc.aff_date,inc.money,inc.status,inc.media_type from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
-    print(sql_re)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:

@@ -9,21 +9,21 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
-    where = '1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
+    #where = 'where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
 
-    sql_total = 'select count(inv.id) c  from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id'
-    rs = await Invoice.query(sql_total)
+    sql_total = 'select count(*) co  from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0'
+
     try:
-        total = rs[0]["c"]
+        rs = await Invoice.query(sql_total)
+        if rs[0]["co"] == 0:
+            return dict(total=0, page=(0, 0), list=())
     except:
-        return dict(total=total, page=(0,0), list=())
-    if total == 0:
-        return dict(total=total, page=(0,0), list=())
+        raise ValueError("查询数据库错误,/apis/invoiceApply_index/index")
+    total = rs[0]["co"]
+
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
-    if total == 0:
-        return dict(total=total, page=p, list=())
-    sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.id invid,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id where inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
+    sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.id invid,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
     res = await Invoice.query(sql_res)
     res = obj2str(res)
 
