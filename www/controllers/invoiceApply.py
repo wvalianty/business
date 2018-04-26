@@ -9,7 +9,7 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
-    where = '1 = 1'
+    where = '1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
 
     sql_total = 'select count(inv.id) c  from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id'
     rs = await Invoice.query(sql_total)
@@ -23,12 +23,9 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total=total, page=p, list=())
-    print(limit)
-    sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.id invid,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
-    print(sql_res)
+    sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.id invid,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id where inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
     res = await Invoice.query(sql_res)
     res = obj2str(res)
-    print(res[0])
 
     return {
         'total':total,

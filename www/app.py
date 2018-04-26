@@ -3,18 +3,20 @@
 
 'python web app'
 
-import logging
-import asyncio, os, sys, json, time
+import asyncio, os, sys, json, time,logging
 from datetime import datetime
 from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
 
-from lib.common import cookie2user, COOKIE_NAME, ctr_dir, datetime_filter
+from lib.common import cookie2user, COOKIE_NAME, ctr_dir
 import core.orm as orm
 from core.coreweb import add_route, add_routes, add_static
 from config import configs
 
 db = configs.db
+
+COOKIE_NAME = configs.cookie.name
+_COOKIE_KEY = configs.session.secret
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -22,15 +24,50 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
+
 #0、管理员
 #1、运营侧
 #2、财务侧
 
-finance = set(["/board","/apis/main/index","/","/apis/board/index","/apis/invoiceApply_index/index","/apis/settleApply_index/index","/apis/settleApply_look/look","/settleApply_identify","/invoiceApply_index","/settleApply_index","/settleApply_look","/login/index","/main"])
-operate = set(["/apis/income/formInit","/apis/income/getIncomeId","/apis/income/form","/apis/invoice/formInit","/invoice/form","/apis/business/index","/apis/settlement/del","/apis/settlement/form","/apis/settlement/formInit","/apis/settlement/info","/apis/settlement/index","/settlement","/apis/business/index","/apis/business/form","/apis/client/form","/apis/client/index","/apis/invoice/index","/invoice","/","/client","/client/form","/apis/income/index","/business","/business/form","/income","/income/form","/login/index","/main"])
+finance = set(["/signout","/board","/apis/finish","/apis/main/index","/","/apis/board/index","/apis/invoiceApply_index/index","/apis/settleApply_index/index","/apis/settleApply_look/look","/settleApply_identify","/invoiceApply_index","/settleApply_index","/settleApply_look","/login/index","/main"])
+operate = set(["/signout","/apis/income/formInit","/apis/income/getIncomeId","/apis/income/form","/apis/invoice/formInit","/invoice/form","/apis/business/index","/apis/settlement/del","/apis/settlement/form","/apis/settlement/formInit","/apis/settlement/info","/apis/settlement/index","/settlement","/apis/business/index","/apis/business/form","/apis/client/form","/apis/client/index","/apis/invoice/index","/invoice","/","/client","/client/form","/apis/income/index","/business","/business/form","/income","/income/form","/login/index","/main"])
 manager = set(["/apis/manager/del","/apis/board/index","/syslog","/apis/manager/index","/apis/manager/info","/apis/manager/form","/api/login","/manager/edit","/manager/form","/manager"])
-super_user = finance | operate | manager
+super_user = finance | operate
+super_user = super_user | manager
 roles = {0:super_user,1:operate,2:finance}
+
+async  def auth_err(request):
+    #return web.Response(body=b'<h1>please check your authority,please understand yourself in your  heart where there is a number,then contact the manager ,thankyou</h1>', content_type='text/html')
+    return web.Response(body=b'<h1>right error or  backend function error</h1>', content_type='text/html')
+
+async def auth_factory(app, handler):
+    @asyncio.coroutine
+    def auth(request):
+        logging.info('check user: %s %s' % (request.method, request.path))
+        request.__user__ = None
+        if request.path.startswith('/static/') or request.path.startswith('/api/login') or request.path.startswith('/login/index'):
+            return (yield from handler(request))
+        cookie_str = request.cookies.get(COOKIE_NAME)
+        if cookie_str:
+            try:
+                user = yield from cookie2user(cookie_str)
+                if user:
+                    logging.info('set current user: %s' % user.email)
+                    request.__user__ = user['email']
+                    role = user.role
+                    modules = roles[int(role)]
+                    if request.path in modules:
+                        return (yield from handler(request))
+                    else:
+                        return (yield from auth_err(request))
+                else:
+                    return (yield from auth_err(request))
+            except:
+                return (yield from auth_err(request))
+        else:
+            return web.HTTPFound('/login/index')
+    return auth
+
 
 def init_jinja2(app, **kw):
     logging.debug('init jinjia2...')
@@ -114,52 +151,15 @@ async def response_factory(app, handler):
 
 
 
-async def auth_factory(app, handler):
-    @asyncio.coroutine
-    def auth(request):
-        logging.info('check user: %s %s' % (request.method, request.path))
-        request.__user__ = None
-        cookie_str = request.cookies.get(COOKIE_NAME)
-        #从cookie能解析 用户名
-        if cookie_str:
-            try:
-                user = yield from cookie2user(cookie_str)
-                if user:
-                    if request.path.startswith('/static/'):
-                        return (yield from handler(request))
-                    if request.path.startswith('/api/login'):
-                        return (yield from handler(request))
-                    if request.path.startswith('/apis/main/index'):
-                        return (yield from handler(request))
-                    logging.info('set current user: %s' % user.email)
-                    request.__user__ = user['email']
-                    role = user.role
-                    modules = roles[int(role)]
-                    if request.path in modules:
-                	    return (yield from handler(request))
-            except:
-                return web.HTTPFound('/login/index')
-                #return (yield from handler(request))
 
-            #先放宽一些，其他后续再改
-        elif request.path.startswith('/login/index') and (request.__user__ is None):
-            return (yield from handler(request))
-        elif request.path.startswith('/static/'):
-            return (yield from handler(request))
-        elif request.path.startswith('/api/login'):
-            return (yield from handler(request))
-        else:
-            return web.HTTPFound('/login/index')
-            #return web.HTTPMovedPermanently('/login/index')
-    return auth
 
 async def init(loop):
     await orm.create_pool(loop=loop, host=db.host, port=db.port, user=db.user, password=db.password, db=db.database)
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, data_factory, response_factory
+        auth_factory,logger_factory, data_factory, response_factory
     ])
     #auth_factory,
-    init_jinja2(app, filters=dict(datetime=datetime_filter))
+    init_jinja2(app)
     add_routes(app, 'handlers')
 
     # 将controllers文件夹下的所有文件，都添加的路由中

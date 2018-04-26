@@ -23,6 +23,7 @@ _RE_SHA1 = re.compile(r'[0-9a-f]{40}$')
 COOKIE_NAME = configs.cookie.name
 _COOKIE_KEY = configs.session.secret
 
+
 def check_admin(request):
     """检查用户是否是后台管理员
     """
@@ -41,6 +42,7 @@ def datetime_filter(t):
         return u'%s天前' % (delta // 86400)
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
+
 
 def obj2str(arr):
     """对象转字符串"""

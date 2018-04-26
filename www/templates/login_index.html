@@ -56,13 +56,11 @@
             passwd = CryptoJS.SHA1(account + ':' + passwd.toString()).toString();
             var data = {"account":account,"passwd":passwd};
             var url = "/api/login";
-            console.log(passwd);
              $.post(url, data ,function (user) {
                         layer.msg(user.msg);
                         // 成功，刷新页面
                         if (user.status) {
                             location.assign("/");
-                            console.log("testing");
                         }
              });
 

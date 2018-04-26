@@ -49,13 +49,9 @@
                     <li class="layui-nav-item">
                         账户名：北京麦酷
                     </li>
+
                     <li class="layui-nav-item">
-                        <a href="javascript:;" id="lock">
-                            <i class="iconfont icon-diannao1"></i> 锁屏
-                        </a>
-                    </li>
-                    <li class="layui-nav-item">
-                        <a href="/logout">
+                        <a href="/signout">
                             <i class="iconfont icon-exit"></i> 退出
                         </a>
                     </li>
@@ -235,19 +231,7 @@
     <script type="text/javascript" src="/static/js/larry.js"></script>
     <script type="text/javascript" src="/static/js/index.js"></script>
     <!-- 锁屏 -->
-    <div class="lock-screen" style="display: none;">
-        <div id="locker" class="lock-wrapper">
-            <div id="time"></div>
-            <div class="lock-box center">
-                <img src="/static/images/userimg.jpg" alt="">
-                <h1>admin</h1>
-                <duv class="form-group col-lg-12">
-                    <input type="password" placeholder='锁屏状态，请输入密码解锁' id="lock_password" class="form-control lock-input" autofocus name="lock_password">
-                    <button id="unlock" class="btn btn-lock">解锁</button>
-                </duv>
-            </div>
-        </div>
-    </div>
+    
 
 </body>
 
