@@ -1394,3 +1394,16 @@ body .layui-layout-admin .layui-larry-foot .p-admin a {
 .layui-table tr.redline td {
     color: red !important;
 }
+
+.layui-btn-mini {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+.layui-btn+.layui-btn{
+    margin-left: 0px;
+}
+.icon-edit:before{
+    content:"\e602";
+}

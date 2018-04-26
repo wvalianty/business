@@ -18,7 +18,7 @@ $(function(){
                     base: "/static/js/"
                 }).use(['form', 'layer', 'laydate'], function () {
 
-                    var form = layui.form(),
+                    var form = layui.form,
                         layer = parent.layer === undefined ? layui.layer : parent.layer,
                         laydate = layui.laydate;
 
@@ -53,6 +53,8 @@ $(function(){
                     if (typeof (hook_init_ui) == 'function') {
                         hook_init_ui(form, layer)
                     }
+
+                    form.re
                 });
             }
         },

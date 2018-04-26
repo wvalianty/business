@@ -15,7 +15,7 @@ layui.config({
 }).use(['jquery', 'element', 'layer', 'navtab'], function() {
     window.jQuery = window.$ = layui.jquery;
     window.layer = layui.layer;
-    var element = layui.element(),
+    var element = layui.element,
         navtab = layui.navtab({
             elem: '.larry-tab-box'
         });

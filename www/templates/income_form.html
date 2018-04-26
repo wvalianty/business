@@ -15,7 +15,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label" >公司名称</label>
         <div class="layui-input-4">
-            <select name="client_id" v-model="info.client_id" lay-verify="required" lay-filter="select">
+            <select name="client_id" v-model="info.client_id" lay-verify="required" lay-filter="select" lay-search>
                 <option value=""></option>
                 <option  value="1" v-for="item in other.clientList" :value="item.id">{{item.name}}</option>
             </select>
@@ -24,7 +24,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label" >业务类型</label>
         <div class="layui-input-4">
-            <select name="business_type" v-model="info.business_type" lay-verify="required" lay-filter="select">
+            <select name="business_type" v-model="info.business_type" lay-verify="required" lay-filter="select" lay-search>
                 <option value=""></option>
                 <option v-for="item in other.typeList" :value="item.type">{{item.type}}</option>
             </select>

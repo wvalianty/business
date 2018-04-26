@@ -5,6 +5,7 @@ $(function(){
         data: {
             list: [],
             currPage: 1,
+            total: 0, // 数据总条数
             other: [],
             page: [],
             params: {}, // 当前页面查询参数
@@ -49,6 +50,7 @@ $(function(){
 
                     self.list = data.list;
                     self.page = data.page;
+                    self.total = data.total;
                     if (typeof data.other != 'undefined') {
                         self.other = data.other
                     }
@@ -134,7 +136,7 @@ $(function(){
                     $("#searchForm select").map((index, ele) => {
                         $(ele).val('');
                     });
-                    layui.form().render('select');
+                    layui.form.render('select');
                     self.params = {};
                     self.getLists(1, {isSearch:1});
                 });
@@ -194,7 +196,7 @@ $(function(){
             layui.config({
                 base: '/static/js/'
             }).use(['form', 'layer', 'jquery', 'laypage'], function () {
-                var form = layui.form(),
+                var form = layui.form,
                     layer = parent.layer === undefined ? layui.layer : parent.layer,
                     laypage = layui.laypage,
                     $ = layui.jquery;
@@ -205,12 +207,14 @@ $(function(){
                 // 更新搜索框
                 form.render('select');
 
-                laypage({
-                    cont: 'page',
-                    pages: self.page[0], //总页数
+
+                laypage.render({
+                    elem: 'page',
+                    count: self.total,
                     curr: self.page[1],
-                    groups: 5, //连续显示分页数
-                    jump: function (obj, first) {
+                    limit:10,
+                    groups: 5,
+                    jump: function(obj, first){
                         //得到了当前页，用于向服务端请求对应数据
                         self.currPage = obj.curr;
                         if (!first) {
@@ -218,7 +222,7 @@ $(function(){
                             self.getLists(self.currPage);
                         }
                     }
-                });
+                })
             });
         }
     });

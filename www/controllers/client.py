@@ -35,28 +35,24 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
     clients = obj2str(clients)
 
     # 获得每个客户下的投放数和回款数
+    selectField = "count(*) tfCount, sum(money) tfMoney"
     for item in clients:
         # 投放数
-        where = 'client_id=%s' % item.id
-        item['tfCount'] = await Income.findNumber('count(id)', where)
+        where = 'is_delete = 0 and client_id=%s' % item.id
+        info = await Income.findOne(selectField, where)
+        item['tfCount'] = round(info['tfCount'], 2) if info['tfCount'] else 0
 
         # 投放金额
-        tfMoney = await Income.findNumber('sum(money)', where)
-        item['tfMoney'] = round(tfMoney, 2) if tfMoney else 0  
+        item['tfMoney'] = round(info['tfMoney'], 2) if info['tfMoney'] else 0
 
         # 回款金额
-        incomeIds = await Income.findCols(selectField='income_id', where="client_id=%s" % item.id)
-        
-        if not incomeIds and len(incomeIds) > 0:
-            where = "income_id in (%s)" % (','.join(incomeIds))
-            hkMoney = await Settlement.findNumber('sum(balance)', where)
-            item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
-        else:
-            item['hkMoney'] = 0
+        where = "%s and status = 2" % where
+        field = "count(*) hkCount, sum(money) hkMoney"
+        info = await Income.findOne(field, where)
+        item['hkMoney'] = round(info['hkMoney'], 2) if info['hkMoney'] else 0
 
         # 回款数
-        where = '%s and status = 2' % where
-        item['hkCount'] = await Income.findNumber('count(id)', where)
+        item['hkCount'] = round(info['hkCount'], 2) if info['hkCount'] else 0
         item['invoice'] = item['invoice'].replace('\n', '<br/>')
 
         # 合同是否有效

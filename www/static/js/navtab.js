@@ -11,7 +11,7 @@
  * +----------------------------------------------------------------------
  */
 layui.define(['element'], function(exports) {
-    var element = layui.element(),
+    var element = layui.element,
         $ = layui.jquery,
         layer = parent.layer === undefined ? layui.layer : parent.layer,
         module_name = 'navtab',
@@ -44,7 +44,6 @@ layui.define(['element'], function(exports) {
         var $container;
         if (typeof(_config.elem) === 'string') {
             $container = $('' + _config.elem + '');
-            //console.log($container);
         }
         if (typeof(_config.elem) === 'object') {
             $container = _config.elem;
@@ -73,7 +72,7 @@ layui.define(['element'], function(exports) {
         ELEM.titleBox.find('li').each(function(i, e) {
             var $em = $(this).children('em');
             if ($em.text() === title) {
-                tabIndex = i;
+                tabIndex = $em.siblings('i.layui-tab-close')[0].dataset.id;
             };
         });
         return tabIndex;
@@ -85,7 +84,7 @@ layui.define(['element'], function(exports) {
      */
     LarryTab.prototype.tabAdd = function(data) {
         var _this = this;
-        var tabIndex = _this.exists(data.title);
+        var tabIndex = _this.exists(data.title) || 0;
         // 若不存在
         if (tabIndex === -1) {
             globalTabIdIndex++;
@@ -106,7 +105,8 @@ layui.define(['element'], function(exports) {
             //添加tab
             element.tabAdd(ELEM.tabFilter, {
                 title: title,
-                content: content
+                content: content,
+                id: globalTabIdIndex
             });
             //iframe 自适应
             ELEM.contentBox.find('iframe[data-id=' + globalTabIdIndex + ']').each(function() {
@@ -115,11 +115,11 @@ layui.define(['element'], function(exports) {
             if (_this.config.closed) {
                 //监听关闭事件
                 ELEM.titleBox.find('li').children('i.layui-tab-close[data-id=' + globalTabIdIndex + ']').on('click', function() {
-                    element.tabDelete(ELEM.tabFilter, $(this).parent('li').index()).init();
+                    element.tabDelete(ELEM.tabFilter, this.dataset.id);
                 });
             };
             //切换到当前打开的选项卡
-            element.tabChange(ELEM.tabFilter, ELEM.titleBox.find('li').length - 1);
+            element.tabChange(ELEM.tabFilter, globalTabIdIndex);
         } else {
             element.tabChange(ELEM.tabFilter, tabIndex);
         }
