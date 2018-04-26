@@ -156,12 +156,14 @@ def add_static(app):
     '''添加静态文件路径'''
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'static')
     app.router.add_static('/static/', path)
+
     logging.info('add static %s => %s' % ('/static/', path))
 
 def add_route(app, fn):
     '''添加路由'''
     method = getattr(fn, '__method__', None)
     path = getattr(fn, '__route__', None)
+
     if path is None or method is None:
         raise ValueError('@get or @post not defined in %s' % str(fn))
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
