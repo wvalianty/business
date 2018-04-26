@@ -155,7 +155,6 @@ async def delete(*, id):
         users = await Users.findAll(where = where)
         user = users[0]
         user.is_delete = 1
-        print(user)
         rows = await Users(**user).update()
         if rows == 1:
             return returnData(1, "删除")
