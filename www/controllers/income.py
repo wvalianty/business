@@ -30,7 +30,7 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     # 合计金额
     totalMoney = 0
 
-    where = '1=1'
+    where = 'i.is_delete = 0'
     if keyword:
         where = "{} and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
@@ -63,7 +63,7 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
 
     for item in lists:
         item['status_text'] = statusMap[item['status']]
-        item['media_type'] = mediaTypeMap[item['media_type']]
+        item['media_type_text'] = mediaTypeMap[item['media_type']]
         totalMoney += item['money']
 
     if isExport and int(isExport) == 1:
@@ -137,8 +137,15 @@ async def form(**kw):
     id = kw.get('id', 0)
     if id.isdigit() and int(id) > 0:
         action = '编辑'
-        info['id'] = id
-        info['income_id'] = kw.get('income_id', '')
+        # 如果是已回款状态，则只能编辑 渠道成本
+        oldInfo = await Income.find(id)
+        print(oldInfo)
+        if oldInfo['status'] == 2:
+            oldInfo['cost'] = info['cost']
+            info = oldInfo
+        else:
+            info['id'] = id
+            info['income_id'] = kw.get('income_id', '')
     else:
         # 获得收入编号
         info['income_id'] = await getIncomeNo(info['aff_date'])

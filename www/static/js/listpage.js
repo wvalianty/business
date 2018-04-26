@@ -70,10 +70,10 @@ $(function(){
                     }
 
                     let title = this.dataset.title || '这是一个弹出框';
-                    let area = this.dataset.area || "600px,400px";
+                    let area = this.dataset.area || "600px,500px";
                     layer.open({
                         type: 2,
-                        content: [url, 'no'],
+                        content: [url],
                         area: area.split(','),
                         title: title,
                         maxmin: true,

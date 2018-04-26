@@ -18,7 +18,10 @@
     <div class="layui-form-item">
         <label class="layui-form-label" >公司名称</label>
         <div class="layui-input-6">
-            <input class="layui-input" v-model="info.company_name" lay-verify="required" readonly type="text">
+            <select name="client_id" v-model="info.client_id" lay-verify="required" lay-filter="select">
+                <option value=""></option>
+                <option v-for="item in other.clientList" :value="item.id">{{item.name}}</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
@@ -88,10 +91,26 @@ function hook_init_ui(form, layer) {
 
         app.info[data.elem.name] = data.value;
         
-        if (data.elem.name == 'income_id') {
+        var url = '/apis/income/detail',
+            module = 'income';
+            console.log(data.elem.name)
+        if (data.elem.name == 'client_id') {
+            url = '/apis/client/info';
+            module = 'client';
+        }
 
-            getIncomeDetail(data.value);
-        } 
+        url += '?id=' + data.value;
+        var fields = {
+            'income': ['aff_date', 'money', 'status_text'],
+            'client': ['invoice']
+        };
+        $.get(url, function (res) {
+            for (let key in res.info) {
+                if (fields[module].in_array(key)) {
+                    app.$set(app.info, key, res.info[key])
+                }
+            }
+        });
     });
 
     $('#balance').blur(function(){
@@ -104,7 +123,8 @@ function hook_init_ui(form, layer) {
             app.info.rate = 0;
             return;
         }
-        app.$set(app.info, 'rate', val / app.info.money * 100 + '%');
+        var val = (val / app.info.money * 100).toFixed(2)
+        app.$set(app.info, 'rate', val + '%');
     });
 }
 </script>

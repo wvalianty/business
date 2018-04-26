@@ -19,7 +19,7 @@ statusMap = (
 sqlTpl = "SELECT {} FROM invoice inv \
             INNER JOIN income i ON inv.`income_id`=i.`id` \
             INNER JOIN `client` c ON i.`client_id` = c.`id`  \
-            where {}"
+            where inv.is_delete = 0 and {}"
 
 # 查询字段
 selectField = "inv.id,inv.info, inv.finished, inv.finished_time, inv.add_date,\
@@ -116,7 +116,7 @@ async def formInit(*, id=0):
     
     # 获得所有收入ID，id,income_id
     if int(id) == 0:
-        sql = "SELECT id, income_id FROM income WHERE id NOT IN (SELECT income_id FROM invoice)"
+        sql = "SELECT id, income_id FROM income WHERE id NOT IN (SELECT income_id FROM invoice where is_delete = 0)"
         incomeIdList = await Income.query(sql)
     else:
         incomeIdList = await Income.findAll(field="id,income_id")

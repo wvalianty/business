@@ -26,6 +26,7 @@ class Client(Model):
     indate_end = DateField()
     invoice = StringField()
     add_date = DateTimeField(default=curr_datetime)
+    is_delete = IntegerField(default=0)
 
 class Business(Model):
     """业务类型表
@@ -53,6 +54,7 @@ class Income(Model):
     media_type = IntegerField()
     cost = StringField()
     add_date = DateTimeField(default=curr_datetime)
+    is_delete = IntegerField(default=0)
 
 class Invoice(Model):
     __table__ = 'invoice'
@@ -62,15 +64,18 @@ class Invoice(Model):
     add_date = DateTimeField(default=curr_datetime)
     finished = IntegerField(default=0)
     finished_time = DateTimeField()
+    is_delete = IntegerField(default=0)
 
 class Settlement(Model):
     __table__ = 'settlement'
     id = IntegerField(primary_key=True)
     income_id = IntegerField()
+    client_id = IntegerField()
     balance = FloatField()
     status = IntegerField(default=0)
     add_date = DateTimeField(default=curr_datetime)
     finished_time = DateTimeField()
+    is_delete = IntegerField(default=0)
 
 class Syslogs(Model):
     __table__ = 'syslog'
@@ -82,6 +87,7 @@ class Syslogs(Model):
     module = StringField()
     sql = StringField()
     add_date = DateTimeField(default=curr_datetime)
+    is_delete = IntegerField(default=0)
 
 class IncomeNo(Model):
     
@@ -98,9 +104,5 @@ class Users(Model):
     passwd = StringField()
     role = IntegerField()
     name = StringField()
-<<<<<<< HEAD
     created_at =  DateTimeField()
-=======
-    created_at =  DateTimeField()
-    admin = IntegerField()
->>>>>>> 87514535d1e44cb26540d1a0e9aca698f4b5bc63
+    is_delete = IntegerField(default=0)

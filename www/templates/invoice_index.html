@@ -30,7 +30,7 @@
     </form>
 </div>
 <div class="layui-inline">
-    <a class="layui-btn layui-btn-normal add-btn" data-url="/invoice/form" data-title="新增客户" data-area="700px,700px">新增</a>
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/invoice/form" data-title="新增客户">新增</a>
 </div>
 {% endblock %}
 
@@ -58,8 +58,7 @@
             <td v-html="item.info" align="left"></td>
             <td v-html="item.status_text"></td>
             <td>
-                <!-- <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/invoice/form?id=' + item.id" data-title="编辑发票" data-area="700px,700px" v-show="!item.finished"><i class="iconfont icon-edit"></i> 编辑</a> -->
-                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/invoice/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/invoice/del?id=' + item.id " v-if="!item.finished"><i class="layui-icon" ></i> 删除</a>
             </td>
         </tr>
         <tr>

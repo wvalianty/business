@@ -39,7 +39,7 @@
     </form>
 </div>
 <div class="layui-inline">
-    <a class="layui-btn layui-btn-normal add-btn" data-url="/income/form" data-title="新增客户" data-area="700px,700px">新增</a>
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/income/form" data-title="新增客户">新增</a>
 </div>
 {% endblock %}
 
@@ -67,10 +67,10 @@
             <td>{{ item.aff_date }}</td>
             <td>{{ item.money }}</td>
             <td>{{ item.status_text }}</td>
-            <td>{{ item.media_type }}</td>
+            <td>{{ item.media_type_text }}</td>
             <td>
-                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" data-area="700px,700px" v-if="item.status != 2"><i class="iconfont icon-edit" ></i> 编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/income/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
+                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" data-area="700px,700px" v-if="item.status != 2 || item.media_type == 1"><i class="iconfont icon-edit" ></i> 编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/income/del?id=' + item.id " v-if="item.status != 2"><i class="layui-icon"></i> 删除</a>
             </td>
         </tr>
         <tr>

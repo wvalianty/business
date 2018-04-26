@@ -69,14 +69,18 @@ $(function(){
                     self.layuiRender();
                 });
             }
-            
+           
             // 钩子函数，初始化的时候执行
+            var timeout = 0;
             if (typeof (hook_init) == 'function') {
                 hook_init(self)
+                timeout = 500;
             }
 
             if (!id || id == '') {
-                this.layuiRender();
+                setTimeout(function(){
+                    self.layuiRender()
+                },timeout);
             }
         }
     })

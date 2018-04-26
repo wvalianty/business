@@ -24,6 +24,25 @@ COOKIE_NAME = configs.cookie.name
 _COOKIE_KEY = configs.session.secret
 
 
+def check_admin(request):
+    """检查用户是否是后台管理员
+    """
+    if request.__user__ is None or not request.__user__.admin:
+        raise APIPermissionError()
+
+def datetime_filter(t):
+    delta = int(time.time() - t)
+    if delta < 60:
+        return u'1分钟前'
+    if delta < 3600:
+        return u'%s分钟前' % (delta // 60)
+    if delta < 86400:
+        return u'%s小时前' % (delta // 3600)
+    if delta < 604800:
+        return u'%s天前' % (delta // 86400)
+    dt = datetime.fromtimestamp(t)
+    return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
+
 
 def obj2str(arr):
     """对象转字符串"""

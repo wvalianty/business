@@ -7,13 +7,13 @@ from lib.common import obj2str
 async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
-    where = '1 = 1'
+    where = '1 = 1 and settle.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
     #if search
     if keyword:
         where = "name like '%%{}%%'".format(keyword)
 
     count_id = '%s' %("settle.id")
-    sql_total = 'select count(%s) c  from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on inc.client_id = c.id' %(count_id)
+    sql_total = 'select count(%s) c  from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on inc.client_id = c.id where settle.client_id = c.id' %(count_id)
     re = await Settlement.query(sql_total)
     try:
         total = re[0]["c"]
@@ -25,7 +25,7 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     p = (math.ceil(total / pageSize), page)
     if total == 0:
         return dict(total=total, page=p, list=())
-    sql_res = 'select inc.id,inc.income_id,c.name,inc.aff_date,inc.money,inc.status,settle.balance,settle.status sstatus from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on inc.client_id = c.id order by settle.id desc limit %s,%s' %(limit[0],limit[1])
+    sql_res = 'select inc.id,inc.income_id,c.name,inc.aff_date,inc.money,inc.status,settle.balance,settle.status sstatus from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on inc.client_id = c.id where settle.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  and  settle.client_id = c.id order by settle.id desc limit %s,%s' %(limit[0],limit[1])
     try:
         res = await Settlement.query(sql_res)
     except:
@@ -51,7 +51,7 @@ async def settleApply_formIndex(*,keyword=None,action=None, page=1, pageSize=10)
     pageSize = int(pageSize)
 
     income_id = int(keyword)
-    sql_total = 'select count(*) co from settlement settle inner join income inc on settle.income_id = inc.id  inner join client c on inc.client_id = c.id where settle.income_id = %s;' %(income_id)
+    sql_total = 'select count(*) co from settlement settle inner join income inc on settle.income_id = inc.id  inner join client c on inc.client_id = c.id where settle.income_id = %s and c.is_delete = 0 and inc.is_delete = 0 and settle.is_delete = 0 and settle.client_id = c.id ' %(income_id)
     re = await  Client.query(sql_total)
     try:
         total = re[0]["co"]
@@ -61,7 +61,7 @@ async def settleApply_formIndex(*,keyword=None,action=None, page=1, pageSize=10)
     if total == 0:
         return dict(total=total, page=p, list=())
     limit = ((page - 1) * pageSize, pageSize)
-    sql_res = ' select c.name,settle.balance,inc.status,inc.add_date from settlement settle inner join income inc on settle.income_id = inc.id  inner join client c on inc.client_id = c.id where settle.income_id = %s  order by inc.id desc  limit %s,%s' %(income_id,limit[0],limit[1])
+    sql_res = ' select c.name,settle.balance,inc.status,inc.add_date from settlement settle inner join income inc on settle.income_id = inc.id  inner join client c on inc.client_id = c.id where settle.income_id = %s and c.is_delete = 0 and inc.is_delete = 0 and settle.is_delete = 0 and settle.client_id = c.id order by inc.id desc  limit %s,%s' %(income_id,limit[0],limit[1])
     res = await  Client.query(sql_res)
     res = obj2str(res)
     return {

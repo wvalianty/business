@@ -5,6 +5,21 @@
 
 'use strict';
 
+
+/**
+ * 为数组增加in_array函数
+ * @param {*} element 
+ */
+Array.prototype.in_array = function (element) {
+
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] == element) {
+            return true;
+        }
+    } 
+    return false;
+}  
+
 /**
  *  获得地址栏中的参数
  * @param {参数名} name 

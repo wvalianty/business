@@ -90,11 +90,11 @@ function hook_init(vueObj) {
     let id = getQueryStr('id') || 0;
     $.get('/apis/income/formInit?id=' + id, function(data) {
         
-        vueObj.other = data;
+        app.other = data;
         if( id == 0 ) {
-            vueObj.info.media_type = 0;
-            vueObj.info.status = 0;
-            vueObj.info.income_id = data.income_id
+            app.info.media_type = 0;
+            app.info.status = 0;
+            app.info.income_id = data.income_id
         }
     });
 }
