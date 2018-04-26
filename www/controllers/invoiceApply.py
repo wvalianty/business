@@ -11,8 +11,8 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
 
     #where = 'where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
 
-    sql_total = 'select count(inv.id) co  from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0'
-
+    sql_total = 'select count(*) co  from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0'
+    
     try:
         rs = await Invoice.query(sql_total)
         if rs[0]["co"] == 0:
