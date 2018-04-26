@@ -29,11 +29,14 @@ logging.basicConfig(
 #1、运营侧
 #2、财务侧
 
-finance = set(["/signout","/syslogs","/board","/apis/finish","/apis/main/index","/","/apis/board/index","/apis/invoiceApply_index/index","/apis/settleApply_index/index","/apis/settleApply_look/look","/settleApply_identify","/invoiceApply_index","/settleApply_index","/settleApply_look","/login/index","/main"])
-operate = set(["/signout","/syslogs","/apis/income/formInit","/apis/income/getIncomeId","/apis/income/form","/apis/invoice/formInit","/invoice/form","/apis/business/index","/apis/settlement/del","/apis/settlement/form","/apis/settlement/formInit","/apis/settlement/info","/apis/settlement/index","/settlement","/apis/business/index","/apis/business/form","/apis/client/form","/apis/client/index","/apis/invoice/index","/invoice","/","/client","/client/form","/apis/income/index","/business","/business/form","/income","/income/form","/login/index","/main"])
-manager = set(["/apis/manager/del","/apis/board/index","/syslog","/apis/manager/index","/apis/manager/info","/apis/manager/form","/api/login","/manager/edit","/manager/form","/manager"])
+manager = set(["/manager/form","/apis/settlement/del","/apis/settlement/form","/apis/settlement/formInit","/apis/settlement/index","/apis/syslogs/del","/apis/syslogs/index","/apis/settlement/info","/board","/","/login/index","/main","/manager","/manager/edit","/syslogs","/apis/main/index","/apis/manager/del","/apis/finish","/api/login","/apis/manager/index","/apis/manager/info","/signout","/apis/manager/form"])
+operate = set(["/business","/business/form","/client","/settlement","/apis/board/index","/settlement/form","/client/form","/income","/income/form","/invoice","/invoice/form","/apis/business/index","/apis/client/del","/apis/client/form","/apis/client/index","/apis/client/info","/apis/income/del","/apis/income/detail","/apis/income/form","/apis/income/formInit","/apis/income/getIncomeId","/apis/income/index","/apis/income/info","/apis/invoice/del","/apis/invoice/form","/apis/invoice/formInit","/apis/invoice/index","/apis/business/form"])
+finance = set(["/settleApply_look","/apis/settleApply_look/look","/settleApply_identify","/apis/settleApply_index/index","/settleApply_index","/apis/invoice/info","/apis/invoiceApply_index/index","/invoiceApply_index"])
+
 super_user = finance | operate
 super_user = super_user | manager
+operate = operate | manager
+finance = finance | manager
 roles = {0:super_user,1:operate,2:finance}
 
 async  def auth_err(request):
