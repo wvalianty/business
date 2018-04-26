@@ -359,6 +359,7 @@
 .larry-tab-box>.layui-tab-title {
     border-bottom: 1px solid #e2e2e2;
     border-top: 5px solid #009688;
+    background-color: white;
 }
 
 .larry-tab-box .layui-tab-title cite {
@@ -523,3 +524,98 @@ dd.layui-nav-itemed .menu_three {
     padding: 0 10px;
     font-size: 12px;
 }
+.layui-nav {
+	position: relative;
+	padding: 0 0px;
+	background-color: #393D49;
+	color: #c2c2c2;
+	border-radius: 2px;
+	font-size: 0;
+	box-sizing: border-box!important
+}
+
+.layui-nav * {
+	font-size: 14px
+}
+.closeBox {
+    position: absolute;
+    right: 0;
+    background-color: #fff !important;
+    color: #000;
+    border-left: 1px solid #e2e2e2;
+    top:8px;
+    height: 38px;
+    line-height: 38px;
+}
+
+.closeBox .layui-nav-item {
+    line-height: 38px;
+}
+.closeBox  .layui-nav-child{
+	top:38px;
+}
+.closeBox .layui-nav-item a, .closeBox .layui-nav-item a:hover{
+    color: #000;
+}
+
+.icon-zhanghu:before { content: "\e605"; }
+
+.icon-lock1:before { content: "\e622"; }
+
+.icon-erweima:before { content: "\e62d"; }
+
+.icon-xinlangweibo:before { content: "\e63d"; }
+
+.icon-qq:before { content: "\e63e"; }
+
+.icon-icon:before { content: "\e609"; }
+
+.icon-edit:before { content: "\e602"; }
+
+.icon-computer:before { content: "\e645"; }
+
+.icon-text:before { content: "\e64d"; }
+
+.icon-guanbi:before { content: "\e62f"; }
+
+.icon-loginout:before { content: "\e608"; }
+
+.icon-shuaxin1:before { content: "\e648"; }
+
+.icon-shezhi1:before { content: "\e64a"; }
+
+.icon-gonggao:before { content: "\e614"; }
+
+.icon-menu1:before { content: "\e62a"; }
+
+.icon-wenben:before { content: "\e600"; }
+
+.icon-dengji3:before { content: "\e61e"; }
+
+.icon-dengji1:before { content: "\e628"; }
+
+.icon-dengji2:before { content: "\e629"; }
+
+.icon-dengji4:before { content: "\e62b"; }
+
+.icon-dengji5:before { content: "\e62c"; }
+
+.icon-dengji6:before { content: "\e62e"; }
+
+.icon-new1:before { content: "\e610"; }
+
+.icon-huanfu:before { content: "\e623"; }
+
+.icon-link:before { content: "\e657"; }
+
+.icon-lingsheng:before { content: "\e601"; }
+
+.icon-star:before { content: "\e783"; }
+
+.icon-dongtaifensishu:before { content: "\e603"; }
+
+.icon-prohibit:before { content: "\e73a"; }
+
+.icon-caozuo:before { content: "\e64e"; }
+
+.icon-weather:before { content: "\e89e"; }

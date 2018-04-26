@@ -42,11 +42,11 @@ async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
     for item in lists:
 
         # 查询回款数
-        where = "business_type = '%s' and aff_date = '%s' and status = 2" % (item.type, currDate)
+        where = "is_delete = 0 and business_type = '%s' and aff_date = '%s' and status = 2" % (item.type, currDate)
         item['hkCount'] = await Income.findNumber('count(id)', where)
 
         # 回款金额
-        where = "business_type = '%s' and status=2" % item.type
+        where = "is_delete = 0 and business_type = '%s' and status=2" % item.type
         hkMoney = await Income.findNumber('sum(money)', where)
         item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
 
