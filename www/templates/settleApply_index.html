@@ -55,8 +55,8 @@
             <td>{{ item.balance }}</td>
             <td>
 {#                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>#}
-                <a    v-if="item.sstatus == 0" class="layui-btn layui-btn-normal identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.id"   data-area="180px,140px">完成</a>
-                <a   class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.id" data-title="详细信息" data-area="600px,400px">查看</a>
+                <a    v-if="item.sstatus == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.id"   data-area="180px,140px"><i class="layui-icon"></i> 完成</a>
+                <a   class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.id" data-title="详细信息" data-area="600px,400px"><i class="iconfont icon-edit"></i>查看</a>
             </td>
         </tr>
     </tbody>
