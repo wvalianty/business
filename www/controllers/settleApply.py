@@ -35,7 +35,7 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     res = obj2str(res)
     try:
         for i in range(len(res)):
-            res[i]["percentage"] = '%3.3f' %(res[i]["balance"]/res[i]["money"])
+            res[i]["percentage"] = '%3.2f' %(res[i]["balance"]/res[i]["money"])
         for j in range(len(res)):
             if res[j]["sstatus"] == 0:
                 t = res[j]
