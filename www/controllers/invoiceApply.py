@@ -24,9 +24,16 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     sql_res = 'select inc.income_id,c.name,inc.aff_date,inc.money,inv.id invid,inv.info,inv.finished,inv.finished_time from invoice inv inner join income inc on inv.income_id = inc.id inner join client c on c.id = inc.client_id  where 1 = 1 and inv.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  order by inc.id desc limit %s,%s '  %(limit[0],limit[1])
-    res = await Invoice.query(sql_res)
+    try:
+        res = await Invoice.query(sql_res)
+    except:
+        raise ValueError("/apis/invoiceApply_index/index,应该是表字段有变化,total查询已经通过了")
     res = obj2str(res)
-
+    for j in math.ceil(len(res) / 2):
+        if res[j]["finished"] == 1:
+            t = res[j]
+            res.pop(j)
+            res.append(t)
     return {
         'total':total,
         'page':p,
