@@ -36,11 +36,11 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     try:
         for i in range(len(res)):
             res[i]["percentage"] = '%3.3f' %(res[i]["balance"]/res[i]["money"])
-        for j in range(math.ceil(len(res) / 2)):
-            if res[j]["sstatus"] == 1:
+        for j in range(len(res)):
+            if res[j]["sstatus"] == 0:
                 t = res[j]
                 res.pop(j)
-                res.append(t)
+                res.insert(0, t)
     except:
         return dict(total=total, page=p, list=())
     return {

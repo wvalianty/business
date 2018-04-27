@@ -29,11 +29,11 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
     except:
         raise ValueError("/apis/invoiceApply_index/index,应该是表字段有变化,total查询已经通过了")
     res = obj2str(res)
-    for j in math.ceil(len(res) / 2):
-        if res[j]["finished"] == 1:
+    for j in range(len(res)):
+        if res[j]["finished"] == 0:
             t = res[j]
             res.pop(j)
-            res.append(t)
+            res.insert(0,t)
     return {
         'total':total,
         'page':p,
