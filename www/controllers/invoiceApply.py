@@ -40,14 +40,14 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
         'list':res
     }
 
-
+#inv.id
 @get('/apis/finish')
 async def apis_finish(*,id):
     if not id.isdigit() or int(id) <= 0:
         return {
             'msg': '确认失败,缺少请求参数'
         }
-    where = "income_id = %s" %(id)
+    where = "id = %s" %(id)
     invoices = await Invoice.findAll(where)
     invoices = obj2str(invoices)
     if len(invoices) == 1:
