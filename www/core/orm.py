@@ -54,7 +54,7 @@ async def addsyslog(sql, args=None, affetced_id=0):
     if not affetced_id:
         affetced_id = 0
     
-    currDate = time.strftime('%Y-%m-%d')
+    currDate = time.strftime('%Y-%m-%d %H:%M:%S')
     params = ['admin', action, table, table, sql, affetced_id, currDate]
     syslogSql = "INSERT INTO syslog(username, operate, `table`, module, `sql`, affetced_id,  add_date) value(?, ?, ?, ?, ?, ?, ?)"
     
