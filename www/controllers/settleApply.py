@@ -27,7 +27,7 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
         return dict(total=total, page=(0,0), list=())
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
-    sql_res = 'select inc.id,inc.income_id,c.name,inc.aff_date,inc.money,inc.status,settle.balance,settle.status sstatus from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on settle.client_id = c.id where settle.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  and  settle.client_id = c.id order by settle.id desc limit %s,%s' %(limit[0],limit[1])
+    sql_res = 'select inc.id,inc.income_id,c.name,inc.aff_date,inc.money,inc.status,settle.balance,settle.status sstatus from settlement settle inner join income inc on settle.income_id = inc.id inner join client c  on settle.client_id = c.id where settle.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0  order by settle.id desc limit %s,%s' %(limit[0],limit[1])
     try:
         res = await Settlement.query(sql_res)
     except:
@@ -36,7 +36,7 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
     try:
         for i in range(len(res)):
             res[i]["percentage"] = '%3.3f' %(res[i]["balance"]/res[i]["money"])
-        for j in math.ceil(len(res)/2):
+        for j in range(math.ceil(len(res) / 2)):
             if res[j]["sstatus"] == 1:
                 t = res[j]
                 res.pop(j)
