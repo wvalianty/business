@@ -120,7 +120,7 @@ async def formInit(*, id=0):
     """
 
     # 获得所有收入ID，id,income_id
-    incomeIdList = await Income.findAll(field="id,income_id")
+    incomeIdList = await Income.findAll(field="id,income_id", where='media_type=1')
 
     # 获得所有客户信息, id, name
     clientList = await Client.findAll(field="id, name")
