@@ -7,7 +7,7 @@ from core.coreweb import get, post
 from lib.models import Income, Client, Invoice
 from lib.common import obj2str, returnData, totalLimitP, addAffDateWhere
 import client, income
-from config import configs
+
 
 # 结算状态
 statusMap = (
@@ -22,7 +22,7 @@ sqlTpl = "SELECT {} FROM invoice inv \
             where inv.is_delete = 0 and {}"
 
 # 查询字段
-selectField = "inv.id,inv.info,inv.inv_money, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date, \
+selectField = "inv.id,inv.info, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date, \
                 c.name company_name, \
                 i.income_id, i.money, i.aff_date"
 
@@ -31,17 +31,15 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
     page = int(page)
     pageSize = int(pageSize)
     year = time.strftime('%Y')
-
+    
     # 合计金额
     totalMoney = 0
-    print(configs.user.name)
-    exit
     where = '1=1'
     if keyword:
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and finished = {}".format(where, status)
-
+    
     where = await addAffDateWhere(where, month, isSearch)
 
     sql = sqlTpl.format('count(*) c', where)
@@ -66,7 +64,7 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
         item['status_text'] = statusMap[item['finished']]
         if int(item['finished']) == 1:
             statusDate = item['finished_time']
-
+        
         item['status_text'] = "%s<br/>%s" % (item['status_text'], statusDate)
         item['info'] = item['info'].replace('\n', '<br/>')
         totalMoney += item['money']
@@ -119,9 +117,12 @@ async def info(*,id=0):
 async def formInit(*, id=0):
     """form表单初始化数据加载
     """
-
+    
     # 获得所有收入ID，id,income_id
     income_ids = await Invoice.findCols('income_id')
+    if not income_ids:
+        income_ids = ['0']
+
     income_id_str = ','.join(income_ids)
     sql = "SELECT id, income_id FROM income WHERE id NOT IN (%s) and status = 0 and is_delete = 0;" % income_id_str
     incomeIdList = await Income.query(sql)
@@ -162,7 +163,7 @@ async def form(*, id=0, income_id=''):
         return returnData(0, action , '收入ID不属于同一家公司，不能开一张票')
 
     # 获得收入信息
-
+    
     income_id_arr = income_ids.split(',')
     incomeInfo = None
     for income_id in income_id_arr:
