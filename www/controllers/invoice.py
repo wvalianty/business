@@ -22,7 +22,7 @@ sqlTpl = "SELECT {} FROM invoice inv \
             where inv.is_delete = 0 and {}"
 
 # 查询字段
-selectField = "inv.id,inv.info, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date, \
+selectField = "inv.id,inv.info,inv.inv_money, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date, \
                 c.name company_name, \
                 i.income_id, i.money, i.aff_date"
 
@@ -39,8 +39,6 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and finished = {}".format(where, status)
-    
-    where = await addAffDateWhere(where, month, isSearch)
 
     sql = sqlTpl.format('count(*) c', where)
     rs = await Invoice.query(sql)
@@ -52,7 +50,7 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
             'totalMoney': round(totalMoney, 2)
         })
 
-    where = " %s order by %s limit %s" % (where, 'inv.finished asc, income_id desc', limit)
+    where = " %s order by %s limit %s" % (where, 'inv.finished asc, inv.id desc', limit)
     sql = sqlTpl.format(selectField, where)
     lists = await Invoice.query(sql)
 
