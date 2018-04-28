@@ -50,8 +50,14 @@ async def apis_finish(*,id):
     where = "id = %s" %(id)
     invoices = await Invoice.findAll(where)
     invoices = obj2str(invoices)
+
     if len(invoices) == 1:
         invoiceId = invoices[0]["id"]
+        income_id = invoices[0]["income_id"]
+        wherei = " id = %s " %(income_id)
+        incomes = await  Income.findAll(where=wherei)
+        incomes[0]["status"] = 1
+        r_status = await  Income(**incomes[0]).save()
         if invoices[0]["finished"] == 1:
             return {
                 'msg': '已经确认过了！'
