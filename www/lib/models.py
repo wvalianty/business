@@ -59,7 +59,7 @@ class Income(Model):
 class Invoice(Model):
     __table__ = 'invoice'
     id = IntegerField(primary_key=True)
-    income_id = IntegerField()
+    income_id = StringField()
     info = StringField()
     add_date = DateTimeField(default=curr_datetime)
     finished = IntegerField(default=0)

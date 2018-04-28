@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-"发票管理模块"
+"结算单管理模块"
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Income, Client, Settlement

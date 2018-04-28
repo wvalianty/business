@@ -149,9 +149,9 @@ $(function(){
                     $('.search_btn[lay-submit]').click()
                 });
              
-                $('#searchForm input').unbind('keyup').keyup(function(e){
+                $(document).unbind('keyup').keyup(function(e){
                  
-                    if (e.which == 13) {
+                    if (e.which == 13 && $('.search_btn[lay-submit]').length > 0) {
                         $('.search_btn[lay-submit]').click()
                     }
                 });

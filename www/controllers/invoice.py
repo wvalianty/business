@@ -17,12 +17,12 @@ statusMap = (
 
 # sql模板
 sqlTpl = "SELECT {} FROM invoice inv \
-            INNER JOIN income i ON inv.`income_id`=i.`id` \
+            INNER JOIN income i ON i.`id` in (inv.`income_id`) \
             INNER JOIN `client` c ON i.`client_id` = c.`id`  \
             where inv.is_delete = 0 and {}"
 
 # 查询字段
-selectField = "inv.id,inv.info, inv.finished, inv.finished_time, inv.add_date,\
+selectField = "inv.id,inv.info, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date, \
                 c.name company_name, \
                 i.income_id, i.money, i.aff_date"
 
@@ -53,9 +53,8 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
             'totalMoney': round(totalMoney, 2)
         })
 
-    where = " %s order by %s limit %s" % (where, 'income_id desc', limit)
+    where = " %s order by %s limit %s" % (where, 'inv.finished asc, income_id desc', limit)
     sql = sqlTpl.format(selectField, where)
-
     lists = await Invoice.query(sql)
 
     # 将获得数据中的日期转换为字符串
@@ -70,6 +69,12 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
         item['status_text'] = "%s<br/>%s" % (item['status_text'], statusDate)
         item['info'] = item['info'].replace('\n', '<br/>')
         totalMoney += item['money']
+
+        if item['in_id'].find(',') > 0:
+            income_ids = await Income.findCols('income_id', "id in (%s)" % item['in_id'])
+            if income_ids:
+                item['income_id'] = ','.join(income_ids)
+
 
     return {
         'total': total,
@@ -115,7 +120,9 @@ async def formInit(*, id=0):
     """
     
     # 获得所有收入ID，id,income_id
-    sql = "SELECT id, income_id FROM income WHERE id NOT IN (SELECT income_id FROM invoice where is_delete = 0) and status = 0 and is_delete = 0;"
+    income_ids = await Invoice.findCols('income_id')
+    income_id_str = ','.join(income_ids)
+    sql = "SELECT id, income_id FROM income WHERE id NOT IN (%s) and status = 0 and is_delete = 0;" % income_id_str
     incomeIdList = await Income.query(sql)
 
     if not incomeIdList:
@@ -133,30 +140,33 @@ async def formInit(*, id=0):
     return res
 
 @post('/apis/invoice/form')
-async def form(*, id=0, income_id=0):
+async def form(*, id=0, income_id=''):
 
     action = '添加'
-
-    if  not income_id:
+    income_ids = income_id
+    income_id = ''
+    if not income_ids:
         return returnData(0, action, '请选择收入ID')
 
     # 判断该收入ID是否添加过发票信息
-    rs = await Invoice.findNumber(selectField="count(*)", where="income_id=%s" % income_id)
+    rs = await Invoice.findNumber(selectField="count(*)", where="income_id in (%s)" % income_ids)
 
     if rs:
         return returnData(0, action, '收入ID已存在')
 
     # 获得收入信息
+    
+    income_id = income_ids.split(',')[0]
     rs = await income.detail(id=income_id)
 
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info = Invoice.find(id)
-        info['income_id'] = income_id
+        info['income_id'] = income_ids
         info['info'] = rs['info']['invoice']
     else:
         info = dict(
-            income_id = income_id,
+            income_id = income_ids,
             info = rs['info']['invoice']
         )
 

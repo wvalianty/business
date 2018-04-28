@@ -150,3 +150,7 @@ CREATE TABLE `syslog` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+
+ALTER TABLE `business`.`invoice`   
+  CHANGE `income_id` `income_id` VARCHAR(50) NULL  COMMENT '收入id,多个用英文逗号分隔',
+  DROP FOREIGN KEY `invoice_ibfk_1`;

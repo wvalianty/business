@@ -16,6 +16,8 @@ $(function(){
                 var self = this;
                 layui.config({
                     base: "/static/js/"
+                }).extend({
+                    formSelects: 'formSelects'
                 }).use(['form', 'layer', 'laydate'], function () {
 
                     var form = layui.form,
@@ -54,7 +56,6 @@ $(function(){
                         hook_init_ui(form, layer)
                     }
 
-                    form.re
                 });
             }
         },
