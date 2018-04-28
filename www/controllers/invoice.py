@@ -154,20 +154,34 @@ async def form(*, id=0, income_id=''):
     if rs:
         return returnData(0, action, '收入ID已存在')
 
+    # 如果是多个收入ID， 判断是否属于同一家公司
+    rs = await Income.findCols("client_id", "id in (%s)" % income_ids, groupBy="client_id")
+
+    if len(rs) > 1:
+        return returnData(0, action , '收入ID不属于同一家公司，不能开一张票')
+
     # 获得收入信息
     
-    income_id = income_ids.split(',')[0]
-    rs = await income.detail(id=income_id)
+    income_id_arr = income_ids.split(',')
+    incomeInfo = None
+    for income_id in income_id_arr:
+        rs = await income.detail(id=income_id)
+        if not incomeInfo:
+            incomeInfo = rs['info']
+        else:
+            incomeInfo['money'] += rs['info']['money']
 
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info = Invoice.find(id)
         info['income_id'] = income_ids
-        info['info'] = rs['info']['invoice']
+        info['inv_money'] = incomeInfo['money']
+        info['info'] = incomeInfo['invoice']
     else:
         info = dict(
             income_id = income_ids,
-            info = rs['info']['invoice']
+            inv_money = incomeInfo['money'],
+            info = incomeInfo['invoice']
         )
 
     rows = await Invoice(**info).save()

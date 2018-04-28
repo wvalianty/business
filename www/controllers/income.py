@@ -210,6 +210,25 @@ async def detail(*, id=0):
     
     return res
 
+
+@get('/apis/income/getSumMoney')
+async def getSumMoney(*, ids=None):
+    """根据多个收入id，返回总金额
+    
+    Keyword Arguments:
+        ids {str} -- [收入ID，多个用逗号分隔] (default: {''})
+    """
+    if not ids:
+        return returnData(0, '开票金额获取', '缺少参数')
+
+    totatlMoney = await Income.findNumber('sum(money)', "id in (%s)" % ids)
+
+    return {
+        'status': 1,
+        'msg': '开票金额获取成功',
+        'inv_money': totatlMoney
+    }
+
 async def export(lists):
     """导出execl表格
     """

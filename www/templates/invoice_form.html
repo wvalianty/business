@@ -61,23 +61,10 @@ function hook_init(vueObj) {
 // 初始化UI
 function hook_init_ui(form, layer) {
 
-    /* form.on('select(select)', function(data){
-        
-        app.info[data.elem.name] = data.value;
-        
-        if (data.elem.name == 'income_id') {
-
-            getIncomeDetail(data.value);
-        } 
-
-    }); */
-
     layui.use(['formSelects'], function(){
         var form = layui.form,
-            formSelects = layui.formSelects,
-            income_id = 0;
+            formSelects = layui.formSelects;
         
-        // formSelects.debug(true);//开启debug模式
         formSelects.selects({
             filter: "select",
             name: 'income_id',
@@ -90,13 +77,24 @@ function hook_init_ui(form, layer) {
                 });
                 selectVal = selectVal.slice(0, -1);
                 app.$set(app.info, 'income_id', selectVal);
+                
+                getIncomeDetail(arr[0].val);
+                
+                if (arr.length > 1) {
 
-                if(arr.length > 0 && income_id != arr[0].val){
+                    debugger
+                    var url = "/apis/income/getSumMoney?ids=" + selectVal
+                
+                    $.get(url, function(res){
+                        if (!res.status) {
+                            layer.msg(res.msg);
+                            return;
+                        }
 
-                    income_id = arr[0].val;
-                    getIncomeDetail(income_id);
+                        app.$set(app.info, 'money', res.inv_money)
+                    });
                 }
-                console.log(selectVal)
+
             }
         });
 

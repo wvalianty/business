@@ -61,6 +61,7 @@ class Invoice(Model):
     id = IntegerField(primary_key=True)
     income_id = StringField()
     info = StringField()
+    inv_money = FloatField()
     add_date = DateTimeField(default=curr_datetime)
     finished = IntegerField(default=0)
     finished_time = DateTimeField()
