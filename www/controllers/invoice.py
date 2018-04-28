@@ -7,7 +7,7 @@ from core.coreweb import get, post
 from lib.models import Income, Client, Invoice
 from lib.common import obj2str, returnData, totalLimitP, addAffDateWhere
 import client, income
-
+from config import configs
 
 # 结算状态
 statusMap = (
@@ -34,7 +34,8 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
     
     # 合计金额
     totalMoney = 0
-
+    print(configs.user.name)
+    exit
     where = '1=1'
     if keyword:
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)

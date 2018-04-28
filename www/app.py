@@ -57,6 +57,7 @@ async def auth_factory(app, handler):
                 if user:
                     logging.info('set current user: %s' % user.email)
                     request.__user__ = user['email']
+                    configs.user.name = user['email']
                     role = user.role
                     modules = roles[int(role)]
                     if request.path in modules:
@@ -159,7 +160,7 @@ async def response_factory(app, handler):
 async def init(loop):
     await orm.create_pool(loop=loop, host=db.host, port=db.port, user=db.user, password=db.password, db=db.database)
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, data_factory, response_factory
+        auth_factory, logger_factory, data_factory, response_factory
     ])
     #auth_factory,
     init_jinja2(app)

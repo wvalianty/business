@@ -1,7 +1,11 @@
 #! /usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-import logging, asyncio, aiomysql, time
+import logging, asyncio, aiomysql, time, os, sys
+curr_dir = os.path.dirname(os.path.realpath(__file__))
+conf_dir = os.path.join(curr_dir, '..','..', 'conf')
+sys.path.append(conf_dir)
+from config import configs
 
 '''
 res = await conroutin or res = yield from coroutine
@@ -55,7 +59,8 @@ async def addsyslog(sql, args=None, affetced_id=0):
         affetced_id = 0
     
     currDate = time.strftime('%Y-%m-%d %H:%M:%S')
-    params = ['admin', action, table, table, sql, affetced_id, currDate]
+    username = configs.user.name
+    params = [username, action, table, table, sql, affetced_id, currDate]
     syslogSql = "INSERT INTO syslog(username, operate, `table`, module, `sql`, affetced_id,  add_date) value(?, ?, ?, ?, ?, ?, ?)"
     
     await execute(syslogSql, params)
