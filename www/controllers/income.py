@@ -4,7 +4,7 @@
 "收入管理模块"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Income, Client, Business, IncomeNo
+from lib.models import Income, Client, Business, IncomeNo, Invoice
 from lib.common import obj2str, exportExcel, totalLimitP, returnData, addAffDateWhere
 
 
@@ -165,7 +165,13 @@ async def delete(*, id):
     try:
         rows = await Income.delete(id)
     except Exception as e:
-        return returnData(0, action, '删除失败,请先删除发票管理中该收入ID条目')
+        return returnData(0, action, '请先删除发票管理中该收入ID条目')
+
+    try:
+        # 删除对应的发票单
+        inv_rows = await Invoice.delete(where="%s in (income_id) and finished = 0" % id)
+    except Exception as e:
+        return returnData(0, action , '删除发票单失败')
 
     return returnData(rows, action)
 

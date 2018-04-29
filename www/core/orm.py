@@ -418,7 +418,7 @@ class Model(dict, metaclass=ModelMetaClass):
         return rows
         
     @classmethod
-    async def delete(cls, pk=None, flag=True):
+    async def delete(cls, pk=None, flag=True, where=None):
         """根据主键删除数据
         
         Keyword Arguments:
@@ -435,11 +435,11 @@ class Model(dict, metaclass=ModelMetaClass):
             args = [pk]
             rows = await execute(cls.__delete__, args)
         else:
-            sql = "UPDATE %s SET is_delete = 1 WHERE id = %s" % (cls.__table__, pk)
+            if not where:
+                sql = "UPDATE %s SET is_delete = 1 WHERE id = %s" % (cls.__table__, pk)
+            else:
+                sql = "UPDATE %s SET is_delete = 1 WHERE %s" % (cls.__table__, where)
             rows = await execute(sql, None)
-
-        if rows != 1:
-            logging.warn('failed to remove by primary key : affected rows: %s' % rows)
         
         return rows
 
