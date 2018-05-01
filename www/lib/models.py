@@ -31,7 +31,7 @@ class Client(Model):
 class Business(Model):
     """业务类型表
     """
-    
+
     __table__ = 'business_type'
 
     id = IntegerField(primary_key=True)
@@ -40,7 +40,7 @@ class Business(Model):
 class Income(Model):
     """收入管理表
     """
-    
+
     __table__ = 'income'
 
     id = IntegerField(primary_key=True)
@@ -91,7 +91,7 @@ class Syslogs(Model):
     is_delete = IntegerField(default=0)
 
 class IncomeNo(Model):
-    
+
     __table__ = 'income_no'
     id = IntegerField(primary_key=True)
     income_no = StringField()
@@ -107,3 +107,31 @@ class Users(Model):
     name = StringField()
     created_at =  DateTimeField()
     is_delete = IntegerField(default=0)
+
+class Rule(Model):
+
+    __table__ = 'rule'
+
+    id = IntegerField(primary_key=True)
+    route = StringField()
+    title = StringField()
+    type = IntegerField(default=1)
+    status = IntegerField(default=1)
+    authopen = IntegerField(default=1)
+    icon = StringField()
+    condition = StringField()
+    pid = IntegerField(default=0)
+    sort = IntegerField(default=50)
+    add_date = DateTimeField(default=curr_datetime)
+    zt = IntegerField(default=0)
+    menustatus = IntegerField(default=0)
+
+class Role(Model):
+
+    __table__ = 'role'
+
+    id = IntegerField(primary_key=True)
+    title = StringField()
+    status = BooleanField()
+    rules = TextField()
+    add_date = DateTimeField(default=curr_datetime)

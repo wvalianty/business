@@ -164,3 +164,35 @@ def  managerEdit(**kv):
     return {
         '__template__':'adminEdit.html'
     }
+
+# 用户管理 ----- end
+
+
+# 权限管理 ------- start
+@get("/rule")
+def rule(request):
+    return {
+        '__template__': 'rule_index.html'
+    }
+@get("/rule/form")
+def rule_form(**kv):
+    return {
+        '__template__': 'rule_form.html'
+    }
+
+# 权限管理 ------- end
+
+
+# 角色管理 ------- start
+@get("/role")
+def role(request):
+    return {
+        '__template__': 'role_index.html'
+    }
+@get("/role/form")
+def role_form(**kv):
+    return {
+        '__template__': 'role_form.html'
+    }
+# 角色管理 ------- end
+

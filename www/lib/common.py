@@ -48,16 +48,16 @@ def obj2str(arr):
     """对象转字符串"""
     for item in arr:
         for field in item:
-            if isinstance(item[field], datetime.datetime):  
-                item[field] = item[field].strftime('%Y-%m-%d %H:%M:%S')  
-            elif isinstance(item[field], datetime.date):  
-                item[field] = item[field].strftime("%Y-%m-%d") 
-    
+            if isinstance(item[field], datetime.datetime):
+                item[field] = item[field].strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(item[field], datetime.date):
+                item[field] = item[field].strftime("%Y-%m-%d")
+
     return arr
 
 def exportExcel(name, fields, lists):
     """导出excle报表
-    
+
     Arguments:
         name {[type]} -- [文件名]
         fields {[type]} -- [导出字段名]
@@ -101,7 +101,7 @@ def returnData(rows, action, other=None):
     if rows == 1:
         status = 1
         msg = "%s成功" % action
-    
+
     if other:
         msg = "%s,%s" % (msg, other)
 
@@ -112,7 +112,7 @@ def returnData(rows, action, other=None):
 
 def totalLimitP(rs, page, pageSize, limitFlag = False):
     """返回数据总条数，limit，页数
-    
+
     Arguments:
         rs {[type]} -- [description]
         page {[type]} -- [description]
@@ -144,10 +144,10 @@ async def addAffDateWhere(where, month, isSearch=None):
             year, month = (dates[0], dates[1])
         else:
             month = time.strftime('%m')
-    
+
     if month:
         where = "{} and aff_date = '{}-{}'".format(where, year, month)
-    
+
     return where
 
 def user2cookie(user, max_age):
@@ -185,3 +185,48 @@ async def cookie2user(cookie_str):
     except Exception as e:
         logging.exception(e)
         return None
+
+def ruleTree(lists):
+    """
+    获得权限规则菜单
+    """
+    if not lists:
+        return []
+
+    maps = {}
+
+    for item in lists:
+        maps[item['id']] = item
+
+    for id in list(maps.keys()):
+        if id not in maps:
+            continue
+        item = maps[id]
+
+        if item['pid'] == 0:
+            continue
+
+        if item['pid'] in maps:
+
+            if 'child' not in maps[item['pid']]:
+                maps[item['pid']]['child'] = []
+
+            maps[item['pid']]['child'].append(item)
+            del maps[id]
+        else:
+            for id2 in list(maps.keys()):
+                if id2 not in maps:
+                    continue
+
+                tmp = maps[id2]
+                if 'child' in tmp:
+                    for i, child in enumerate(tmp['child']):
+                        if child['id'] == item['pid']:
+                            if 'child' not in maps[id2]['child'][i]:
+                                maps[id2]['child'][i]['child'] = []
+
+                            maps[id2]['child'][i]['child'].append(item)
+                            del maps[id]
+                            break;
+
+    return maps

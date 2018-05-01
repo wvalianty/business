@@ -4,83 +4,55 @@
 "收入管理模块"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Income, Client, Business, IncomeNo, Invoice
-from lib.common import obj2str, exportExcel, totalLimitP, returnData, addAffDateWhere
+from lib.models import Rule
+from lib.common import obj2str, totalLimitP, returnData, ruleTree
 
-
-# 结算状态
-statusMap = (
-    '待开票',
-    '未回款',
-    '已回款'
+# 菜单状态
+menuStatusMap = (
+    '隐藏',
+    '显示'
 )
 
-# 媒体类型
-mediaTypeMap = (
-    '自媒体',
-    '外媒'
+# 权限状态
+authopenMap = (
+    '无需验证',
+    '需要验证'
 )
 
-@get('/apis/income/index')
-async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
+@get('/apis/rule/index')
+async def index(*, keyword=None, page=1, pageSize=10):
 
     page = int(page)
     pageSize = int(pageSize)
 
-    # 合计金额
-    totalMoney = 0
-
-    where = 'i.is_delete = 0'
+    where = "1=1"
     if keyword:
-        where = "{} and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
-    if status and status.isdigit():
-        where = "{} and status = {}".format(where, status)
-    if mediaType and mediaType.isdigit():
-        where = "{} and media_type = {}".format(where, mediaType)
+        where = "{} and title like '%%{}%%'".format(where, keyword)
 
-    where = await addAffDateWhere(where, month, isSearch)
+    total = await Rule.findNumber('count(*)', where)
 
-    sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
-    rs = await Income.query(sql)
-
-    total, limit, p = totalLimitP(rs, page, pageSize)
+    total, limit, p = totalLimitP(total, page, pageSize, True)
     if total == 0:
-        return dict(total = total, page = p, list = (), other = {
-            'statusMap': statusMap,
-            'mediaTypeMap': mediaTypeMap,
-            'totalMoney': round(totalMoney, 2)
-        })
+        return dict(total = total, page = p, list = ())
 
-    sql = "SELECT i.*,c.name company_name FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where %s order by %s" % (where, 'income_id desc')
-
-    if not isExport or int(isExport) != 1:
-        sql = '%s limit %s' % (sql, limit)
-
-    lists = await Income.query(sql)
+    lists = await Rule.findAll(where=where, orderBy="sort desc, id asc")
 
     # 将获得数据中的日期转换为字符串
     lists = obj2str(lists)
 
     for item in lists:
-        item['status_text'] = statusMap[item['status']]
-        item['media_type_text'] = mediaTypeMap[item['media_type']]
-        totalMoney += item['money']
+        item['menustatus_text'] = menuStatusMap[item['menustatus']]
+        item['authopen_text'] = authopenMap[item['authopen']]
 
-    if isExport and int(isExport) == 1:
-        return await export(lists)
+    lists = ruleTree(lists)
 
     return {
         'total': total,
         'page': p,
-        'list': lists,
-        'other': {
-            'statusMap': statusMap,
-            'mediaTypeMap': mediaTypeMap,
-            'totalMoney': round(totalMoney, 2)
-        }
+        'list': lists
     }
 
-@get('/apis/income/info')
+@get('/apis/rule/info')
 async def info(*,id):
 
     action = '查询'
@@ -98,63 +70,47 @@ async def info(*,id):
 
     return res
 
-@get('/apis/income/formInit')
+@get('/apis/rule/formInit')
 async def formInit(*, id):
     """form表单初始化数据加载
     """
 
-    # 获得所有公司列表， id,name
-    clientList = await Client.findAll(field='id,name')
-
-    # 获得所有业务类型，id,type
-    typeList = await Business.findAll(field='id,type')
+    # 获得所有规则列表
+    lists = await Rule.findAll(field="id, pid, title",orderBy='sort desc')
+    lists = ruleTree(lists)
 
     res = {
-        'clientList': clientList,
-        'typeList': typeList
+        'ruleList': lists
     }
 
     return res
 
-@post('/apis/income/form')
+@post('/apis/rule/form')
 async def form(**kw):
 
     action = '添加'
     info = dict(
-        client_id = kw.get('client_id', 0),
-        business_type = kw.get('business_type', ''),
-        name = kw.get('name', ''),
-        money = kw.get('money', 0),
-        status = kw.get('status', 0),
-        media_type = kw.get('media_type', 0),
-        cost = kw.get('cost', ''),
-        aff_date = kw.get('aff_date')
+        pid = kw.get('pid', 0),
+        title = kw.get('title', ''),
+        route = kw.get('route', ''),
+        icon = kw.get('icon', 0),
+        menustatus = kw.get('menustatus', 0),
     )
 
-    if info['client_id'] == 0 or info['business_type'] == '':
-        return returnData(0, action, '公司名称或业务类型不能为空')
+    if info['title'] == '':
+        return returnData(0, action, '权限名称或路由不能为空')
 
     id = kw.get('id', 0)
     if id.isdigit() and int(id) > 0:
         action = '编辑'
-        # 如果是已回款状态，则只能编辑 渠道成本
-        oldInfo = await Income.find(id)
-        if oldInfo['status'] == 2:
-            oldInfo['cost'] = info['cost']
-            info = oldInfo
-        else:
-            info['id'] = id
-            info['income_id'] = kw.get('income_id', '')
-    else:
-        # 获得收入编号
-        info['income_id'] = await getIncomeNo(info['aff_date'])
-        await IncomeNo(income_no=info['income_id'], aff_date=info['aff_date']).save()
+        oldInfo = await Rule.find(id)
+        info = dict(oldInfo, info)
 
-    rows = await Income(**info).save()
+    rows = await Rule(**info).save()
 
     return returnData(rows, action)
 
-@get('/apis/income/del')
+@get('/apis/rule/del')
 async def delete(*, id):
 
     action = '删除'
@@ -174,7 +130,7 @@ async def delete(*, id):
 
     return returnData(rows, action)
 
-@get('/apis/income/getIncomeId')
+@get('/apis/rule/getIncomeId')
 async def getIncomeId(*, aff_date=None):
 
     income_id = await getIncomeNo(aff_date)
@@ -184,7 +140,7 @@ async def getIncomeId(*, aff_date=None):
         'income_id': income_id
     }
 
-@get('/apis/income/detail')
+@get('/apis/rule/detail')
 async def detail(*, id=0):
     """获得收入报表详情
     """
@@ -216,7 +172,7 @@ async def detail(*, id=0):
     return res
 
 
-@get('/apis/income/getSumMoney')
+@get('/apis/rule/getSumMoney')
 async def getSumMoney(*, ids=None):
     """根据多个收入id，返回总金额
 

@@ -1,0 +1,108 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}新增权限规则{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">父级</label>
+        <div class="layui-input-4">
+            <select name="pid" v-model="info.pid" lay-verify="required" lay-filter="select" lay-search>
+                <option value="">默认顶级</option>
+                <template v-for="onemenu in other.ruleList">
+                    <option :value="onemenu.id">{{onemenu.title}}</option>
+                    <template v-if="'child' in onemenu" v-for="twomenu in onemenu.child">
+                        <option :value="twomenu.id" >|— {{twomenu.title}}</option>
+                        <template v-if="'child' in twomenu">
+                            <option :value="threemenu.id" v-for="threemenu in twomenu.child">|— |— {{threemenu.title}}</option>
+                        </template>
+                    </template>
+                </template>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" >权限名称</label>
+        <div class="layui-input-4">
+            <input class="layui-input" type="text" name="title" v-model="info.title" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" >路由</label>
+        <div class="layui-input-4">
+            <input class="layui-input" type="text" name="route" v-model="info.route" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图标名称</label>
+        <div class="layui-input-6">
+            <input class="layui-input" name="icon" v-model="info.icon" lay-verify="required" type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单状态</label>
+        <div class="layui-input-6">
+            <input type="radio" v-model="info.menustatus" lay-filter="radio" name="menustatus" value="0" title="关闭" checked>
+            <input type="radio" v-model="info.menustatus" lay-filter="radio" name="menustatus" value="1" title="开启" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.sort" name="sort" type="number">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+<!-- footer -->
+{% block footer%}
+<script type="text/javascript">
+
+// 初始化时数据加载
+function hook_init(vueObj) {
+
+    let id = getQueryStr('id') || 0;
+    $.get('/apis/rule/formInit?id=' + id, function(data) {
+
+        app.other = data;
+        if( id == 0 ) {
+            app.info.sort = 50;
+            app.info.menustatus = 1;
+        }
+    });
+}
+
+// 初始化UI
+function hook_init_ui(form, layer) {
+
+    form.on('radio(radio)', function(data){
+
+        // if(data.elem.name == 'media_type') {
+        //     if (data.value == "1") {
+        //         $('#cost').show();
+        //     } else {
+        //         $('#cost').hide();
+        //     }
+        // }
+
+        app.info[data.elem.name] = data.value;
+    });
+
+    form.on('select(select)', function(data){
+
+        app.info[data.elem.name] = data.value;
+    });
+
+}
+</script>
+{% endblock %}

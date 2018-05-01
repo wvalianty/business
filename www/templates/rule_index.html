@@ -1,0 +1,58 @@
+{% extends 'layout_table.html' %}
+
+<!-- title -->
+{% block title %} 权限管理 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+<div class="layui-inline">
+    <form class="layui-form" id="searchForm" style="padding:0px;">
+        <div class="layui-input-inline" style="width: 150px;">
+            <input name="keyword" placeholder="可搜索权限名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn search_btn" id="selectAll" >查询全部</a>
+    </form>
+</div>
+<div class="layui-inline">
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/rule/form" data-title="新增权限规则">新增</a>
+</div>
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th style="text-align:left;">编号</th>
+            <th>图标</th>
+            <th>权限名称</th>
+            <th>路由</th>
+            <th>是否验证权限</th>
+            <th>菜单状态</th>
+            <th>排序</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template v-for="item in list">
+            <tr>
+                <td align="left">{{ item.id }}</td>
+                <td>{{ item.icon }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.route }}</td>
+                <td>{{ item.authopen }}</td>
+                <td>{{ item.menustatus }}</td>
+                <td>{{ item.sort }}</td>
+                <td>
+                    <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" v-if="item.status != 2 || item.media_type == 1"><i class="iconfont icon-edit" ></i> 编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/income/del?id=' + item.id " v-if="item.status != 2"><i class="layui-icon"></i> 删除</a>
+                </td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+{% endblock %}
+
