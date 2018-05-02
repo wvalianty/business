@@ -40,11 +40,13 @@
         <template v-for="item in list">
             <tr>
                 <td align="left">{{ item.id }}</td>
-                <td>{{ item.icon }}</td>
-                <td>{{ item.title }}</td>
+                <td><i :class="'iconfont ' + item.icon"></i></td>
+                <td>
+                    <template v-for="i in item.level">|—</template>
+                    {{ item.title }}</td>
                 <td>{{ item.route }}</td>
-                <td>{{ item.authopen }}</td>
-                <td>{{ item.menustatus }}</td>
+                <td>{{ item.authopen_text }}</td>
+                <td>{{ item.menustatus_text }}</td>
                 <td>{{ item.sort }}</td>
                 <td>
                     <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/rule/form?id=' + item.id" data-title="编辑权限规则"><i class="iconfont icon-edit" ></i> 编辑</a>

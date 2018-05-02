@@ -69,7 +69,7 @@ async def formInit(*, id):
     """
 
     # 获得所有规则列表
-    lists = await Rule.findAll(field="id, pid, title",orderBy='sort desc')
+    lists = await Rule.findAll(field="id, pid, title",orderBy='sort desc, id asc')
     lists = ruleTree(lists)
 
     res = {

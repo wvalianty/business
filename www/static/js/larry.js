@@ -10,9 +10,45 @@
  * | Author: qinshouwei <313492783@qq.com>
  * +----------------------------------------------------------------------
  */
+
+
+var app = new Vue({
+    el: '#layui_layout',
+    data: {
+        leftmenu: [],
+        username: ''
+    }, 
+    methods: {
+        getLeftMenu: function () {
+
+            var self = this;
+            // 获得左侧菜单数据
+            $.get('/apis/admin/leftmenu', function (res) {
+
+                if (!res.status) {
+                    location.href = '/login/index';
+                    return;
+                }
+
+                self.leftmenu = res.leftmenu;
+                self.username = res.username;
+
+            });
+        },
+        hasChild: function (item) {
+            return 'child' in item;
+        }
+    },
+    mounted: function() {
+        this.getLeftMenu();
+    }
+});
+
+
+
 layui.config({
     base: '/static/js/'
-}).use(['jquery', 'element', 'layer', 'navtab'], function() {
+}).use(['jquery', 'element', 'layer', 'navtab'], function () {
     window.jQuery = window.$ = layui.jquery;
     window.layer = layui.layer;
     var element = layui.element,
@@ -22,10 +58,10 @@ layui.config({
 
 
     //iframe自适应
-    $(window).on('resize', function() {
+    $(window).on('resize', function () {
         var $content = $('#larry-tab .layui-tab-content');
         $content.height($(this).height() - 136);
-        $content.find('iframe').each(function() {
+        $content.find('iframe').each(function () {
             $(this).height($content.height());
         });
         tab_W = $('#larry-tab').width();
@@ -35,18 +71,15 @@ layui.config({
     }).resize();
 
     // 左侧菜单导航-->tab
-    $(function() {
+    $(function () {
         // 注入菜单
-        // var $menu = $('.larry-tab-menu');
-        // console.log($menu);
-        // $('#larry-tab .layui-tab-title').append($menu);
-        $('#larry-nav-side').click(function() {
+        $('#larry-nav-side').click(function () {
             if ($(this).attr('lay-filter') !== undefined) {
-                $(this).children('ul').find('li').each(function() {
+                $(this).children('ul').find('li').each(function () {
                     var $this = $(this);
                     if ($this.find('dl').length > 0) {
-                        var $dd = $this.find('dd').each(function() {
-                            $(this).click(function() {
+                        var $dd = $this.find('dd').each(function () {
+                            $(this).click(function () {
                                 var $a = $(this).children('a');
                                 var href = $a.data('url');
                                 if (!href) {
@@ -65,7 +98,7 @@ layui.config({
 
                         });
                     } else {
-                        $this.click(function() {
+                        $this.click(function () {
                             var $a = $(this).children('a');
                             var href = $a.data('url');
                             var icon = $a.children('i:first').data('icon');
@@ -82,7 +115,7 @@ layui.config({
             }
         });
 
-        $(".menu_three").on("click", function() {
+        $(".menu_three").on("click", function () {
 
             $(this).parent().unbind('click').addClass(' layui-nav-itemed');
             $(this).next().toggle();
@@ -93,7 +126,7 @@ layui.config({
             }
         });
 
-        $("ol").on("click", "li a", function() {
+        $("ol").on("click", "li a", function () {
             $('.layui-this').removeClass('layui-this');
             $(this).parent().addClass('layui-this'); // 添加当前元素的样式
 

@@ -38,7 +38,14 @@
     <div class="layui-form-item">
         <label class="layui-form-label">图标名称</label>
         <div class="layui-input-6">
-            <input class="layui-input" name="icon" v-model="info.icon" lay-verify="required" type="text">
+            <input class="layui-input" name="icon" v-model="info.icon"  type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否验证权限</label>
+        <div class="layui-input-6">
+            <input type="radio" v-model="info.authopen" lay-filter="radio" name="authopen" value="0" title="否" checked>
+            <input type="radio" v-model="info.authopen" lay-filter="radio" name="authopen" value="1" title="是">
         </div>
     </div>
     <div class="layui-form-item">
@@ -78,6 +85,7 @@ function hook_init(vueObj) {
         if( id == 0 ) {
             app.info.sort = 50;
             app.info.menustatus = 1;
+            app.info.authopen = 1;
         }
     });
 }

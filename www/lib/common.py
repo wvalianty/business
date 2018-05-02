@@ -228,6 +228,16 @@ def ruleTree(lists, isList=False):
                             maps[id2]['child'][i]['child'].append(item)
                             del maps[id]
                             break
+                        elif 'child' in child:
+                            for j, twochild in enumerate(child['child']):
+                                if twochild['id'] == item['pid']:
+                                    if 'child' not in maps[id2]['child'][i]['child'][j]:
+                                        maps[id2]['child'][i]['child'][j]['child'] = []
+                                    
+                                    maps[id2]['child'][i]['child'][j]['child'].append(
+                                        item)
+                                    del maps[id]
+                                    break
     
     if isList:
         lists = []
@@ -238,13 +248,15 @@ def ruleTree(lists, isList=False):
             if 'child' in item:
                 for onechild in item['child']:
                     onechild['level'] = 1
-                    onechild['title'] = '|— %s' % onechild['title']
                     lists.append(onechild)
                     if 'child' in onechild:
                         for twochild in onechild['child']:
                             twochild['level'] = 2
-                            twochild['title'] = '|—|— %s' % twochild['title']
                             lists.append(twochild)
+                            if 'child' in twochild:
+                                for threechild in twochild['child']:
+                                    threechild['level'] = 3
+                                    lists.append(threechild)
         
         return lists
  
