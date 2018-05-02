@@ -19,7 +19,9 @@ moduleMaps = {
     'INVOICE': '发票管理',
     'INCOME': '收入报表',
     'SETTLEMENT': '结算单',
-    'USERS': '用户管理'
+    'USERS': '用户管理',
+    'ROLE': '用户组管理',
+    'RULE': '规则管理'
 }
 
 # sql模板

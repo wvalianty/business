@@ -8,11 +8,11 @@
 
 <div class="layui-inline">
     <form class="layui-form" id="searchForm" style="padding:0px;">
-        <div class="layui-input-inline" style="width: 150px;">
+        <!-- <div class="layui-input-inline" style="width: 150px;">
             <input name="keyword" placeholder="可搜索权限名称" class="layui-input search_input" type="text" v-model="params.keyword">
-        </div>
+        </div
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
-        <a class="layui-btn search_btn" id="selectAll" >查询全部</a>
+        <a class="layui-btn search_btn" id="selectAll" >查询全部</a>> -->
     </form>
 </div>
 <div class="layui-inline">
@@ -40,15 +40,17 @@
         <template v-for="item in list">
             <tr>
                 <td align="left">{{ item.id }}</td>
-                <td>{{ item.icon }}</td>
-                <td>{{ item.title }}</td>
+                <td><i :class="'iconfont ' + item.icon"></i></td>
+                <td>
+                    <template v-for="i in item.level">|—</template>
+                    {{ item.title }}</td>
                 <td>{{ item.route }}</td>
-                <td>{{ item.authopen }}</td>
-                <td>{{ item.menustatus }}</td>
+                <td>{{ item.authopen_text }}</td>
+                <td>{{ item.menustatus_text }}</td>
                 <td>{{ item.sort }}</td>
                 <td>
-                    <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" v-if="item.status != 2 || item.media_type == 1"><i class="iconfont icon-edit" ></i> 编辑</a>
-                    <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/income/del?id=' + item.id " v-if="item.status != 2"><i class="layui-icon"></i> 删除</a>
+                    <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/rule/form?id=' + item.id" data-title="编辑权限规则"><i class="iconfont icon-edit" ></i> 编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/rule/del?id=' + item.id " v-if="item.status != 2"><i class="layui-icon"></i> 删除</a>
                 </td>
             </tr>
         </template>

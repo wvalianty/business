@@ -194,5 +194,11 @@ def role_form(**kv):
     return {
         '__template__': 'role_form.html'
     }
+
+@get("/role/rule")
+def role_rule(**kv):
+    return {
+        '__template__': 'role_rule.html'
+    }
 # 角色管理 ------- end
 

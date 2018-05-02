@@ -186,7 +186,7 @@ async def cookie2user(cookie_str):
         logging.exception(e)
         return None
 
-def ruleTree(lists):
+def ruleTree(lists, isList=False):
     """
     获得权限规则菜单
     """
@@ -227,6 +227,37 @@ def ruleTree(lists):
 
                             maps[id2]['child'][i]['child'].append(item)
                             del maps[id]
-                            break;
-
+                            break
+                        elif 'child' in child:
+                            for j, twochild in enumerate(child['child']):
+                                if twochild['id'] == item['pid']:
+                                    if 'child' not in maps[id2]['child'][i]['child'][j]:
+                                        maps[id2]['child'][i]['child'][j]['child'] = []
+                                    
+                                    maps[id2]['child'][i]['child'][j]['child'].append(
+                                        item)
+                                    del maps[id]
+                                    break
+    
+    if isList:
+        lists = []
+        for id in list(maps.keys()):
+            item = maps[id]
+            item['level'] = 0
+            lists.append(item)
+            if 'child' in item:
+                for onechild in item['child']:
+                    onechild['level'] = 1
+                    lists.append(onechild)
+                    if 'child' in onechild:
+                        for twochild in onechild['child']:
+                            twochild['level'] = 2
+                            lists.append(twochild)
+                            if 'child' in twochild:
+                                for threechild in twochild['child']:
+                                    threechild['level'] = 3
+                                    lists.append(threechild)
+        
+        return lists
+ 
     return maps

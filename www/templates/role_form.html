@@ -1,0 +1,58 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}新增权限规则{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label" >角色名称</label>
+        <div class="layui-input-4">
+            <input class="layui-input" type="text" name="title" v-model="info.title" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+<!-- footer -->
+{% block footer%}
+<script type="text/javascript">
+
+// 初始化时数据加载
+function hook_init(vueObj) {
+
+    let id = getQueryStr('id') || 0;
+    $.get('/apis/rule/formInit?id=' + id, function(data) {
+
+        app.other = data;
+        if( id == 0 ) {
+            app.info.sort = 50;
+            app.info.menustatus = 1;
+        }
+    });
+}
+
+// 初始化UI
+function hook_init_ui(form, layer) {
+
+    form.on('radio(radio)', function(data){
+
+        app.info[data.elem.name] = data.value;
+    });
+
+    form.on('select(select)', function(data){
+
+        app.info[data.elem.name] = data.value;
+    });
+
+}
+</script>
+{% endblock %}
