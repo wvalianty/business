@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-"收入管理模块"
+"权限管理模块"
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Rule
@@ -29,12 +29,6 @@ async def index(*, keyword=None, page=1, pageSize=10):
     if keyword:
         where = "{} and title like '%%{}%%'".format(where, keyword)
 
-    total = await Rule.findNumber('count(*)', where)
-
-    total, limit, p = totalLimitP(total, page, pageSize, True)
-    if total == 0:
-        return dict(total = total, page = p, list = ())
-
     lists = await Rule.findAll(where=where, orderBy="sort desc, id asc")
 
     # 将获得数据中的日期转换为字符串
@@ -43,12 +37,11 @@ async def index(*, keyword=None, page=1, pageSize=10):
     for item in lists:
         item['menustatus_text'] = menuStatusMap[item['menustatus']]
         item['authopen_text'] = authopenMap[item['authopen']]
-
-    lists = ruleTree(lists)
-
+    
+    lists = ruleTree(lists, True)
     return {
-        'total': total,
-        'page': p,
+        'total': 0,
+        'page': [1,10],
         'list': lists
     }
 
@@ -61,7 +54,7 @@ async def info(*,id):
     if not id:
         return returnData(0, action, 'ID不存在')
 
-    info = await Income.find(id)
+    info = await Rule.find(id)
     if not info:
         return returnData(0, action)
 
@@ -104,7 +97,7 @@ async def form(**kw):
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         oldInfo = await Rule.find(id)
-        info = dict(oldInfo, info)
+        info = dict(oldInfo, **info)
 
     rows = await Rule(**info).save()
 
@@ -117,17 +110,11 @@ async def delete(*, id):
     if not id.isdigit() or int(id) <= 0:
         return returnData(0, action, '缺少请求参数')
 
-    try:
-        rows = await Income.delete(id)
-    except Exception as e:
-        return returnData(0, action, '请先删除发票管理中该收入ID条目')
-
-    try:
-        # 删除对应的发票单
-        inv_rows = await Invoice.delete(where="%s in (income_id) and finished = 0" % id)
-    except Exception as e:
-        return returnData(0, action , '删除发票单失败')
-
+    count = await Rule.findNumber('count(*)', where="pid = %s" % id)
+    if count > 0:
+        return returnData(0, action, '请先删除子菜单')
+    
+    rows = await Rule.delete(id)
     return returnData(rows, action)
 
 @get('/apis/rule/getIncomeId')
