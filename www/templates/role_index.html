@@ -1,0 +1,42 @@
+{% extends 'layout_table.html' %}
+
+<!-- title -->
+{% block title %} 角色管理 {% endblock %}
+
+<!-- menu start -->
+{% block menubox %}
+
+<div class="layui-inline">
+    <a class="layui-btn layui-btn-normal add-btn" data-url="/role/form" data-title="新增角色" data-area="600px,300px">新增</a>
+</div>
+{% endblock %}
+
+
+<!-- table start -->
+{% block table %}
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th style="text-align:left;">编号</th>
+            <th>角色</th>
+            <th>添加时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template v-for="item in list">
+            <tr>
+                <td align="left">{{ item.id }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.add_date }}</td>
+                <td>
+                    <a class="layui-btn layui-btn-mini layui-btn-normal edit-btn" v-bind:data-url="'/role/rule?id=' + item.id" data-title="配置规则"><i class="iconfont icon-edit" ></i> 配置规则</a>
+                    <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/role/form?id=' + item.id" data-title="编辑角色"><i class="iconfont icon-edit" ></i> 编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/role/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
+                </td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+{% endblock %}
+

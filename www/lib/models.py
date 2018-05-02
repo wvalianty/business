@@ -132,6 +132,6 @@ class Role(Model):
 
     id = IntegerField(primary_key=True)
     title = StringField()
-    status = BooleanField()
+    status = BooleanField(default=0)
     rules = TextField()
     add_date = DateTimeField(default=curr_datetime)

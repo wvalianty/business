@@ -62,7 +62,7 @@ async def addsyslog(sql, args=None, affetced_id=0):
     username = configs.user.name
     params = [username, action, table, table, sql, affetced_id, currDate]
     syslogSql = "INSERT INTO syslog(username, operate, `table`, module, `sql`, affetced_id,  add_date) value(?, ?, ?, ?, ?, ?, ?)"
-    
+ 
     await execute(syslogSql, params)
     
 

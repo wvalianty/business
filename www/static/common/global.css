@@ -1407,3 +1407,17 @@ body .layui-layout-admin .layui-larry-foot .p-admin a {
 .icon-edit:before{
     content:"\e602";
 }
+
+
+ul.ztree li span.button.switch{margin-right:5px}
+ul.ztree>li{background: #dae6f0;padding: 8px;}
+ul.ztree>li ul li{background: #eef5fa;margin-top: 8px;padding: 5px;}
+ul.ztree>li ul li ul li{background: #f6fbff;padding: 5px;}
+ul.ztree>li ul li ul li ul li{background: #fff;padding: 5px;}
+ul.ztree ul ul ul li{display:inline-block;}
+ul.ztree>ul li>ul>li{padding:5px}
+ul.ztree>ul li>ul{margin-top:12px}
+ul.ztree>ul li{padding:15px;padding-right:25px}
+ul.ztree>ul li{white-space:normal!important;background: #01AAED}
+ul.ztree li{white-space:inherit;}
+ul.ztree>li>a>span{font-size:15px;font-weight:700}
