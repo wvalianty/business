@@ -5,10 +5,10 @@
 
 configs = {
     "db": {
-        "host": "127.0.0.1",
+        "host": "rm-bp125wn81demb3djuo.mysql.rds.aliyuncs.com",
         "port": 3306,
         "user": "root",
-        "password": "123456",
+        "password": "W8UnSRjCCqz4JEdVw4",
         "database": "business"
     }, 
     "session": {
@@ -19,8 +19,5 @@ configs = {
     },
     'app': {
         'port': '8080'
-    },
-    'user': {
-        'name': 'admin_root'
     }
 }

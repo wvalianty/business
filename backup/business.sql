@@ -82,15 +82,14 @@ DROP TABLE IF EXISTS `invoice`;
 
 CREATE TABLE `invoice` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '发票管理，id',
-  `income_id` int(6) DEFAULT NULL COMMENT '收入id',
+  `income_id` VARCHAR(50) NULL  COMMENT '收入id,多个用英文逗号分隔',
   `info` varchar(100) DEFAULT NULL COMMENT '开票信息',
   `add_date` datetime DEFAULT NULL COMMENT '添加时间',
   `finished` tinyint(4) DEFAULT '0' COMMENT '财务确定完成',
   `finished_time` datetime DEFAULT NULL COMMENT '完成时间',
   `is_delete` tinyint(1) DEFAULT '0' COMMENT '是否已删除',
   PRIMARY KEY (`id`),
-  KEY `income_id` (`income_id`),
-  CONSTRAINT `invoice_ibfk_1` FOREIGN KEY (`income_id`) REFERENCES `income` (`id`)
+  KEY `income_id` (`income_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `settlement` */
@@ -151,6 +150,4 @@ CREATE TABLE `syslog` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 
-ALTER TABLE `business`.`invoice`   
-  CHANGE `income_id` `income_id` VARCHAR(50) NULL  COMMENT '收入id,多个用英文逗号分隔',
-  DROP FOREIGN KEY `invoice_ibfk_1`;
+-- ALTER TABLE `business`.`invoice`   CHANGE `income_id` `income_id` VARCHAR(50) NULL  COMMENT '收入id,多个用英文逗号分隔',DROP FOREIGN KEY `invoice_ibfk_1`;
