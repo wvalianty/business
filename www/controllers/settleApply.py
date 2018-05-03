@@ -59,7 +59,6 @@ async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
     pageSize = int(pageSize)
     income_id = int(keyword)
 
-    print(income_id)
 
     total = 1
     p = (1, 1)
@@ -70,7 +69,7 @@ async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
         res = obj2str(res)
     except:
         raise ValueError("/apis/settleApply_look/look  数据出现错误")
-    print(res)
+
 
     return {
         "total": total,
