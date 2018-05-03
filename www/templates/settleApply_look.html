@@ -21,22 +21,16 @@
     </colgroup>
     <thead>
         <tr>
-            <th style="text-align:left;">公司名称</th>
-            <th>结算金额</th>
-            <th>收入状态</th>
-            <th>添加时间</th>
+            <th style="text-align:left;">开票信息</th>
+
         </tr>
     </thead>
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
          <tr v-for="item in list">
 
-             <td align="left">{{ item.name }}</td>
-             <td> {{ item.balance }} </td>
-             <td v-if="item.status == 0"> 代开票 </td>
-             <td v-if="item.status == 1">未回款</td>
-             <td v-if="item.status == 2">已回款</td>
-             <td>{{ item.add_date }}</td>
+             <td align="left">{{ item.info }}</td>
+
         </tr>
     </tbody>
 </table>
