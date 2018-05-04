@@ -2,7 +2,7 @@
 from core.coreweb import get, post
 
 from lib.common import obj2str,returnData,user2cookie,cookie2user
-from lib.models import Syslogs,Client,Income,Settlement,Business,curr_datetime,next_id,Users
+from lib.models import Syslogs,Client,Income,Settlement,Business,curr_datetime,next_id,Users,Role
 import hashlib,asyncio,json,time,re,logging,datetime,math
 import hashlib,asyncio,json,time,re,logging
 
@@ -63,7 +63,7 @@ async  def login(*,account,passwd):
 async  def useradd(*,phone=None,email=None,passwd=None,role=None,name=None,id=None):
     # if not phone or not email or not passwd or not name:
     #     return returnData(0,"缺少请求参数，")
-
+    print("yes")
     if id :
         user = dict(
             id = int(id),
@@ -271,20 +271,15 @@ async  def lookAll(*,page=1,pageSize=30):
     if total == 0:
         return dict(total=total, page=p, list=())
     users = await Users.findAll(orderBy='id desc', where=where, limit=pageSize)
-
-
     users = obj2str(users)
-
+    roles = await  Role.findAll()
+    roles = obj2str(roles)
+    roles_template = {}
+    for role in roles:
+        roles_template[role["id"]] = role["title"]
     for item in users:
         item["passwd"] = "******"
-        if item["role"] == 0:
-            item["role"] = "管理员"
-        elif item["role"] == 1:
-            item["role"] = "运营侧"
-        elif item["role"] == 2:
-            item["role"] = "财务侧"
-        else:
-            item["role"] = "角色错误"
+        item["role"] = roles_template[item["role"]]
     return {
         'total': total,
         'page': p,
@@ -292,17 +287,14 @@ async  def lookAll(*,page=1,pageSize=30):
     }
 
 
-
-
-# @get('/apis/manager/del')
-# async def delete(*, id):
-#     if not id.isdigit() or int(id) <= 0:
-#         return returnData(0, '删除', '缺少请求参数')
-#
-#     try:
-#         rows = await Users.delete(id)
-#         msg = None
-#     except Exception as e:
-#         rows = 0
-#         msg = "删除失败"
-#     return returnData(rows, '删除', msg)
+@get("/apis/manger/init_role")
+async def get_role(request):
+    sql_role = 'select id,title from role'
+    try:
+        id_roles = await Role.query(sql_role)
+        id_roles = obj2str(id_roles)
+    except:
+        raise ValueError("/apis/manger/init_role获取用户角色错误")
+    return {
+        "id_roles":id_roles
+    }

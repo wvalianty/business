@@ -12,6 +12,7 @@ from lib.common import cookie2user, COOKIE_NAME, ctr_dir
 import core.orm as orm
 from core.coreweb import add_route, add_routes, add_static
 from config import configs
+from lib.models import Role,Users,Rule
 
 db = configs.db
 
@@ -24,20 +25,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-
-#0、管理员
-#1、运营侧
-#2、财务侧
-
-manager = set(["/manager/form","/apis/settlement/del","/apis/settlement/form","/apis/settlement/formInit","/apis/settlement/index","/apis/syslogs/del","/apis/syslogs/index","/apis/settlement/info","/board","/","/login/index","/main","/manager","/manager/edit","/syslogs","/apis/main/index","/apis/manager/del","/apis/finish","/api/login","/apis/manager/index","/apis/manager/info","/signout","/apis/manager/form"])
-operate = set(["/business","/business/form","/client","/settlement","/apis/board/index","/settlement/form","/client/form","/income","/income/form","/invoice","/invoice/form","/apis/business/index","/apis/client/del","/apis/client/form","/apis/client/index","/apis/client/info","/apis/income/del","/apis/income/detail","/apis/income/form","/apis/income/formInit","/apis/income/getIncomeId","/apis/income/index","/apis/income/info","/apis/invoice/del","/apis/invoice/form","/apis/invoice/formInit","/apis/invoice/index","/apis/business/form"])
-finance = set(["/settleApply_look","/apis/settleApply_look/look","/settleApply_identify","/apis/settleApply_index/index","/settleApply_index","/apis/invoice/info","/apis/invoiceApply_index/index","/invoiceApply_index"])
-
-super_user = finance | operate
-super_user = super_user | manager
-operate = operate | manager
-finance = finance | manager
-roles = {0:super_user,1:operate,2:finance}
 
 async  def auth_err(request):
     #return web.Response(body=b'<h1>please check your authority,please understand yourself in your  heart where there is a number,then contact the manager ,thankyou</h1>', content_type='text/html')
@@ -52,14 +39,21 @@ async def auth_factory(app, handler):
             return (yield from handler(request))
         cookie_str = request.cookies.get(COOKIE_NAME)
         if cookie_str:
+            modules = []
             try:
                 user = yield from cookie2user(cookie_str)
                 if user:
                     logging.info('set current user: %s' % user.email)
                     request.__user__ = user['email']
                     configs.user.name = user['email']
-                    role = user.role
-                    modules = roles[int(role)]
+                    roles = yield from  Role.find(int(user.role))
+                    rules = roles["rules"]
+                    for ruleid in rules.split(","):
+                        if ruleid != "":
+                            route = yield from Rule.find(int(ruleid))
+                            if route:
+                                modules.append(route["route"])
+                    print(modules)
                     if request.path in modules:
                         return (yield from handler(request))
                     else:

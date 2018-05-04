@@ -13,10 +13,8 @@
         <label class="layui-form-label">角色</label>
         <div class="layui-input-3">
               <select name="role" lay-verify="required">
-                <option value=""></option>
-                <option value="0">管理员</option>
-                <option value="1">运营侧</option>
-                <option value="2">财务侧</option>
+                  <option value=""></option>
+                  <option v-for="role in other.id_roles" :value="role.id">{{ role.title }}</option>
               </select>
         </div>
     </div>
@@ -61,7 +59,11 @@
 
 {% block footer %}
 <script type="text/javascript">
-
-
+// 初始化时数据加载
+function hook_init(vueObj) {
+    $.get('/apis/manger/init_role', function(data) {
+        app.$set(app.other, 'id_roles', data.id_roles);
+    });
+}
 </script>
 {% endblock %}
