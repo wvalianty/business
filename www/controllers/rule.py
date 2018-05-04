@@ -88,6 +88,7 @@ async def form(**kw):
         route = kw.get('route', ''),
         icon = kw.get('icon', 0),
         menustatus = kw.get('menustatus', 0),
+        authopen = kw.get('authopen', 1)
     )
 
     if info['title'] == '':
