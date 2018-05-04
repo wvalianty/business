@@ -69,7 +69,8 @@ async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
         res = obj2str(res)
     except:
         raise ValueError("/apis/settleApply_look/look  数据出现错误")
-
+    for info in res:
+        info["info"] = info["info"].replace("\n","</br>")
 
     return {
         "total": total,

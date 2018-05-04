@@ -9,6 +9,11 @@
 
 {% endblock %}
 
+{% block header %}
+    <style>
+        .layui-elem-quote.menubox {display: none}
+    </style>
+{% endblock %}
 
 <!-- table start -->
 {% block table %}
@@ -28,9 +33,7 @@
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
          <tr v-for="item in list">
-
-             <td align="left">{{ item.info }}</td>
-
+                 <td align="left" v-html="item.info"></td>
         </tr>
     </tbody>
 </table>

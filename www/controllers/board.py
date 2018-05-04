@@ -1,7 +1,7 @@
 from core.coreweb import get, post
 from lib.models import Income,Client
 import math,datetime,time
-from lib.common import obj2str,exportExcel
+from lib.common import obj2str,exportExcel,addAffDateWhere
 
 # 结算状态
 statusMap = (
@@ -21,6 +21,7 @@ async def export(lists):
     fields = {
         'income_id': '收入ID',
         'name': '公司名称',
+        'business_type': '业务类型',
         'cname': '业务名称',
         'aff_date': '归属时间',
         'money': '收入金额',
@@ -33,8 +34,8 @@ async def export(lists):
 async def board_index(*,isExport=None,keyword=None, month=None, status=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
-    year = time.strftime('%Y')
-
+    # year = time.strftime('%Y')
+    totalMoney = 0
     where = "where 1=1 and inc.is_delete = 0 and c.is_delete = 0 "
     numOrstr = None
 
@@ -43,9 +44,10 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
 
     if status and status.isdigit():
         where = "{} and status = {}  ".format(where, status)
-    if month and month.isdigit():
-        month = month.zfill(2)
-        where = "{} and aff_date like '%%{}-{}%%'".format(where, year, month)
+    # if month and month.isdigit():
+    #     month = month.zfill(2)
+    #     where = "{} and aff_date like '%%{}-{}%%'".format(where, year, month)
+    where = await addAffDateWhere(where, month, None)
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     sql_total = 'select count(*) cc from income inc inner join client c on inc.client_id = c.id %s' %(where)
 
@@ -53,13 +55,17 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
     total = re[0]["cc"]
     p = (math.ceil(total / pageSize), page)
     if total == 0:
-        return dict(total = total, page = (0,0), list = ())
-    sql_re = 'select inc.income_id,c.name,inc.name cname,inc.aff_date,inc.money,inc.status,inc.media_type from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
+        return dict(total=total, page=(0,0), list=(), other={
+            'totalMoney': round(totalMoney, 2)
+        })
+
+    sql_re = 'select inc.income_id,inc.business_type,c.name,inc.name cname,inc.aff_date,inc.money,inc.status,inc.media_type from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:
         item['status'] = statusMap[item['status']]
         item['media_type'] = mediaTypeMap[item['media_type']]
+        totalMoney = totalMoney + item['money']
 
     if isExport and int(isExport) == 1:
         return await export(res)
@@ -70,7 +76,8 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
         'list':res,
         'other':{
             'statusMap': statusMap,
-            'mediaTypeMap': mediaTypeMap
+            'mediaTypeMap': mediaTypeMap,
+            'totalMoney': round(totalMoney, 2)
         }
     }
 
