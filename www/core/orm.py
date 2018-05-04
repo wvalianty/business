@@ -372,9 +372,12 @@ class Model(dict, metaclass=ModelMetaClass):
         return cls(**rs[0])
     
     @classmethod
-    async def findOne(cls, selectField="*", where=None, args=None):
+    async def findOne(cls, selectField="*", where=None, args=None, isDelete=True):
         'find one by select and where'
         sql = ['select %s from `%s`' % (selectField, cls.__table__) ]
+
+        where = addSoftDeleteWhere(cls, where, isDelete)
+
         if where:
             sql.append('where')
             sql.append(where)

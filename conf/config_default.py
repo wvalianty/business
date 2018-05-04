@@ -21,6 +21,6 @@ configs = {
         'port': '8080'
     },
     'user': {
-        'name': 'admin_root'
+        'name': ''
     }
 }
