@@ -8,7 +8,7 @@ from datetime import datetime
 from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
 
-from lib.common import cookie2user, COOKIE_NAME, ctr_dir
+from lib.common import cookie2user, COOKIE_NAME, ctr_dir,obj2str
 import core.orm as orm
 from core.coreweb import add_route, add_routes, add_static
 from config import configs
@@ -35,10 +35,12 @@ async def auth_factory(app, handler):
     def auth(request):
         logging.info('check user: %s %s' % (request.method, request.path))
         request.__user__ = None
-        if request.path.startswith('/static/') or request.path.startswith('/api/login') or request.path.startswith('/login/index'):
+        if request.path.startswith('/static/') or request.path.startswith('/api/login') or request.path.startswith('/login/index')  or request.path.startswith('/apis'):
             return (yield from handler(request))
         cookie_str = request.cookies.get(COOKIE_NAME)
         if cookie_str:
+
+            #module可以写到全局变量里面
             modules = []
             try:
                 user = yield from cookie2user(cookie_str)
@@ -53,7 +55,6 @@ async def auth_factory(app, handler):
                             route = yield from Rule.find(int(ruleid))
                             if route:
                                 modules.append(route["route"])
-                    print(modules)
                     if request.path in modules:
                         return (yield from handler(request))
                     else:
@@ -154,7 +155,7 @@ async def response_factory(app, handler):
 async def init(loop):
     await orm.create_pool(loop=loop, host=db.host, port=db.port, user=db.user, password=db.password, db=db.database)
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, data_factory, response_factory
+        auth_factory,logger_factory, data_factory, response_factory
     ])
     #auth_factory,
     init_jinja2(app)

@@ -13,10 +13,8 @@ async def leftmenu(request):
     
     # 获得当前用户名
     username = configs.user.name
- 
     # 获得当前用户信息
-    userInfo = await Users.findOne(where="name='%s'" % username)
-   
+    userInfo = await Users.findOne(where="email='%s'" % username)
     if not userInfo:
         return {
             'status': 0,

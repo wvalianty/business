@@ -66,16 +66,20 @@ async def rule(*, id=None):
         return returnData(0, '配置权限', '缺少请求参数')
 
     lists = await Rule.findAll(field="id, pid, title", orderBy="sort desc, id asc")
-
     # 获得当前用户组的权限
     info = await Role.find(id)
-    checkedList = info['rules'].rstrip(',').split(',')
-    
-    for item in lists:
-        item['open'] = True
-        if str(item['id']) in checkedList:
-            item['checked'] = True
-    
+    if info["rules"]:
+        checkedList = info['rules'].rstrip(',').split(',')
+
+        if checkedList:
+            for item in lists:
+                item['open'] = True
+                if str(item['id']) in checkedList:
+                    item['checked'] = True
+        else:
+            for item in lists:
+                item['open'] = True
+
     lists.append({
         'id': 0,
         'pid': 0,
