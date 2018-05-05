@@ -66,6 +66,23 @@
             var text = getNowFormatDate();
             $("#hello").html(text);
         })
+
+        $(function () {
+            $('a[data-url="/settleApply_index"]').unbind('click').click(
+            function () {
+                var url_ = $(this).attr("data-url");
+                window.parent.click_from_main(url_);
+            })
+        })
+
+        $(function () {
+            $('a[data-url="/invoiceApply_index"]').unbind('click').click(
+            function () {
+                var url_ = $(this).attr("data-url");
+                window.parent.click_from_main(url_);
+            })
+        })
+
 </script>
 
 
@@ -166,8 +183,8 @@
                 </tbody>
             </table>
             <div id="right">
-                <a href="/settleApply_index"><div id="test">您有{{ other.settle }}个结算申请带处理</div></a>
-                <a href="/invoiceApply_index"><div id="test">您有{{ other.invoice }}个发票申请带处理</div></a>
+                <a data-url="/settleApply_index"><div id="test">您有{{ other.settle }}个结算申请带处理</div></a>
+                <a data-url="/invoiceApply_index"><div id="test">您有{{ other.invoice }}个发票申请带处理</div></a>
             </div>
         <div>
 </div>

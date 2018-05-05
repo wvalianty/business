@@ -11,6 +11,18 @@
  * +----------------------------------------------------------------------
  */
 'use strict';
+
+function click_from_main(url_) {
+    if ($('#leftmenu a[data-url="' + url_ + '"]').parents('.layui-nav-item').hasClass("layui-nav-itemed")){
+		$('#leftmenu a[data-url="' + url_ + '"]').trigger('click');
+    }
+
+    else{
+        $('#leftmenu a[data-url="' + url_ + '"]').parents('li.layui-nav-item').addClass('layui-nav-itemed');
+		$('#leftmenu a[data-url="' + url_ + '"]').trigger('click');
+    }
+}
+
 layui.use(['jquery', 'layer'], function() {
     window.jQuery = window.$ = layui.jquery;
     window.layer = layui.layer;
