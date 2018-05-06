@@ -27,6 +27,7 @@ async def export(lists):
         'money': '收入金额',
         'status': '结算进度',
         'media_type': '媒体类型',
+        'cost':'渠道成本',
     }
     return exportExcel('收入报表', fields, lists)
 
@@ -59,7 +60,7 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
             'totalMoney': round(totalMoney, 2)
         })
 
-    sql_re = 'select inc.income_id,inc.business_type,c.name,inc.name cname,inc.aff_date,inc.money,inc.status,inc.media_type from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
+    sql_re = 'select inc.cost,inc.income_id,inc.business_type,c.name,inc.name cname,inc.aff_date,inc.money,inc.status,inc.media_type from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:
