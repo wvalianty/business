@@ -55,6 +55,7 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
 #keyword 就是 income.id
 @get('/apis/settleApply_look/look')
 async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
+    print("aa")
     page = int(page)
     pageSize = int(pageSize)
     income_id = int(keyword)
@@ -71,6 +72,14 @@ async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
         raise ValueError("/apis/settleApply_look/look  数据出现错误")
     for info in res:
         info["info"] = info["info"].replace("\n","</br>")
+
+    flag = res
+    if not flag:
+        sql_re = 'select info from invoice where %s in (income_id)' % (income_id)
+        try:
+            res = await Invoice.query(sql_re)
+        except:
+            raise ValueError("/apis/settleApply_look/look  数据出现错误")
 
     return {
         "total": total,
