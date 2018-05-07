@@ -44,7 +44,7 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
 
     where = "s.is_delete =0"
     if keyword:
-        where = "%s and username like '%%{}%%'".format(where, keyword)
+        where = "{} and (s.username like '%%{}%%' or i.income_id like '%%{}%%')".format(where, keyword, keyword)
     if operate and operate in operateMaps.keys():
         where = "%s and operate = '%s'" % (where, operate)
     if module and module in moduleMaps.keys():
