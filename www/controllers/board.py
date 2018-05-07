@@ -45,7 +45,7 @@ async def board_index(*,isExport=None,keyword=None, month=None,year=None, status
 
     if status and status.isdigit():
         where = "{} and status = {}  ".format(where, status)
-    
+
     if month:
         if int(month) < 10:
             month = "0" + str(month)

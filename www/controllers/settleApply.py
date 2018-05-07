@@ -55,7 +55,6 @@ async def settleApply_index(*,keyword=None, page=1, pageSize=10):
 #keyword 就是 income.id
 @get('/apis/settleApply_look/look')
 async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
-    print("aa")
     page = int(page)
     pageSize = int(pageSize)
     income_id = int(keyword)
@@ -64,27 +63,27 @@ async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
     total = 1
     p = (1, 1)
 
-    where = " income_id = %s" %(income_id)
+    where = " id = %s" %(income_id)
     try:
-        res = await Invoice.findAll(where=where)
-        res = obj2str(res)
+        res_tmp = await Income.findOne(where=where)
     except:
         raise ValueError("/apis/settleApply_look/look  数据出现错误")
-    for info in res:
-        info["info"] = info["info"].replace("\n","</br>")
-
-    flag = res
-    if not flag:
-        sql_re = 'select info from invoice where %s in (income_id)' % (income_id)
-        try:
-            res = await Invoice.query(sql_re)
-        except:
-            raise ValueError("/apis/settleApply_look/look  数据出现错误")
+    client_id =  res_tmp["client_id"]
+    wherec = " id = %s " %(client_id)
+    try:
+        res = await  Client.findOne(where=wherec)
+    except:
+        raise ValueError("/apis/settleApply_look/look  数据出现错误")
+    res["invoice"] = res["invoice"].replace("\n","</br>")
+    rest = {}
+    for k,v in res.items():
+        if k == "invoice":
+            rest["invoice"] = res["invoice"]
 
     return {
         "total": total,
         "page": p,
-        "list": res
+        "list": rest
     }
     # wherei = " id = %s " %(income_id)
     # try:

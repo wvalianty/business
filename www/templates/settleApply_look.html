@@ -32,13 +32,12 @@
     </thead>
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
-         <tr v-for="item in list">
-                 <td align="left" v-html="item.info"></td>
+         <tr>
+                 <td align="left" v-html="list.invoice"></td>
         </tr>
     </tbody>
 </table>
 {% endblock %}
-
 <!-- footer -->
 {% block footer %}
 {% endblock %}
