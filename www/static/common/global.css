@@ -1421,3 +1421,8 @@ ul.ztree>ul li{padding:15px;padding-right:25px}
 ul.ztree>ul li{white-space:normal!important;background: #01AAED}
 ul.ztree li{white-space:inherit;}
 ul.ztree>li>a>span{font-size:15px;font-weight:700}
+
+
+.gray-btn {
+    background-color: gray !important;
+}

@@ -131,10 +131,11 @@ def totalLimitP(rs, page, pageSize, limitFlag = False):
 
     return total, limit, p
 
-async def addAffDateWhere(where, month, isSearch=None):
+async def addAffDateWhere(where, month, isSearch=None, year=None):
     """where 条件添加归属日期参数
     """
-    year = time.strftime('%Y')
+    if not year:
+        year = time.strftime('%Y')
     if month and month.isdigit():
         month = month.zfill(2)
     elif not month and not isSearch:
@@ -147,6 +148,8 @@ async def addAffDateWhere(where, month, isSearch=None):
 
     if month:
         where = "{} and aff_date = '{}-{}'".format(where, year, month)
+    elif year:
+        where = "{} and aff_date like '{}-{}'".format(where, year, '%%')
 
     return where
 

@@ -89,6 +89,7 @@ class Syslogs(Model):
     sql = StringField()
     add_date = DateTimeField(default=curr_datetime)
     is_delete = IntegerField(default=0)
+    is_read = IntegerField(default=0)
 
 class IncomeNo(Model):
 

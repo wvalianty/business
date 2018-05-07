@@ -457,6 +457,16 @@ class Model(dict, metaclass=ModelMetaClass):
         return rs
 
     @classmethod
+    async def execute(cls, sql=None, args=None):
+        """sql修改操作
+        """
+        if not sql:
+            return None
+
+        rs = await execute(sql, args)
+        return rs
+
+    @classmethod
     async def findCols(cls, selectField="*", where=None, args=None, groupBy=None, orderBy=None):
         
         rs = await cls.findAll(field=selectField, where=where,args=args,groupBy=groupBy,orderBy=orderBy)

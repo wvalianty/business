@@ -22,7 +22,7 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
+async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=10):
 
     page = int(page)
     pageSize = int(pageSize)
@@ -37,9 +37,9 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
         where = "{} and status = {}".format(where, status)
     if mediaType and mediaType.isdigit():
         where = "{} and media_type = {}".format(where, mediaType)
-
-    where = await addAffDateWhere(where, month, isSearch)
-
+    
+    where = await addAffDateWhere(where, month, isSearch, year)
+    
     sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
     rs = await Income.query(sql)
 
@@ -240,11 +240,12 @@ async def export(lists):
     fields = {
         'income_id': '收入ID',
         'company_name': '公司名称',
+        'business_type': '业务类型',
         'name': '业务名称',
         'aff_date': '归属时间',
         'money': '收入金额',
-        'status': '结算进度',
-        'media_type': '媒体类型',
+        'status_text': '结算进度',
+        'media_type_text': '媒体类型',
         'cost': '渠道成本'
     }
 

@@ -8,17 +8,17 @@
 
 <div class="layui-inline">
     <form class="layui-form" id="searchForm" style="padding:0px;">
-        <div class="layui-input-inline">
-            <input name="keyword" placeholder="请输入管理员名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        <div class="layui-input-inline" style="width: 160px;">
+            <input name="keyword" placeholder="可搜索操作人、操作目标" class="layui-input search_input" type="text" v-model="params.keyword">
         </div>
-        <div class="layui-input-inline">
+        <div class="layui-input-inline" style="display: none;">
             <select class="layui-input" name="operate">
                 <option value="">操作类型</option>
                 <option value="">操作类型</option>
                 <option :value="key" v-for="(val,key) in other.operateMaps">{{val}}</option>
             </select>
         </div>
-        <div class="layui-input-inline">
+        <div class="layui-input-inline" style="display: none;">
             <select class="layui-input" name="module">
                 <option value="">操作模块</option>
                 <option value="">操作模块</option>
@@ -27,6 +27,7 @@
         </div>
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
         <a class="layui-btn search_btn" id="selectAll">查询全部</a>
+        <a class="layui-btn search_btn" id="readAll">全部已读</a>
     </form>
 </div>
 {% endblock %}
@@ -37,21 +38,82 @@
 <table class="layui-table">
     <thead>
         <tr>
-            <th style="text-align:left;">管理员</th>
-            <th>操作</th>
-            <th>模块</th>
-            <!-- <th>SQL</th> -->
+            <th style="text-align:left;">操作人</th>
+            <th>操作目标</th>
+            <th>操作记录</th>
             <th>操作时间</th>
         </tr>
     </thead>
     <tbody>
-        <tr v-for="item in list">
-            <td align="left">{{ item.username }}</td>
-            <td>{{ item.operate_text }}</td>
-            <td>{{ item.module_text }}</td>
-            <!-- <td>{{ item.sql }}</td> -->
-            <td>{{ item.add_date }}</td>
-        </tr>
+        <template v-for="item in list">
+            <tr :class="{'redline': !item.is_read}">
+                <td align="left">{{ item.username }}</td>
+                <td>{{ item.income_id }}</td>
+                <td>{{ item.operate_text }}</td>
+                <td>
+                    {{ item.add_date }} <br/>
+                    <a class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id"> 详情</a>
+                </td>
+            </tr>
+            <tr style="display: none;">
+                <td colspan="4">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>收入ID</td>
+                                <td>公司名称</td>
+                                <td>业务名称</td>
+                                <td>收入金额</td>
+                                <td>结算进度</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{item.income_id}}</td>
+                                <td>{{item.company_name}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.money}}</td>
+                                <td>{{item.status_text}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </template>
     </tbody>
 </table>
+{% endblock %}
+
+
+{% block footer %}
+<script>
+
+    function hook_updated(){
+    
+        $('.syslogInfo').click(function(){
+          
+            $(this).parents('tr').next().toggle();
+            if($(this).parents('tr').hasClass('redline')){
+                $(this).parents('tr').removeClass('redline');
+
+                var id = $(this).data('id');
+                $.get('/apis/syslogs/read?id=' + id, function(res){
+                    if(!res.status) {
+
+                        layui.layer.msg(res.msg);
+                    }
+                });
+            }
+        });
+
+        $('#readAll').unbind('click').click(function(){
+
+            $.get('/apis/syslogs/readall', function(res){
+                if(!res.status) {
+                    layui.layer.msg(res.msg)
+                }
+            });
+        });
+    }
+</script>
 {% endblock %}

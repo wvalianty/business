@@ -60,8 +60,8 @@
             <td v-html="item.invoice" align="left"></td>
             <td v-html="item.status_text" ></td>
             <td>
-                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/'+module+'/form?id=' + item.id" data-title="编辑结算单" v-show="!item.status"><i class="iconfont icon-edit"></i> 编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/'+module+'/del?id=' + item.id " v-if="!item.status"><i class="layui-icon"></i> 删除</a>
+                <a class="layui-btn layui-btn-mini" v-bind:data-url="'/'+module+'/form?id=' + item.id" data-title="编辑结算单" :class="{'edit-btn':!item.status, 'gray-btn': item.status}" ><i class="iconfont icon-edit"></i> 编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini" v-bind:data-url="'/apis/'+module+'/del?id=' + item.id " :class="{'del-btn':!item.status, 'gray-btn': item.status}"><i class="layui-icon"></i> 删除</a>
             </td>
         </tr>
         <tr>

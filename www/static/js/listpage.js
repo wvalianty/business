@@ -223,6 +223,10 @@ $(function(){
                         }
                     }
                 })
+
+                if(typeof hook_updated == 'function') {
+                    hook_updated();
+                }
             });
         }
     });
