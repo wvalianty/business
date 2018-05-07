@@ -75,7 +75,7 @@ async def invoiceApply_index(*, keyword=None, page=1, pageSize=10):
                 else:
                     tmp["show"] = 0
                     if tmp["finished"] ==0:
-                        res.insert(int(j),tmp)
+                        res.insert(int(income_ids.index(j)),tmp)
                     else:
                         res.append(tmp)
 
