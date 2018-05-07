@@ -156,21 +156,22 @@ async def form(**kw):
 
 @get('/apis/income/del')
 async def delete(*, id):
-
+    # 1. 已回款收入单不能删除
+    # 2. 未回款收入单可以删除，但不删除关联发票信息
+    # 3. 待开票收入单可删除，但要删除未处理的发票信息
     action = '删除'
     if not id.isdigit() or int(id) <= 0:
         return returnData(0, action, '缺少请求参数')
 
     try:
-        rows = await Income.delete(id)
+        rows = await Income.delete(id, where="status<2")
     except Exception as e:
-        return returnData(0, action, '请先删除发票管理中该收入ID条目')
-
-    try:
-        # 删除对应的发票单
-        inv_rows = await Invoice.delete(where="%s in (income_id) and finished = 0" % id)
-    except Exception as e:
-        return returnData(0, action , '删除发票单失败')
+        return returnData(0, action , '删除失败')
+    
+    rows = 1
+    # 删除对应的未处理的发票单
+    if rows:
+        await Invoice.delete(where="%s in (income_id) and finished = 0" % id)
 
     return returnData(rows, action)
 

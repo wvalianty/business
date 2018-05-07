@@ -120,11 +120,14 @@ async def delete(*, id):
     if not id.isdigit() or int(id) <= 0:
         return returnData(0, '删除', '缺少请求参数')
     
-    try:
-        rows = await Client.delete(id)
-        msg = None
-    except Exception as e:
+    # 判断是否有收入单关联
+    count = await Income.findNumber('count(*)', where="client_id=%s" % id)
+
+    if count > 0:
         rows = 0
         msg = "请先删除收入报表中有关该客户的记录"
-
+    else:
+        rows = await Client.delete(id)
+        msg = None
+   
     return returnData(rows, '删除', msg)
