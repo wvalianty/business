@@ -8,7 +8,13 @@
 {% block menubox %}
 <div class="layui-inline" style="width:100%;">
     <form class="layui-form" id="searchForm" style="padding:0px; background-color:#f2f2f2; ">
-
+          <div class="layui-input-inline">
+            <select name="year">
+                <option value="">全部年份</option>
+                <option value="">全部年份</option>
+                <option v-for="year in 10" :value="year + 2017">{{year + 2017}}年</option>
+            </select>
+        </div>
         <div class="layui-input-inline">
             <select name="month">
                 <option value="">全部时间</option>
