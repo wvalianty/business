@@ -151,3 +151,6 @@ CREATE TABLE `syslog` (
 
 
 -- ALTER TABLE `business`.`invoice`   CHANGE `income_id` `income_id` VARCHAR(50) NULL  COMMENT '收入id,多个用英文逗号分隔',DROP FOREIGN KEY `invoice_ibfk_1`;
+
+ALTER TABLE `business`.`syslog`   
+  ADD COLUMN `is_read` TINYINT(1) DEFAULT 0  NULL  COMMENT '标记是否已读' AFTER `sql`;

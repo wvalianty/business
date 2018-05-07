@@ -6,6 +6,7 @@ import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Syslogs
 from lib.common import obj2str, returnData, totalLimitP
+from income import statusMap as incomeStatusMap
 
 operateMaps = {
     'INSERT': '新增',
@@ -25,11 +26,13 @@ moduleMaps = {
 }
 
 # sql模板
-sqlTpl = "SELECT {} FROM syslog \
-       WHERE module != 'INCOME_NO' and {}"
+sqlTpl = "SELECT {} FROM syslog s \
+        INNER JOIN income i ON s.affetced_id = i.id \
+        INNER JOIN client c ON i.client_id = c.id \
+        WHERE module = 'INCOME' and s.is_delete =0 and {}"
 
 # 搜索字段
-selectField = 'id, username, `operate`, `module`, `sql`, `add_date`'
+selectField = 's.id, s.username, s.`operate`, s.`module`, s.`add_date`, s.is_read, i.income_id, c.name company_name, i.name, i.money, i.status'
 
 @get('/apis/syslogs/index')
 async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10):
@@ -39,9 +42,9 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
     # 当前日期
     # currDate = time.strftime('%Y-%m-%d')
 
-    where = 'is_delete=0'
+    where = "s.is_delete =0"
     if keyword:
-        where = "username like '%%{}%%'".format(keyword)
+        where = "{} and (s.username like '%%{}%%' or i.income_id like '%%{}%%')".format(where, keyword, keyword)
     if operate and operate in operateMaps.keys():
         where = "%s and operate = '%s'" % (where, operate)
     if module and module in moduleMaps.keys():
@@ -57,8 +60,9 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
             'moduleMaps': moduleMaps
         })
     
-    where = "%s order by %s limit %s" % (where, 'id desc', limit)
+    where = "%s order by %s limit %s" % (where, 's.id desc', limit)
     sql = sqlTpl.format(selectField, where)
+   
     lists = await Syslogs.query(sql)
 
     # 将获得数据中的日期转换为字符串
@@ -68,6 +72,7 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
     for item in lists:
         item['operate_text'] = operateMaps[item['operate']]
         item['module_text'] = moduleMaps[item['module']]
+        item['status_text'] = incomeStatusMap[item['status']]
        
 
     return {
@@ -80,6 +85,26 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
         }
     }
 
+
+@get('/apis/syslogs/read')
+async def read(*, id):
+    
+    if not id.isdigit() or int(id) <= 0:
+        return returnData(0, '标记已读', '缺少请求参数')
+    
+    info = await Syslogs.find(id)
+    info['is_read'] = 1
+    rows = await Syslogs(**info).update()
+
+    return returnData(rows, '标记已读')
+
+@get('/apis/syslogs/readall')
+async def read_all(request):
+    
+    sql = "UPDATE syslog SET is_read = 1"
+    rows = await Syslogs.execute(sql)
+
+    return returnData(1, '全部标记已读')
 
 
 @get('/apis/syslogs/del')

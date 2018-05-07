@@ -58,11 +58,11 @@
             <td v-html="item.info" align="left"></td>
             <td v-html="item.status_text"></td>
             <td>
-                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/invoice/del?id=' + item.id " v-if="!item.finished"><i class="layui-icon" ></i> 删除</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini" v-bind:data-url="'/apis/invoice/del?id=' + item.id " :class="{'del-btn':!item.finished, 'gray-btn':item.finished}" ><i class="layui-icon" ></i> 删除</a>
             </td>
         </tr>
         <tr>
-            <td colspan="8" align="left">合计金额: {{ other.totalMoney }}</td>
+            <td colspan="8" align="center">合计金额: {{ other.totalMoney }}</td>
         </tr>
     </tbody>
 </table>

@@ -12,9 +12,16 @@
             <input name="keyword" placeholder="可搜索收入id,公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
         </div>
         <div class="layui-input-inline">
+            <select name="year">
+                <option value="">全部年份</option>
+                <option value="">全部年份</option>
+                <option v-for="year in 10" :value="year + 2017">{{year + 2017}}年</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
             <select name="month">
-                <option value="">全部时间</option>
-                <option value="">全部时间</option>
+                <option value="">全部月份</option>
+                <option value="">全部月份</option>
                 <option v-for="month in 12" :value="month">{{month}}月</option>
             </select>
         </div>
@@ -69,8 +76,9 @@
             <td>{{ item.status_text }}</td>
             <td>{{ item.media_type_text }}</td>
             <td>
-                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" v-if="item.status != 2 || item.media_type == 1"><i class="iconfont icon-edit" ></i> 编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/income/del?id=' + item.id " v-if="item.status != 2"><i class="layui-icon"></i> 删除</a>
+                <a class="layui-btn layui-btn-mini" :class="{'edit-btn': (item.status != 2 || item.media_type == 1), 'gray-btn':!(item.status != 2 || item.media_type == 1)}" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" ><i class="iconfont icon-edit" ></i> 编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini" v-bind:data-url="'/apis/income/del?id=' + item.id " 
+                :class="{'del-btn': item.status != 2, 'gray-btn':item.status==2}"><i class="layui-icon"></i> 删除</a>
             </td>
         </tr>
         <tr>

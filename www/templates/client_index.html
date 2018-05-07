@@ -50,8 +50,8 @@
             </td>
             <td>{{ item.tfCount }}/{{ item.tfMoney }}</td>
             <td>{{ item.hkCount }}/{{ item.hkMoney || 0}}</td>
-            <td v-html="item.invoice" style="text-align:left;"></td>
-            <td>
+            <td v-html="item.invoice" style="text-align:left;width: 350px;"></td>
+            <td style="width: 170px;">
                 <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>
                 <a class="layui-btn layui-btn-danger layui-btn-mini del-btn" v-bind:data-url="'/apis/client/del?id=' + item.id "><i class="layui-icon"></i> 删除</a>
             </td>
