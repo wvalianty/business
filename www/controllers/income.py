@@ -22,7 +22,7 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, status=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=10):
 
     page = int(page)
     pageSize = int(pageSize)
@@ -30,15 +30,13 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     # 合计金额
     totalMoney = 0
 
-    where = 'i.is_delete = 0'
+    where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 'i.is_delete')
     if keyword:
-        where = "{} and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
+        where = "{} and (income_id like '%%{}%%' or c.name like '%%{}%%')".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and status = {}".format(where, status)
     if mediaType and mediaType.isdigit():
         where = "{} and media_type = {}".format(where, mediaType)
-    
-    where = await addAffDateWhere(where, month, isSearch, year)
     
     sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
     rs = await Income.query(sql)

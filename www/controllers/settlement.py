@@ -22,7 +22,7 @@ sqlTpl = "SELECT {} FROM settlement s INNER JOIN income i ON s.`income_id`=i.`id
 selectField = "s.id,s.balance, s.status, s.add_date,s.finished_time, c.name company_name, c.invoice, i.income_id, i.money, i.aff_date"
 
 @get('/apis/settlement/index')
-async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, page=1, pageSize=10):
 
     page = int(page)
     pageSize = int(pageSize)
@@ -32,7 +32,9 @@ async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1,
     # 合计结算金额
     totalBalance = 0
 
-    where = 's.is_delete = 0'
+    lastDate = await getLastDate()
+    where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 's.is_delete', 'aff_date', lastDate)
+    
     if keyword:
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
@@ -170,3 +172,17 @@ async def delete(*, id):
     return returnData(rows, action)
 
 
+
+async def getLastDate():
+    """获得最后一条数据的月份
+    """
+
+    lastDateSql = "select aff_date from settlement s \
+                    inner join income i On s.`income_id` = i.`id` \
+                    order by i.`aff_date` desc"
+    
+    rs = await Settlement.query(lastDateSql)
+    if rs and len(rs) > 0:
+        return rs[0]['aff_date']
+    
+    return None

@@ -195,10 +195,11 @@ $(function(){
             var self = this;
             layui.config({
                 base: '/static/js/'
-            }).use(['form', 'layer', 'jquery', 'laypage'], function () {
+            }).use(['form', 'layer', 'jquery', 'laypage', 'laydate'], function () {
                 var form = layui.form,
                     layer = parent.layer === undefined ? layui.layer : parent.layer,
                     laypage = layui.laypage,
+                    laydate = layui.laydate,
                     $ = layui.jquery;
 
                 // 等数据渲染完成，再绑定事件
@@ -207,6 +208,15 @@ $(function(){
                 // 更新搜索框
                 form.render('select');
 
+                if($('.rangeDate').length > 0) {
+                    var type = $('.rangeDate').data('type') || 'date';
+                    laydate.render({
+                        elem: '.rangeDate',
+                        type: type,
+                        range: true
+                    });
+                }
+                
 
                 laypage.render({
                     elem: 'page',
@@ -222,7 +232,7 @@ $(function(){
                             self.getLists(self.currPage);
                         }
                     }
-                })
+                });
 
                 if(typeof hook_updated == 'function') {
                     hook_updated();
