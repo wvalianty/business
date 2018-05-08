@@ -154,3 +154,10 @@ CREATE TABLE `syslog` (
 
 ALTER TABLE `business`.`syslog`   
   ADD COLUMN `is_read` TINYINT(1) DEFAULT 0  NULL  COMMENT '标记是否已读' AFTER `sql`;
+
+ALTER TABLE `business`.`income`   
+ADD COLUMN `money_status` TINYINT(1) DEFAULT 0  NULL  COMMENT '回款状态，0：未回款，1：已回款，2：确认回款' AFTER `is_delete`,
+ADD COLUMN `inv_status` TINYINT(1) DEFAULT 0  NULL  COMMENT '开票状态：0: 未开票，1：已开票，2：不开票' AFTER `money_status`;
+
+ALTER TABLE `business`.`income`   
+  CHANGE `inv_status` `inv_status` TINYINT(1) DEFAULT 0  NULL  COMMENT '开票状态：0: 未开票，1：不开票，2：已开票，';

@@ -16,15 +16,19 @@
                 placeholder="选择日期">
         </div>
         <div class="layui-input-inline">
-            <select name="status">
-                <option value="">全部状态</option>
-                <option value="">全部状态</option>
-                <option v-for="status,index in other.statusMap" :value="index">{{status}}</option>
+            <select name="moneyStatus">
+                <option value="">回款状态</option>
+                <option v-for="status,index in other.moneyStatusMap" :value="index">{{status}}</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="invStatus">
+                <option value="">开票状态</option>
+                <option v-for="status,index in other.invStatusMap" :value="index">{{status}}</option>
             </select>
         </div>
         <div class="layui-input-inline">
             <select name="mediaType">
-                <option value="">媒体类型</option>
                 <option value="">媒体类型</option>
                 <option v-for="type,index in other.mediaTypeMap" :value="index">{{type}}</option>
             </select>
@@ -51,7 +55,9 @@
             <th>业务名称</th>
             <th>归属时间</th>
             <th>收入金额</th>
-            <th>结算进度</th>
+            <th>收款公司</th>
+            <th>回款状态</th>
+            <th>开票状态</th>
             <th>媒体类型</th>
             <th>操作</th>
         </tr>
@@ -63,16 +69,23 @@
             <td>{{ item.business_type }}-{{ item.name }}</td>
             <td>{{ item.aff_date }}</td>
             <td>{{ item.money }}</td>
-            <td>{{ item.status_text }}</td>
+            <td>{{ item.income_company }}</td>
+            <td>
+                {{ item.money_status_text }}
+                <template v-if="item.money_status">
+                    <br/> {{ item.return_money_date }}
+                </template>
+            </td>
+            <td>{{ item.inv_status_text }}</td>
             <td>{{ item.media_type_text }}</td>
             <td>
-                <a class="layui-btn layui-btn-mini" :class="{'edit-btn': (item.status != 2 || item.media_type == 1), 'gray-btn':!(item.status != 2 || item.media_type == 1)}" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" ><i class="iconfont icon-edit" ></i> 编辑</a>
+                <a class="layui-btn layui-btn-mini" :class="{'edit-btn': (item.money_status != 1 || item.media_type == 1), 'gray-btn':!(item.money_status != 1 || item.media_type == 1)}" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" ><i class="iconfont icon-edit" ></i> 编辑</a>
                 <a class="layui-btn layui-btn-danger layui-btn-mini" v-bind:data-url="'/apis/income/del?id=' + item.id " 
-                :class="{'del-btn': item.status != 2, 'gray-btn':item.status==2}"><i class="layui-icon"></i> 删除</a>
+                :class="{'del-btn': item.money_status != 1, 'gray-btn':item.money_status==1}"><i class="layui-icon"></i> 删除</a>
             </td>
         </tr>
         <tr>
-            <td colspan="8" align="center">合计金额: {{ other.totalMoney }}</td>
+            <td colspan="10" align="center">合计金额: {{ other.totalMoney }}</td>
         </tr>
     </tbody>
 </table>

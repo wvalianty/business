@@ -37,6 +37,12 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">渠道成本</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.cost" readonly lay-verify="required" type="number">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">结算金额</label>
         <div class="layui-input-6">
             <input class="layui-input" v-model="info.balance" :max="info.money" lay-verify="required" type="number" name="balance" id="balance">
@@ -49,15 +55,27 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">结算类型</label>
+        <div class="layui-input-6">
+            <input type="radio" v-model="info.stype" lay-filter="radio" name="stype" :value="index" :title="stype" v-for="stype, index in other.stypeMap">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">收款信息</label>
         <div class="layui-input-6">
             <textarea placeholder="请输入内容摘要" readonly v-model="info.invoice" class="layui-textarea" lay-verify="required"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">收入状态</label>
+        <label class="layui-form-label">回款状态</label>
         <div class="layui-input-6">
-            <input class="layui-input" v-model="info.status_text" lay-verify="required" type="text" readonly>
+            <input class="layui-input" v-model="info.money_status_text" lay-verify="required" type="text" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">发票状态</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.inv_status_text" lay-verify="required" type="text" readonly>
         </div>
     </div>
     <div class="layui-form-item">
@@ -81,6 +99,10 @@ function hook_init(vueObj) {
     $.get('/apis/settlement/formInit?id=' + id, function(data) {
         
         vueObj.other = data;
+
+        if(id == 0){
+            app.info.stype = 0;
+        }
     });
 }
 
@@ -93,7 +115,6 @@ function hook_init_ui(form, layer) {
         
         var url = '/apis/income/detail',
             module = 'income';
-            console.log(data.elem.name)
         if (data.elem.name == 'client_id') {
             url = '/apis/client/info';
             module = 'client';
@@ -101,7 +122,7 @@ function hook_init_ui(form, layer) {
 
         url += '?id=' + data.value;
         var fields = {
-            'income': ['aff_date', 'money', 'status_text'],
+            'income': ['aff_date', 'money', 'money_status_text','inv_status_text','cost'],
             'client': ['invoice']
         };
         $.get(url, function (res) {
@@ -116,14 +137,14 @@ function hook_init_ui(form, layer) {
     $('#balance').blur(function(){
 
         var val = parseInt(this.value);
-        if (val > app.info.money) {
-            layer.msg('结算金额不能大于收入金额，请重新输入');
+        if (val > app.info.cost) {
+            layer.msg('结算金额不能大于渠道成本，请重新输入');
             
             app.info.balance = 0;
             app.info.rate = 0;
             return;
         }
-        var val = (val / app.info.money * 100).toFixed(2)
+        var val = (val / app.info.cost * 100).toFixed(2)
         app.$set(app.info, 'rate', val + '%');
     });
 }

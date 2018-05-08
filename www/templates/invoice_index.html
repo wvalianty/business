@@ -39,10 +39,10 @@
         <tr>
             <th style="text-align:left;">收入ID</th>
             <th>公司名称</th>
-            <!-- <th>归属时间</th> -->
             <th>开票金额</th>
             <th>开票信息</th>
             <th>发票状态</th>
+            <th>发票号</th>
             <th>操作</th>
         </tr>
     </thead>
@@ -50,10 +50,10 @@
         <tr v-for="item in list">
             <td align="left">{{ item.income_id }}</td>
             <td>{{ item.company_name }}</td>
-            <!-- <td>{{ item.aff_date }}</td> -->
             <td>{{ item.inv_money }}</td>
             <td v-html="item.info" align="left"></td>
             <td v-html="item.status_text"></td>
+            <td>{{ item.comments }}</td>
             <td>
                 <a class="layui-btn layui-btn-danger layui-btn-mini" v-bind:data-url="'/apis/invoice/del?id=' + item.id " :class="{'del-btn':!item.finished, 'gray-btn':item.finished}" ><i class="layui-icon" ></i> 删除</a>
             </td>

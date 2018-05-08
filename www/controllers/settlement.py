@@ -15,11 +15,17 @@ statusMap = (
     '已处理',
 )
 
+# 结算单类型
+stypeMap = (
+    '对公',
+    '对私'
+)
+
 # sql模板
 sqlTpl = "SELECT {} FROM settlement s INNER JOIN income i ON s.`income_id`=i.`id` INNER JOIN `client` c ON s.`client_id` = c.`id`  where {}"
 
 # 查询字段
-selectField = "s.id,s.balance, s.status, s.add_date,s.finished_time, c.name company_name, c.invoice, i.income_id, i.money, i.aff_date"
+selectField = "s.id,s.balance, s.status,s.stype, s.add_date,s.finished_time, c.name company_name, c.invoice, i.income_id, i.money, i.aff_date"
 
 @get('/apis/settlement/index')
 async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, page=1, pageSize=10):
@@ -70,6 +76,7 @@ async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, pag
         
         item['status_text'] = "%s<br/>%s" % (item['status_text'], statusDate)
         item['invoice'] = item['invoice'].replace('\n', '<br/>')
+        item['stype_text'] = stypeMap[item['stype']]
         totalMoney += item['money']
         totalBalance += item['balance']
 
@@ -92,7 +99,7 @@ async def info(*,id=0):
     if not id:
         return returnData(0, '查询', 'ID不存在')
 
-    sql = "SELECT s.id,s.client_id, s.income_id,s.balance, i.aff_date,i.money,i.status, c.invoice,c.name company_name \
+    sql = "SELECT s.id,s.client_id, s.income_id,s.balance,s.stype, i.aff_date,i.money,i.money_status, i.inv_status, c.invoice,c.name company_name \
             FROM settlement s \
             INNER JOIN income i ON s.`income_id` = i.`id` \
             INNER JOIN `client` c ON s.`client_id` = c.`id` \
@@ -108,7 +115,8 @@ async def info(*,id=0):
     res['info'] = obj2str((info))[0]
 
     # 收入状态
-    res['info']['status_text'] = income.statusMap[res['info']['status']]
+    res['info']['money_status_text'] = income.moneyStatusMap[res['info']['money_status']]
+    res['info']['inv_status_text'] = income.invStatusMap[res['info']['inv_status']]
 
     # 结算比例
     rate = round(res['info']['balance'] / res['info']['money'], 2) * 100
@@ -122,31 +130,51 @@ async def formInit(*, id=0):
     """
 
     # 获得所有收入ID，id,income_id
-    incomeIdList = await Income.findAll(field="id,income_id", where='media_type=1')
+    incomeIdList = await Income.findAll(field="id,income_id,cost", where='media_type=1')
 
     # 获得所有客户信息, id, name
     clientList = await Client.findAll(field="id, name")
 
+    # 判断收入单的结算金额是否以结算完
+    # incomeIdList[:] 拷贝incomeIdList, 不直接操作incomeIdList
+    for item in incomeIdList[:]:
+        # 已结算金额
+        settMoney = await Settlement.findNumber('sum(balance)', where="income_id=%s" % item['id']) or 0
+        if float(settMoney) >= float(item['cost']):
+            incomeIdList.remove(item)
+
     res = {
         'incomeIdList': incomeIdList,
-        'clientList': clientList
+        'clientList': clientList,
+        'stypeMap': stypeMap
     }
 
     return res
 
 @post('/apis/settlement/form')
-async def form(*, id=0, income_id=0, client_id=0, balance=0):
+async def form(*, id=0, income_id=0, client_id=0, balance=0, stype=0):
 
     action = '添加'
 
     if  int(income_id) == 0:
         return returnData(0, action, '请选择收入ID')
 
+    # 获得该收入单的渠道成本
+    # 结算的金额不能超过渠道成本
+    totalMoney = await Income.findNumber('cost', where="id=%s" % income_id) or 0
+
+    # 获得已结算的金额
+    settMoney = await Settlement.findNumber('sum(balance)', where="income_id=%s" % income_id) or 0
+
+    if (float(balance) + float(settMoney)) > float(totalMoney):
+        return returnData(0, action, "结算金额不能超过渠道成本,已结算:%s" % settMoney)
+
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info = await Settlement.find(id)
         info['income_id'] = income_id
         info['client_id'] = client_id
+        info['stype'] = stype
         info['balance'] = balance
     else:
         info = dict(
@@ -179,6 +207,7 @@ async def getLastDate():
 
     lastDateSql = "select aff_date from settlement s \
                     inner join income i On s.`income_id` = i.`id` \
+                    where s.is_delete = 0 \
                     order by i.`aff_date` desc"
     
     rs = await Settlement.query(lastDateSql)
