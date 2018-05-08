@@ -161,3 +161,9 @@ ADD COLUMN `inv_status` TINYINT(1) DEFAULT 0  NULL  COMMENT '开票状态：0: �
 
 ALTER TABLE `business`.`income`   
   CHANGE `inv_status` `inv_status` TINYINT(1) DEFAULT 0  NULL  COMMENT '开票状态：0: 未开票，1：不开票，2：已开票，';
+
+ALTER TABLE `business`.`income`   
+  ADD COLUMN `return_money_date` DATE NULL  COMMENT '回款日期' AFTER `income_company`;
+  
+  ALTER TABLE `business`.`settlement`   
+  ADD COLUMN `stype` TINYINT(1) DEFAULT 0  NULL  COMMENT '结算单类型，0：对公，1：对私' AFTER `finished_time`;

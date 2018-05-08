@@ -144,8 +144,8 @@ function hook_init_ui(form, layer) {
             app.info.rate = 0;
             return;
         }
-        var val = (val / app.info.cost * 100).toFixed(2)
-        app.$set(app.info, 'rate', val + '%');
+        var rate = (val / app.info.money * 100).toFixed(3)
+        app.$set(app.info, 'rate', rate + '%');
     });
 }
 </script>

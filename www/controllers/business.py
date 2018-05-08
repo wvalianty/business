@@ -39,7 +39,7 @@ async def index(*, keyword=None, rangeDate=None, isSearch=0, page=1, pageSize=10
     for item in lists:
        
         # 查询回款数
-        where = "%s and business_type = '%s' and status = 2" % (baseWhere, item.type)
+        where = "%s and business_type = '%s' and money_status = 1" % (baseWhere, item.type)
         item['hkCount'] = await Income.findNumber('count(id)', where)
 
         # 回款金额

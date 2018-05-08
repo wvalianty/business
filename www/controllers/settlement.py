@@ -99,7 +99,7 @@ async def info(*,id=0):
     if not id:
         return returnData(0, '查询', 'ID不存在')
 
-    sql = "SELECT s.id,s.client_id, s.income_id,s.balance,s.stype, i.aff_date,i.money,i.money_status, i.inv_status, c.invoice,c.name company_name \
+    sql = "SELECT s.id,s.client_id, s.income_id,s.balance,s.stype, i.aff_date,i.money,i.money_status,i.cost, i.inv_status, c.invoice,c.name company_name \
             FROM settlement s \
             INNER JOIN income i ON s.`income_id` = i.`id` \
             INNER JOIN `client` c ON s.`client_id` = c.`id` \
@@ -119,7 +119,7 @@ async def info(*,id=0):
     res['info']['inv_status_text'] = income.invStatusMap[res['info']['inv_status']]
 
     # 结算比例
-    rate = round(res['info']['balance'] / res['info']['money'], 2) * 100
+    rate = round(res['info']['balance'] / res['info']['money'] * 100, 3)
     res['info']['rate'] = "%s%%" % rate
 
     return res
@@ -129,15 +129,23 @@ async def formInit(*, id=0):
     """form表单初始化数据加载
     """
 
+    # 当前结算单的income_id
+    inIdList = None
+    if id and int(id) > 0:
+        incomeIds = await Settlement.findNumber('income_id', where="id = %s" % id)
+        inIdList = str(incomeIds).split(',')
+    
     # 获得所有收入ID，id,income_id
     incomeIdList = await Income.findAll(field="id,income_id,cost", where='media_type=1')
 
     # 获得所有客户信息, id, name
     clientList = await Client.findAll(field="id, name")
-
+    
     # 判断收入单的结算金额是否以结算完
     # incomeIdList[:] 拷贝incomeIdList, 不直接操作incomeIdList
     for item in incomeIdList[:]:
+        if inIdList and str(item['id']) in inIdList:
+            continue
         # 已结算金额
         settMoney = await Settlement.findNumber('sum(balance)', where="income_id=%s" % item['id']) or 0
         if float(settMoney) >= float(item['cost']):
@@ -155,28 +163,36 @@ async def formInit(*, id=0):
 async def form(*, id=0, income_id=0, client_id=0, balance=0, stype=0):
 
     action = '添加'
-
+    balance = float(balance)
     if  int(income_id) == 0:
         return returnData(0, action, '请选择收入ID')
 
     # 获得该收入单的渠道成本
     # 结算的金额不能超过渠道成本
     totalMoney = await Income.findNumber('cost', where="id=%s" % income_id) or 0
+    totalMoney = float(totalMoney)
 
     # 获得已结算的金额
     settMoney = await Settlement.findNumber('sum(balance)', where="income_id=%s" % income_id) or 0
+    settMoney = float(settMoney)
 
-    if (float(balance) + float(settMoney)) > float(totalMoney):
-        return returnData(0, action, "结算金额不能超过渠道成本,已结算:%s" % settMoney)
 
     if id.isdigit() and int(id) > 0:
         action = '编辑'
         info = await Settlement.find(id)
+        
+        if (balance - info['balance'] + settMoney) > totalMoney:
+            return returnData(0, action, "结算金额不能超过渠道成本,已结算:%s" % settMoney)
+
         info['income_id'] = income_id
         info['client_id'] = client_id
         info['stype'] = stype
         info['balance'] = balance
     else:
+
+        if (balance + settMoney) > totalMoney:
+            return returnData(0, action, "结算金额不能超过渠道成本,已结算:%s" % settMoney)
+
         info = dict(
             income_id = income_id,
             client_id = client_id,

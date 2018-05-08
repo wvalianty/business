@@ -23,7 +23,7 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
             where = "%s and indate_end < '%s'" % (where, currDate)
         else:
             where = "%s and indate_end >= '%s'" % (where, currDate)
-
+    
     total = await Client.findNumber('count(id)', where)
     total, limit, p = totalLimitP(total, page, pageSize, True)
     
@@ -46,7 +46,7 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
         item['tfMoney'] = round(info['tfMoney'], 2) if info['tfMoney'] else 0
 
         # 回款金额
-        where = "%s and status = 2" % where
+        where = "%s and money_status = 1" % where
         field = "count(*) hkCount, sum(money) hkMoney"
         info = await Income.findOne(field, where)
         item['hkMoney'] = round(info['hkMoney'], 2) if info['hkMoney'] else 0
