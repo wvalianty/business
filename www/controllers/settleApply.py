@@ -63,19 +63,27 @@ async def settleApply_formIndex(*,keyword=None, page=1, pageSize=10):
     total = 1
     p = (1, 1)
 
-    where = " income_id = %s" %(income_id)
+    where = " id = %s" %(income_id)
     try:
-        res = await Invoice.findAll(where=where)
-        res = obj2str(res)
+        res_tmp = await Income.findOne(where=where)
     except:
         raise ValueError("/apis/settleApply_look/look  数据出现错误")
-    for info in res:
-        info["info"] = info["info"].replace("\n","</br>")
+    client_id =  res_tmp["client_id"]
+    wherec = " id = %s " %(client_id)
+    try:
+        res = await  Client.findOne(where=wherec)
+    except:
+        raise ValueError("/apis/settleApply_look/look  数据出现错误")
+    res["invoice"] = res["invoice"].replace("\n","</br>")
+    rest = {}
+    for k,v in res.items():
+        if k == "invoice":
+            rest["invoice"] = res["invoice"]
 
     return {
         "total": total,
         "page": p,
-        "list": res
+        "list": rest
     }
     # wherei = " id = %s " %(income_id)
     # try:

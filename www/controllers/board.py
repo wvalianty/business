@@ -32,7 +32,7 @@ async def export(lists):
     return exportExcel('收入报表', fields, lists)
 
 @get('/apis/board/index')
-async def board_index(*,isExport=None,keyword=None, month=None, status=None, page=1, pageSize=10):
+async def board_index(*,isExport=None,keyword=None, month=None,year=None, status=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
     # year = time.strftime('%Y')
@@ -45,10 +45,16 @@ async def board_index(*,isExport=None,keyword=None, month=None, status=None, pag
 
     if status and status.isdigit():
         where = "{} and status = {}  ".format(where, status)
-    # if month and month.isdigit():
-    #     month = month.zfill(2)
-    #     where = "{} and aff_date like '%%{}-{}%%'".format(where, year, month)
-    where = await addAffDateWhere(where, month, None)
+
+    if month:
+        if int(month) < 10:
+            month = "0" + str(month)
+    if month and year:
+        where = "{} and aff_date = '{}-{}'" .format(where,year,month)
+    if month:
+        where = "{} and aff_date like '{}-{}'" .format(where, '%%', month)
+    if year:
+        where = "{} and aff_date like '{}-{}'".format(where, year, '%%')
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     sql_total = 'select count(*) cc from income inc inner join client c on inc.client_id = c.id %s' %(where)
 
