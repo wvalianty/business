@@ -25,7 +25,7 @@ stypeMap = (
 sqlTpl = "SELECT {} FROM settlement s INNER JOIN income i ON s.`income_id`=i.`id` INNER JOIN `client` c ON s.`client_id` = c.`id`  where {}"
 
 # 查询字段
-selectField = "s.id,s.balance, s.status,s.stype, s.add_date,s.finished_time, c.name company_name, c.invoice, i.income_id, i.money, i.aff_date"
+selectField = "s.id,s.balance, s.status,s.stype,s.pay_company, s.add_date,s.finished_time, c.name company_name, c.invoice, i.income_id, i.money, i.aff_date"
 
 @get('/apis/settlement/index')
 async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, page=1, pageSize=10):
@@ -99,7 +99,7 @@ async def info(*,id=0):
     if not id:
         return returnData(0, '查询', 'ID不存在')
 
-    sql = "SELECT s.id,s.client_id, s.income_id,s.balance,s.stype, i.aff_date,i.money,i.money_status,i.cost, i.inv_status, c.invoice,c.name company_name \
+    sql = "SELECT s.id,s.client_id, s.income_id,s.balance,s.pay_company, s.stype, i.aff_date,i.money,i.money_status,i.cost, i.inv_status, c.invoice,c.name company_name \
             FROM settlement s \
             INNER JOIN income i ON s.`income_id` = i.`id` \
             INNER JOIN `client` c ON s.`client_id` = c.`id` \
@@ -160,7 +160,7 @@ async def formInit(*, id=0):
     return res
 
 @post('/apis/settlement/form')
-async def form(*, id=0, income_id=0, client_id=0, balance=0, stype=0):
+async def form(*, id=0, income_id=0, client_id=0, balance=0, stype=0,pay_company=''):
 
     action = '添加'
     balance = float(balance)
@@ -188,6 +188,7 @@ async def form(*, id=0, income_id=0, client_id=0, balance=0, stype=0):
         info['client_id'] = client_id
         info['stype'] = stype
         info['balance'] = balance
+        info['pay_company'] = pay_company
     else:
 
         if (balance + settMoney) > totalMoney:
@@ -196,7 +197,8 @@ async def form(*, id=0, income_id=0, client_id=0, balance=0, stype=0):
         info = dict(
             income_id = income_id,
             client_id = client_id,
-            balance = balance
+            balance = balance,
+            pay_company = pay_company
         )
     
     # 存在id则修改，不能存在id则添加

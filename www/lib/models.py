@@ -82,6 +82,7 @@ class Settlement(Model):
     finished_time = DateTimeField()
     is_delete = IntegerField(default=0)
     stype = IntegerField(default=0)
+    pay_company = StringField()
 
 class Syslogs(Model):
     __table__ = 'syslog'

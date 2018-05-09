@@ -55,7 +55,8 @@ $(function(){
                     if (typeof (hook_init_ui) == 'function') {
                         hook_init_ui(form, layer)
                     }
-
+                   
+                    form.render();
                 });
             }
         },

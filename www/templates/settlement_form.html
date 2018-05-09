@@ -49,6 +49,12 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">请款公司</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.pay_company" :max="info.pay_company" lay-verify="required" type="text" name="pay_company" >
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">结算比例</label>
         <div class="layui-input-6">
             <input class="layui-input" v-model="info.rate" lay-verify="required" type="text" readonly>
