@@ -6,7 +6,7 @@ import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Syslogs
 from lib.common import obj2str, returnData, totalLimitP
-from income import statusMap as incomeStatusMap
+from income import moneyStatusMap, invStatusMap
 
 operateMaps = {
     'INSERT': '新增',
@@ -32,7 +32,7 @@ sqlTpl = "SELECT {} FROM syslog s \
         WHERE module = 'INCOME' and s.is_delete =0 and {}"
 
 # 搜索字段
-selectField = 's.id, s.username, s.`operate`, s.`module`, s.`add_date`, s.is_read, i.income_id, c.name company_name, i.name, i.money, i.status'
+selectField = 's.id, s.username, s.`operate`, s.`module`, s.`add_date`, s.is_read, i.income_id, c.name company_name, i.name, i.money, i.money_status,i.inv_status'
 
 @get('/apis/syslogs/index')
 async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10):
@@ -72,7 +72,8 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
     for item in lists:
         item['operate_text'] = operateMaps[item['operate']]
         item['module_text'] = moduleMaps[item['module']]
-        item['status_text'] = incomeStatusMap[item['status']]
+        item['money_status_text'] = moneyStatusMap[item['money_status']]
+        item['inv_status_text'] = invStatusMap[item['inv_status']]
        
 
     return {

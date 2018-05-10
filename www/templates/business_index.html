@@ -15,12 +15,8 @@
                 <option :value="item.type" v-for="item in other.types">{{item.type}}</option>
             </select>
         </div>
-        <div class="layui-input-inline">
-            <select name="month">
-                <option value="">全部时间</option>
-                <option value="">全部时间</option>
-                <option v-for="month in 12" :value="month">{{month}}月</option>
-            </select>
+        <div class="layui-input-inline" style="width: 150px;">
+            <input type="text" v-model="params.rangeDate"  name="rangeDate" class="layui-input search_input rangeDate" data-type="month" placeholder="选择日期">
         </div>
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm">查询</a>
         <a class="layui-btn search_btn" id="selectAll">查询全部</a>

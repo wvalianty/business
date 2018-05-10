@@ -131,7 +131,7 @@ def totalLimitP(rs, page, pageSize, limitFlag = False):
 
     return total, limit, p
 
-async def addAffDateWhere(where, month, isSearch=None, year=None):
+async def addAffDateWhere1(where, month, isSearch=None, year=None):
     """where 条件添加归属日期参数
     """
     if not year:
@@ -264,3 +264,39 @@ def ruleTree(lists, isList=False):
         return lists
  
     return maps
+
+
+async def addAffDateWhere(rangeDate=None, isSearch=None, delField="is_delete", affField="aff_date", lastDate=None):
+    """获得起止日期
+    """
+    
+    localtimes = time.localtime()
+    currYear = localtimes[0]
+    currMonth = localtimes[1]
+
+    if not lastDate:
+        lastDate = await Income.findNumber('aff_date', orderBy='aff_date desc')
+    if (not isSearch and lastDate) or (isSearch and not rangeDate):
+        dates = lastDate.split('-')
+        currYear, currMonth = (int(dates[0]), int(dates[1]))
+
+    if not rangeDate or rangeDate.find(' - ') != 7:
+        endYear = currYear
+        endMonth = currMonth + 1
+        if currMonth == 13:
+            endMonth = 1
+            endYear += 1
+
+        startDate = "%s-%s" % (currYear, str(currMonth).zfill(2))
+        endDate = "%s-%s" % (endYear, str(endMonth).zfill(2))
+    else:
+        startDate, endDate = rangeDate.split(' - ')
+
+    baseWhere = "%s = 0" % delField
+    dateWhere = "{} >= '{}' and {} < '{}'".format(affField, startDate, affField, endDate)
+    
+    where = baseWhere
+    if not isSearch or (isSearch and rangeDate):
+        where = '{} and {}'.format(where, dateWhere)
+
+    return where

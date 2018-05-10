@@ -50,18 +50,27 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">结算进度</label>
+        <label class="layui-form-label">收款公司</label>
         <div class="layui-input-6">
-            <input type="radio" v-model="info.status" lay-filter="radio" name="status" value="0" title="待开票" checked>
-            <input type="radio" v-model="info.status" lay-filter="radio" name="status" value="1" title="未回款" >
-            <input type="radio" v-model="info.status" lay-filter="radio" name="status" value="2" title="已回款" >
+            <input class="layui-input" name="income_company" v-model="info.income_company" lay-verify="required" type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">回款进度</label>
+        <div class="layui-input-6">
+            <input type="radio" v-model="info.money_status" lay-filter="radio" name="money_status" :value="index" :title="money_status" v-for="money_status, index in other.moneyStatusMap" disabled>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开票进度</label>
+        <div class="layui-input-6">
+            <input type="radio" v-model="info.inv_status" lay-filter="radio" name="inv_status" :value="index" :title="inv_status" v-for="inv_status, index in other.invStatusMap"  :disabled="info.inv_status==2 || index==2">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">媒体类型</label>
         <div class="layui-input-6">
-            <input type="radio" v-model="info.media_type" name="media_type" value="0" title="自媒体" lay-filter="radio" checked>
-            <input type="radio" v-model="info.media_type" name="media_type" value="1" title="外媒" lay-filter="radio">
+            <input type="radio" v-model="info.media_type" lay-filter="radio" name="media_type" :value="index" :title="media_type" v-for="media_type, index in other.mediaStatusMap">
         </div>
     </div>
     <div class="layui-form-item" id="cost" v-show="info.media_type">
@@ -93,7 +102,8 @@ function hook_init(vueObj) {
         app.other = data;
         if( id == 0 ) {
             app.info.media_type = 0;
-            app.info.status = 0;
+            app.info.money_status = 0;
+            app.info.inv_status = 0;
             app.info.income_id = data.income_id
         }
     });

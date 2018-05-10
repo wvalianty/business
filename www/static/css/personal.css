@@ -56,7 +56,7 @@ header.larry-personal-tit span{
 	margin-left: 120px;
 }
 .layui-disabled{
-	background: #EEEEEE;
+	/* background: #EEEEEE; */
 	color: #595963 !important;
 }
 .layui-disabled:hover{

@@ -82,9 +82,7 @@ function hook_init_ui(form, layer) {
                 
                 if (arr.length > 1) {
 
-                    debugger
                     var url = "/apis/income/getSumMoney?ids=" + selectVal
-                
                     $.get(url, function(res){
                         if (!res.status) {
                             layer.msg(res.msg);

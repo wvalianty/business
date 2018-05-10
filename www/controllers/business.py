@@ -8,23 +8,20 @@ from lib.models import Business, Income, Settlement
 from lib.common import obj2str, returnData, addAffDateWhere, totalLimitP
 
 @get('/apis/business/index')
-async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, isSearch=0, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
-    currDate = time.strftime('%Y-%m')
-    where = '1=1'
+    where = baseWhere = await addAffDateWhere(rangeDate, isSearch)
+
     if keyword and keyword.strip() != '':
-        where = "`business_type` like '%%{}%%'".format(keyword)
-    
-    where = await addAffDateWhere(where, month, isSearch)
+        where = "{} and `business_type` like '%%{}%%'".format(where, keyword)
 
     # 查询数据总数
     groupBy = 'aff_date,business_type'
     sql = 'SELECT COUNT(*) c FROM ( \
                 SELECT id FROM `income` where %s GROUP BY %s \
             ) t' % (where, groupBy)
-    
     rs = await Income.query(sql)
     
     total, limit, p = totalLimitP(rs, page, pageSize, True)
@@ -38,11 +35,11 @@ async def index(*, keyword=None, month=None,isSearch=0, page=1, pageSize=10):
     # 查询数据列表
     field='client_id, income_id, business_type type,aff_date,count(*) tfCount, sum(money) tfMoney'
     lists = await Income.findAll(field=field, orderBy="aff_date desc",groupBy=groupBy, where=where, limit=limit)
-   
-    for item in lists:
 
+    for item in lists:
+       
         # 查询回款数
-        where = "is_delete = 0 and business_type = '%s' and aff_date = '%s' and status = 2" % (item.type, currDate)
+        where = "%s and business_type = '%s' and money_status = 1" % (baseWhere, item.type)
         item['hkCount'] = await Income.findNumber('count(id)', where)
 
         # 回款金额

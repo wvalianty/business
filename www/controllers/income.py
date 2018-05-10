@@ -9,10 +9,16 @@ from lib.common import obj2str, exportExcel, totalLimitP, returnData, addAffDate
 
 
 # 结算状态
-statusMap = (
-    '待开票',
+moneyStatusMap = (
     '未回款',
-    '已回款'
+    '已回款',
+)
+
+# 开票状态
+invStatusMap = (
+    '未开票',
+    '不开票',
+    '已开票'
 )
 
 # 媒体类型
@@ -22,7 +28,7 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, month=None, status=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=10):
 
     page = int(page)
     pageSize = int(pageSize)
@@ -30,15 +36,15 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     # 合计金额
     totalMoney = 0
 
-    where = 'i.is_delete = 0'
+    where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 'i.is_delete')
     if keyword:
-        where = "{} and income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
-    if status and status.isdigit():
-        where = "{} and status = {}".format(where, status)
+        where = "{} and (income_id like '%%{}%%' or c.name like '%%{}%%')".format(where, keyword, keyword)
+    if moneyStatus and moneyStatus.isdigit():
+        where = "{} and money_status = {}".format(where, moneyStatus)
+    if invStatus and invStatus.isdigit():
+        where = "{} and inv_status = {}".format(where, invStatus)
     if mediaType and mediaType.isdigit():
         where = "{} and media_type = {}".format(where, mediaType)
-    
-    where = await addAffDateWhere(where, month, isSearch, year)
     
     sql = "SELECT count(*) c FROM income i INNER JOIN `client` c ON i.`client_id` = c.`id` where {}".format(where)
     rs = await Income.query(sql)
@@ -46,7 +52,8 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     total, limit, p = totalLimitP(rs, page, pageSize)
     if total == 0:
         return dict(total = total, page = p, list = (), other = {
-            'statusMap': statusMap,
+            'moneyStatusMap': moneyStatusMap,
+            'invStatusMap': invStatusMap,
             'mediaTypeMap': mediaTypeMap,
             'totalMoney': round(totalMoney, 2)
         })
@@ -62,7 +69,8 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
     lists = obj2str(lists)
 
     for item in lists:
-        item['status_text'] = statusMap[item['status']]
+        item['money_status_text'] = moneyStatusMap[item['money_status']]
+        item['inv_status_text'] = invStatusMap[item['inv_status']]
         item['media_type_text'] = mediaTypeMap[item['media_type']]
         totalMoney += item['money']
 
@@ -74,7 +82,8 @@ async def index(*, keyword=None, month=None, status=None, mediaType=None, isExpo
         'page': p,
         'list': lists,
         'other': {
-            'statusMap': statusMap,
+            'moneyStatusMap': moneyStatusMap,
+            'invStatusMap': invStatusMap,
             'mediaTypeMap': mediaTypeMap,
             'totalMoney': round(totalMoney, 2)
         }
@@ -110,6 +119,9 @@ async def formInit(*, id):
     typeList = await Business.findAll(field='id,type')
 
     res = {
+        'moneyStatusMap': moneyStatusMap,
+        'invStatusMap': invStatusMap,
+        'mediaStatusMap': mediaTypeMap,
         'clientList': clientList,
         'typeList': typeList
     }
@@ -125,7 +137,9 @@ async def form(**kw):
         business_type = kw.get('business_type', ''),
         name = kw.get('name', ''),
         money = kw.get('money', 0),
-        status = kw.get('status', 0),
+        income_company = kw.get('income_company', ''),
+        money_status=0,
+        inv_status=kw.get('inv_status', 0),
         media_type = kw.get('media_type', 0),
         cost = kw.get('cost', ''),
         aff_date = kw.get('aff_date')
@@ -139,15 +153,24 @@ async def form(**kw):
         action = '编辑'
         # 如果是已回款状态，则只能编辑 渠道成本
         oldInfo = await Income.find(id)
-        if oldInfo['status'] == 2:
+        if oldInfo['money_status'] == 1:
             oldInfo['cost'] = info['cost']
             info = oldInfo
         else:
             info['id'] = id
+            info['money_status'] = oldInfo['money_status'] # 运营端不能编辑回款进度
             info['income_id'] = kw.get('income_id', '')
+        
+        # 检查开票状态，如果已开票，则不能修改开票属性，否则开票属性可以为0,1
+        if oldInfo['inv_status'] == 2 or int(info['inv_status']) >= 2:
+            info['inv_status'] = oldInfo['inv_status']
+
     else:
         # 获得收入编号
         info['income_id'] = await getIncomeNo(info['aff_date'])
+        # 新增的时候，发票状态不能为已开票
+        if int(info['inv_status']) >= 2:
+            return returnData(0, action)
         await IncomeNo(income_no=info['income_id'], aff_date=info['aff_date']).save()
 
     rows = await Income(**info).save()
@@ -199,7 +222,7 @@ async def detail(*, id=0):
         return returnData(0, '查询', '收入ID不存在')
 
 
-    sql = "SELECT i.income_id, i.`aff_date`, i.`money`, i.status, \
+    sql = "SELECT i.income_id, i.`aff_date`, i.`money`, i.money_status,i.inv_status,i.cost, \
             c.`name` company_name, c.`invoice` FROM income i \
             INNER JOIN `client` c ON i.`client_id` = c.`id` \
             where i.id = %s" % id
@@ -211,7 +234,8 @@ async def detail(*, id=0):
 
     res['info'] = obj2str((info))[0]
 
-    res['info']['status_text'] = statusMap[res['info']['status']]
+    res['info']['money_status_text'] = moneyStatusMap[res['info']['money_status']]
+    res['info']['inv_status_text'] = invStatusMap[res['info']['inv_status']]
 
     return res
 

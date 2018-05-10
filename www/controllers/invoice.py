@@ -19,24 +19,25 @@ statusMap = (
 sqlTpl = "SELECT {} FROM invoice inv \
             INNER JOIN income i ON i.`id` in (inv.`income_id`) \
             INNER JOIN `client` c ON i.`client_id` = c.`id`  \
-            where inv.is_delete = 0 and {}"
+            where {}"
 
 # 查询字段
-selectField = "inv.id,inv.info,inv.inv_money, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date, \
+selectField = "inv.id,inv.info,inv.inv_money, inv.finished,inv.income_id in_id, inv.finished_time, inv.add_date,inv.comments, \
                 c.name company_name, \
                 i.income_id, i.money, i.aff_date"
 
 @get('/apis/invoice/index')
-async def index(*, keyword=None, month=None, status=None, isSearch=None, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
     year = time.strftime('%Y')
     
     # 合计金额
     totalMoney = 0
-    where = '1=1'
+    lastDate = await getLastDate()
+    where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 'inv.is_delete', 'aff_date', lastDate)
     if keyword:
-        where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
+        where = "{} and (i.income_id like '%%{}%%' or c.name like '%%{}%%')".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and finished = {}".format(where, status)
 
@@ -122,7 +123,7 @@ async def formInit(*, id=0):
         income_ids = ['0']
 
     income_id_str = ','.join(income_ids)
-    sql = "SELECT id, income_id FROM income WHERE id NOT IN (%s) and status = 0 and is_delete = 0;" % income_id_str
+    sql = "SELECT id, income_id FROM income WHERE id NOT IN (%s) and inv_status = 0 and is_delete = 0;" % income_id_str
     incomeIdList = await Income.query(sql)
 
     if not incomeIdList:
@@ -203,3 +204,17 @@ async def delete(*, id):
     return returnData(rows, '删除')
 
 
+async def getLastDate():
+    """获得最后一条数据的月份
+    """
+
+    lastDateSql = "select aff_date from invoice inv \
+                    inner join income i On inv.`income_id` = i.`id` \
+                    where inv.is_delete = 0 \
+                    order by i.`aff_date` desc"
+
+    rs = await Invoice.query(lastDateSql)
+    if rs and len(rs) > 0:
+        return rs[0]['aff_date']
+
+    return None

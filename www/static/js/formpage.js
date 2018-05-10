@@ -55,7 +55,8 @@ $(function(){
                     if (typeof (hook_init_ui) == 'function') {
                         hook_init_ui(form, layer)
                     }
-
+                   
+                    form.render();
                 });
             }
         },
@@ -69,7 +70,9 @@ $(function(){
                 let url = '/apis/' + this.module + '/info?id=' + id;
                 $.get(url, function (data) {
                     self.info = data.info;
-                    self.layuiRender();
+                    setTimeout(() => {
+                        self.layuiRender()
+                    }, 500);
                 });
             }
            

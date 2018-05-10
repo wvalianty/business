@@ -11,12 +11,9 @@
         <div class="layui-input-inline" style="width: 150px;">
             <input name="keyword" placeholder="可搜索收入id,公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
         </div>
-        <div class="layui-input-inline">
-            <select name="month">
-                <option value="">全部时间</option>
-                <option value="">全部时间</option>
-                <option v-for="month in 12" :value="month">{{month}}月</option>
-            </select>
+        <div class="layui-input-inline" style="width: 150px;">
+            <input type="text" v-model="params.rangeDate" name="rangeDate" class="layui-input search_input rangeDate" data-type="month"
+                placeholder="选择日期">
         </div>
         <div class="layui-input-inline">
             <select name="status">
@@ -45,6 +42,8 @@
             <th>归属时间</th>
             <th>收入金额</th>
             <th>结算金额</th>
+            <th>结算类型</th>
+            <th>请款公司</th>
             <th>收款信息</th>
             <th>结算进度</th>
             <th>操作</th>
@@ -57,6 +56,8 @@
             <td>{{ item.aff_date }}</td>
             <td>{{ item.money }}</td>
             <td>{{ item.balance }}</td>
+            <td>{{ item.stype_text }}</td>
+            <td>{{ item.pay_company }}</td>
             <td v-html="item.invoice" align="left"></td>
             <td v-html="item.status_text" ></td>
             <td>
@@ -68,7 +69,7 @@
             <td colspan="4" align="left">
                 合计收入金额: {{ other.totalMoney }}
             </td>
-            <td colspan="4" align="left">
+            <td colspan="6" align="left">
                  合计结算金额: {{ other.totalBalance }}
             </td>
         </tr>

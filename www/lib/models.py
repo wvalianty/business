@@ -50,11 +50,14 @@ class Income(Model):
     name = StringField()
     aff_date = StringField()
     money = FloatField()
-    status = IntegerField()
+    money_status = IntegerField()
+    inv_status = IntegerField()
     media_type = IntegerField()
     cost = StringField()
     add_date = DateTimeField(default=curr_datetime)
     is_delete = IntegerField(default=0)
+    income_company = StringField()
+    return_money_date = DateTimeField()
 
 class Invoice(Model):
     __table__ = 'invoice'
@@ -66,6 +69,7 @@ class Invoice(Model):
     finished = IntegerField(default=0)
     finished_time = DateTimeField()
     is_delete = IntegerField(default=0)
+    comments = StringField()
 
 class Settlement(Model):
     __table__ = 'settlement'
@@ -77,6 +81,8 @@ class Settlement(Model):
     add_date = DateTimeField(default=curr_datetime)
     finished_time = DateTimeField()
     is_delete = IntegerField(default=0)
+    stype = IntegerField(default=0)
+    pay_company = StringField()
 
 class Syslogs(Model):
     __table__ = 'syslog'
