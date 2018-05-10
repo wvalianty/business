@@ -131,7 +131,7 @@ async def settleApply_identify(*,id):
     settle_id = int(id)
     settle = await Settlement.find(settle_id)
     settle["status"] = 1
-    settle["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    settle["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d')
     rows = await Settlement(**settle).update()
     if rows == 1:
         return returnData(1,"结算完成")
