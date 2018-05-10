@@ -1,60 +1,85 @@
 from core.coreweb import get, post
 from lib.models import Income,Client
 import math,datetime,time
-from lib.common import obj2str,exportExcel,addAffDateWhere
+from lib.common import obj2str,exportExcel,addAffDateWhere,returnData
 
 # 结算状态
-statusMap = (
-    '待开票',
+moneyStatusMap = (
     '未回款',
-    '已回款'
+    '已回款',
 )
 
+# 开票状态
+invStatusMap = (
+    '未开票',
+    '不开票',
+    '已开票'
+)
+
+# 媒体类型
 mediaTypeMap = (
     '自媒体',
     '外媒'
 )
 
+
 async def export(lists):
     """导出execl表格
     """
     fields = {
+        'income_table_id':"收入表id",
         'income_id': '收入ID',
         'name': '公司名称',
         'business_type': '业务类型',
         'cname': '业务名称',
         'aff_date': '归属时间',
         'money': '收入金额',
-        'status': '结算进度',
+        'money_status':"回款状态",
+        'invoice':"开票信息",
+        'inv_status':"开票状态",
         'media_type': '媒体类型',
-        'cost':'渠道成本',
+        'income_company':'收款公司',
     }
     return exportExcel('收入报表', fields, lists)
 
 @get('/apis/board/index')
-async def board_index(*,isExport=None,keyword=None, month=None,year=None, status=None, page=1, pageSize=10):
+async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
-    # year = time.strftime('%Y')
     totalMoney = 0
-    where = "where 1=1 and inc.is_delete = 0 and c.is_delete = 0 "
-    numOrstr = None
+    affField = "aff_date"
+    where = "where  inc.is_delete = 0 and c.is_delete = 0 "
 
     if keyword:
         where = "{}  and inc.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
 
-    if status and status.isdigit():
-        where = "{} and status = {}  ".format(where, status)
+    localtimes = time.localtime()
+    currYear = localtimes[0]
+    currMonth = localtimes[1]
+    if not rangeDate or rangeDate.find(' - ') != 7:
+        endYear = currYear
+        endMonth = currMonth + 1
+        if currMonth == 13:
+            endMonth = 1
+            endYear += 1
 
-    if month:
-        if int(month) < 10:
-            month = "0" + str(month)
-    if month and year:
-        where = "{} and aff_date = '{}-{}'" .format(where,year,month)
-    if month:
-        where = "{} and aff_date like '{}-{}'" .format(where, '%%', month)
-    if year:
-        where = "{} and aff_date like '{}-{}'".format(where, year, '%%')
+        startDate = "%s-%s" % (currYear, str(currMonth).zfill(2))
+        endDate = "%s-%s" % (endYear, str(endMonth).zfill(2))
+    else:
+        startDate, endDate = rangeDate.split(' - ')
+    where = "{} and {} >= '{}' and {} < '{}'".format(where,affField, startDate, affField, endDate)
+    if invStatus:
+        where = "{} and inv_status={} " .format(where,int(invStatus))
+    if mediaType:
+        where = "{} and media_type={} " .format(where,int(mediaType))
+    if moneyStatus:
+        where = "{} and money_status={} " .format(where,int(moneyStatus))
+
+
+    # if not isExport or int(isExport) != 1:
+    #     sql = '%s limit %s' % (sql, limit)
+
+
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     sql_total = 'select count(*) cc from income inc inner join client c on inc.client_id = c.id %s' %(where)
 
@@ -66,15 +91,25 @@ async def board_index(*,isExport=None,keyword=None, month=None,year=None, status
             'totalMoney': round(totalMoney, 2)
         })
 
-    sql_re = 'select inc.cost,inc.income_id,inc.business_type,c.name,inc.name cname,inc.aff_date,inc.money,inc.status,inc.media_type from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
+    sql_re = 'SELECT inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,c.invoice,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company  from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:
-        item['status'] = statusMap[item['status']]
+        # item['status'] = statusMap[item['status']]
         item['media_type'] = mediaTypeMap[item['media_type']]
         totalMoney = totalMoney + item['money']
-
     if isExport and int(isExport) == 1:
+        for item in res:
+            if item["money_status"] == 0:
+                item["money_status"] = "未回款"
+            if item["money_status"] == 1:
+                item["money_status"] = "已回款"
+            if item["inv_status"] == 0:
+                item["inv_status"] = "未开票"
+            if item["inv_status"] == 1:
+                item["inv_status"] = "不开票"
+            if item["inv_status"] == 2:
+                item["inv_status"] = "已开票"
         return await export(res)
 
     return {
@@ -82,10 +117,53 @@ async def board_index(*,isExport=None,keyword=None, month=None,year=None, status
         'page':p,
         'list':res,
         'other':{
-            'statusMap': statusMap,
+            'moneyStatusMap': moneyStatusMap,
+            'invStatusMap': invStatusMap,
             'mediaTypeMap': mediaTypeMap,
             'totalMoney': round(totalMoney, 2)
         }
     }
 
 
+@get("/apis/board/info")
+async def  board_info(*,id):
+    income_id = int(id)
+    income = await  Income.find(income_id)
+    print(income)
+    res = dict(
+        id = income["id"],
+        return_money_date = income["return_money_date"],
+        # return_money_date = "2018-08-08",
+        money_status = income["money_status"]
+    )
+    return {
+        "info":res
+    }
+# return returnData(1,"失败")
+@post("/apis/board/form")
+async def board_form(*,return_money_date,money_status,id):
+    if return_money_date and money_status and id:
+        income = await  Income.find(id)
+        income["return_money_date"] = return_money_date
+        income["money_status"] = money_status
+        rows = await Income(**income).update()
+        if rows == 1:
+            return returnData(1,"回款")
+        else:
+            return returnData(0,"回款")
+    else:
+        return returnData(0,"回款")
+
+#/board/invoice_identify?id=68
+@get("/board/invoice_identify")
+async def invoice_identify(*,id):
+    if id:
+        income = await Income.find(int(id))
+        income["inv_status"] = 2
+        rows = await Income(**income).update()
+        if rows == 1:
+            return returnData(1,"已开票操作")
+        else:
+            return returnData(0,"已开票操作")
+    else:
+        return returnData(0,"请求")
