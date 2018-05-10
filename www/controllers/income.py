@@ -268,7 +268,8 @@ async def export(lists):
         'name': '业务名称',
         'aff_date': '归属时间',
         'money': '收入金额',
-        'status_text': '结算进度',
+        'money_status_text': '回款进度',
+        'inv_status_text': '开票进度',
         'media_type_text': '媒体类型',
         'cost': '渠道成本'
     }

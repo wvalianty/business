@@ -300,3 +300,34 @@ async def addAffDateWhere(rangeDate=None, isSearch=None, delField="is_delete", a
         where = '{} and {}'.format(where, dateWhere)
 
     return where
+
+def replBatch(text, old, new):
+    """文本批量替换
+    
+    Arguments:
+        text {[type]} -- [要处理的文本]
+        old {[type]} -- [要替换的文本， 可以是字符串或list]
+        new {[type]} -- [要替换成的文本, 可以是字符串或list]
+    """
+
+    if not isinstance(old, list):
+        old = [old]
+
+    for val in old:
+        if isinstance(new, list):
+            text = text.replace(val, new[old.index(val)])
+        else:
+            text = text.replace(val, new)
+    
+    return text
+
+
+def replLineBreak(text, symbol='<br/>'):
+    """替换换行符
+    
+    Arguments:
+        text {[type]} -- [文本]
+        symbol {[type]} -- [替换成的符号]
+    """
+
+    return replBatch(text, ['\r\n', '\r', '\n'], symbol)

@@ -2,10 +2,10 @@
 # -*- coding:utf-8 -*-
 
 "客户管理模块"
-import math, datetime, time
+import math, datetime, time, re
 from core.coreweb import get, post
 from lib.models import Client, Income, Settlement,Invoice
-from lib.common import obj2str, returnData, totalLimitP
+from lib.common import obj2str, returnData, totalLimitP, replLineBreak
 
 @get('/apis/client/index')
 async def index(*, keyword=None, status=None, page=1, pageSize=10):
@@ -53,7 +53,7 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
 
         # 回款数
         item['hkCount'] = round(info['hkCount'], 2) if info['hkCount'] else 0
-        item['invoice'] = item['invoice'].replace('\n', '<br/>')
+        item['invoice'] = replLineBreak(item['invoice'])
 
         # 合同是否有效
         item['indate_status'] = item['indate_end'] >= currDate
@@ -102,7 +102,7 @@ async def form(*, id, name, indate, invoice):
         name = name.strip(),
         indate_start = indates[0].strip(),
         indate_end = indates[1].strip(),
-        invoice = invoice.strip()
+        invoice= re.sub(r"\s{5,}", '\n', invoice.strip()) # 超过5个以上的空格替换成换行符
     )
 
     if id.isdigit() and int(id) > 0:

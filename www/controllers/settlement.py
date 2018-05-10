@@ -5,7 +5,7 @@
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Income, Client, Settlement
-from lib.common import obj2str, totalLimitP, addAffDateWhere, returnData
+from lib.common import obj2str, totalLimitP, addAffDateWhere, returnData, replLineBreak
 import client, income
 
 
@@ -45,9 +45,6 @@ async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, pag
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and s.status = {}".format(where, status)
-    
-    # 添加归属时间参数
-    # where = await addAffDateWhere(where, month, isSearch)
 
     # 获得总条数和分页数
     sql = sqlTpl.format('count(*) c', where)
@@ -75,7 +72,7 @@ async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, pag
             statusDate = item['finished_time']
         
         item['status_text'] = "%s<br/>%s" % (item['status_text'], statusDate)
-        item['invoice'] = item['invoice'].replace('\n', '<br/>')
+        item['invoice'] = replLineBreak(item['invoice'])
         item['stype_text'] = stypeMap[item['stype']]
         totalMoney += item['money']
         totalBalance += item['balance']

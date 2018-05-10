@@ -67,7 +67,7 @@ class Invoice(Model):
     inv_money = FloatField()
     add_date = DateTimeField(default=curr_datetime)
     finished = IntegerField(default=0)
-    finished_time = DateTimeField()
+    finished_time = DateField()
     is_delete = IntegerField(default=0)
     comments = StringField()
 
