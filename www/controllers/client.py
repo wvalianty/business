@@ -4,7 +4,7 @@
 "客户管理模块"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Client, Income, Settlement
+from lib.models import Client, Income, Settlement,Invoice
 from lib.common import obj2str, returnData, totalLimitP
 
 @get('/apis/client/index')
@@ -111,6 +111,9 @@ async def form(*, id, name, indate, invoice):
 
     rows = await Client(**info).save()
 
+    # 如果编辑成功，则修改发票管理中未处理的发票开票信息
+    await updateInvoiceInfo(rows, id, info['invoice'])
+
     return returnData(rows, action)
 
 
@@ -131,3 +134,22 @@ async def delete(*, id):
         msg = None
    
     return returnData(rows, '删除', msg)
+
+
+async def updateInvoiceInfo(rows, id, invoice):
+
+    # 如果编辑成功，则修改发票管理中未处理的发票开票信息
+    if rows > 0 and id.isdigit() and int(id) > 0:
+
+        # 获得客户ID对应的收入单ID
+        incomeIds = await Income.findCols('id', where="client_id = %s" % id)
+        if incomeIds and len(incomeIds) > 0:
+
+            # 现将数字list转为字符串list，才能使用join函数
+            incomdIdStr = ','.join('%s' % val for val in incomeIds)
+
+            sql = "UPDATE invoice SET info='%s' \
+                    Where finished=0 and income_id in (%s)" % \
+                    (invoice, incomdIdStr)
+            
+            await Invoice.execute(sql)

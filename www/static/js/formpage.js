@@ -70,7 +70,9 @@ $(function(){
                 let url = '/apis/' + this.module + '/info?id=' + id;
                 $.get(url, function (data) {
                     self.info = data.info;
-                    self.layuiRender();
+                    setTimeout(() => {
+                        self.layuiRender()
+                    }, 500);
                 });
             }
            
