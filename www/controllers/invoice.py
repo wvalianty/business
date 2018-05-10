@@ -5,7 +5,7 @@
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Income, Client, Invoice
-from lib.common import obj2str, returnData, totalLimitP, addAffDateWhere
+from lib.common import obj2str, returnData, totalLimitP, addAffDateWhere, replLineBreak
 import client, income
 
 
@@ -65,7 +65,8 @@ async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, pag
             statusDate = item['finished_time']
         
         item['status_text'] = "%s<br/>%s" % (item['status_text'], statusDate)
-        item['info'] = item['info'].replace('\n', '<br/>')
+        item['info'] = replLineBreak(item['info'])
+        item['comments'] = replLineBreak(item['comments'])
         totalMoney += item['money']
 
         if item['in_id'].find(',') > 0:
