@@ -12,7 +12,22 @@
 
 <!-- menu start -->
 {% block menubox %}
+<div class="layui-inline" style="width:100%;">
+    <form class="layui-form" id="searchForm" style="padding:0px; background-color:#f2f2f2; ">
+        <div class="layui-input-inline" style="width: 150px;">
+            <input name="keyword" placeholder="可搜索公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
+        <div class="layui-input-inline" style="width: 150px;">
+            <input type="text" v-model="params.rangeDate" name="rangeDate" class="layui-input search_input rangeDate" data-type="month"
+                placeholder="选择日期">
+        </div>
 
+
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn" id="exportExcel" style="float:right">导出报表</a>
+        <input type="hidden" name="isExport" v-model="isExport">
+    </form>
+</div>
 {% endblock %}
 
 
@@ -34,7 +49,9 @@
             <th>归属时间</th>
             <th>开票金额</th>
             <th>开票信息</th>
+            <th>开票公司</th>
             <th>操作</th>
+            <th>备注</th>
         </tr>
     </thead>
     <tbody>
@@ -46,10 +63,15 @@
             <td>{{ item.aff_date }}</td>
             <td> {{ item.money }} </td>
             <td v-html="item.info"></td>
+            <td> {{ item.income_company }}</td>
             <td  v-if="item.show" v-bind:rowspan="item.rowspan">
 {#                <a  v-bind:id="item.id" class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/invocieApply/form?id=' + item.id"  data-title="请确认"  data-area="280px,180px">完成</a>#}
                 <a v-if="item.finished == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.invid "><i class="layui-icon"></i> 完成</a>
                 <label v-bind:class="item.finished ?  '' : 'date_'  ">完成时间<br/>{{ item.finished_time }}</label>
+            </td>
+            <td v-if="item.show" v-bind:rowspan="item.rowspan">
+                {{ item.comments }}<br>
+                <a   class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/invoiceApply_comment?id=' + item.invid" data-title="添加备注" data-area="500px,250px"><i class="iconfont icon-edit"></i>备注</a>
             </td>
         </tr>
     </tbody>
