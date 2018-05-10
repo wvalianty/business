@@ -78,7 +78,7 @@
                 <p v-html="item.return_money_date"></p>
             </td>
             <td>
-                <a  v-if="item.inv_status == 0"  class="layui-btn layui-btn-danger layui-btn-mini identify-btn" data-title="确认开票" v-bind:data-url="'/board/invoice_identify?id='+item.income_table_id"   ><i class="layui-icon"></i> 确认开票</a>
+                <p v-if="item.inv_status == 0">未开票</p>
                 <p v-if="item.inv_status == 1">不开票</p>
                 <p v-if="item.inv_status == 2">已开票</p>
             </td>
