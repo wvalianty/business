@@ -35,7 +35,6 @@ async def export(lists):
         'aff_date': '归属时间',
         'money': '收入金额',
         'money_status':"回款状态",
-        'invoice':"开票信息",
         'inv_status':"开票状态",
         'media_type': '媒体类型',
         'income_company':'收款公司',
@@ -91,7 +90,7 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
             'totalMoney': round(totalMoney, 2)
         })
 
-    sql_re = 'SELECT inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,c.invoice,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company  from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
+    sql_re = 'SELECT inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:
@@ -129,7 +128,6 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
 async def  board_info(*,id):
     income_id = int(id)
     income = await  Income.find(income_id)
-    print(income)
     res = dict(
         id = income["id"],
         return_money_date = income["return_money_date"],
