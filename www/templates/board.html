@@ -8,31 +8,34 @@
 {% block menubox %}
 <div class="layui-inline" style="width:100%;">
     <form class="layui-form" id="searchForm" style="padding:0px; background-color:#f2f2f2; ">
-          <div class="layui-input-inline">
-            <select name="year">
-                <option value="">全部年份</option>
-                <option value="">全部年份</option>
-                <option v-for="year in 10" :value="year + 2017">{{year + 2017}}年</option>
-            </select>
-        </div>
-        <div class="layui-input-inline">
-            <select name="month">
-                <option value="">全部时间</option>
-                <option value="">全部时间</option>
-                <option v-for="month in 12" :value="month">{{month}}月</option>
-            </select>
-        </div>
-        <div class="layui-input-inline">
-            <select name="status">
-                <option value="">全部状态</option>
-                <option value="">全部状态</option>
-                <option v-for="status,index in other.statusMap" :value="index">{{status}}</option>
-            </select>
-        </div>
         <div class="layui-input-inline" style="width: 150px;">
             <input name="keyword" placeholder="可搜索收入id,公司名称" class="layui-input search_input" type="text" v-model="params.keyword">
         </div>
+        <div class="layui-input-inline" style="width: 150px;">
+            <input type="text" v-model="params.rangeDate" name="rangeDate" class="layui-input search_input rangeDate" data-type="month"
+                placeholder="选择日期">
+        </div>
+        <div class="layui-input-inline">
+            <select name="moneyStatus">
+                <option value="">回款状态</option>
+                <option v-for="status,index in other.moneyStatusMap" :value="index">{{status}}</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="invStatus">
+                <option value="">开票状态</option>
+                <option v-for="status,index in other.invStatusMap" :value="index">{{status}}</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="mediaType">
+                <option value="">媒体类型</option>
+                <option v-for="type,index in other.mediaTypeMap" :value="index">{{type}}</option>
+            </select>
+        </div>
+
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn search_btn" id="selectAll" >查询全部</a>
         <a class="layui-btn" id="exportExcel" style="float:right">导出报表</a>
         <input type="hidden" name="isExport" v-model="isExport">
     </form>
@@ -43,43 +46,56 @@
 <!-- table start -->
 {% block table %}
 <table class="layui-table" id="app">
-    <colgroup>
-        <col width="10%">
-        <col width="10%">
-        <col width="10%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-    </colgroup>
+
     <thead>
         <tr>
-            <th style="text-align:left;">收入ID</th>
+            <th style="text-align:left;">收入表id</th>
+            <th >收入ID</th>
             <th>公司名称</th>
             <th>业务类型</th>
             <th>业务名称</th>
             <th>归属时间</th>
             <th>收入金额</th>
-            <th>结算进度</th>
+            <th>回款状态</th>
+            <th>开票状态</th>
             <th>媒体类型</th>
+            <th>收款公司</th>
         </tr>
     </thead>
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
         <tr v-for="item in list">
-
+            <td>{{ item.income_table_id }}</td>
             <td align="left">{{ item.income_id }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.business_type }}</td>
             <td>{{ item.cname }}</td>
             <td>{{ item.aff_date }}</td>
             <td> {{ item.money }} </td>
-            <td> {{ item.status }}</td>
+            <td>
+                <a  v-if=" ! item.money_status"  class="layui-btn layui-btn-danger layui-btn-mini edit-btn" data-title="确认回款" v-bind:data-url="'/board/money_identify?id='+item.income_table_id"   ><i class="layui-icon"></i> 确认回款</a>
+                {{ item.money_status ? "已回款": "" }}<br>
+                <p v-html="item.return_money_date"></p>
+            </td>
+            <td>
+                <a  v-if="item.inv_status == 0"  class="layui-btn layui-btn-danger layui-btn-mini identify-btn" data-title="确认开票" v-bind:data-url="'/board/invoice_identify?id='+item.income_table_id"   ><i class="layui-icon"></i> 确认开票</a>
+                <p v-if="item.inv_status == 1">不开票</p>
+                <p v-if="item.inv_status == 2">已开票</p>
+            </td>
             <td>{{ item.media_type }}</td>
+            <td>{{ item.income_company }}</td>
+{#            <td>#}
+{#                <a class="layui-btn layui-btn-danger layui-btn-mini edit-btn" v-bind:data-url="'/board/money_identify?id='+item.income_id"   ><i class="layui-icon"></i> 确认回款</a>#}
+{#            </td>#}
+{#            <td>#}
+{#                <a class="layui-btn layui-btn-danger layui-btn-mini edit-btn" v-bind:data-url="'/board/invoice_identify='+item.income_id"   ><i class="layui-icon"></i> 确认开票</a>#}
+{#            </td>#}
+{#            <td>#}
+{#                <a class="layui-btn layui-btn-danger layui-btn-mini edit-btn" v-bind:data-url="'/board/company_identify='+item.income_id"   ><i class="layui-icon"></i> 确认开票</a>#}
+{#            </td>#}
         </tr>
         <tr>
-            <td colspan="8" align="center">合计金额: {{ other.totalMoney }}</td>
+            <td colspan="12" align="center">合计金额: {{ other.totalMoney }}</td>
         </tr>
     </tbody>
 </table>

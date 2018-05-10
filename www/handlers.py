@@ -202,3 +202,21 @@ def role_rule(**kv):
     }
 # 角色管理 ------- end
 
+@get("/main_operate")
+def main_operate(request):
+    return {
+        '__template__': 'main_operate.html'
+    }
+
+
+@get("/invoiceApply_comment")
+def  invoiceApply_comment(**kv):
+    return {
+        '__template__': 'invoiceApply_comment.html'
+    }
+
+@get("/board/money_identify")
+def money_identify(**kv):
+    return {
+        '__template__': 'board_money_identify.html'
+    }

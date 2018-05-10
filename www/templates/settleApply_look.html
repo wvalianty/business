@@ -18,23 +18,15 @@
 <!-- table start -->
 {% block table %}
 <table class="layui-table" id="app">
-    <colgroup>
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-    </colgroup>
     <thead>
         <tr>
             <th style="text-align:left;">开票信息</th>
-
         </tr>
     </thead>
     <tbody>
-{#        <tr v-for="item in list"  style="color:red">      #}
          <tr>
                  <td align="left" v-html="list.invoice"></td>
-        </tr>
+         </tr>
     </tbody>
 </table>
 {% endblock %}

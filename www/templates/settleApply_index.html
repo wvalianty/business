@@ -11,26 +11,42 @@
 
 <!-- menu start -->
 {% block menubox %}
+<div class="layui-inline" style="width:100%;">
+    <form class="layui-form" id="searchForm" style="padding:0px; background-color:#f2f2f2; ">
+        <div class="layui-input-inline" style="width: 150px;">
+            <input name="keyword" placeholder="请输入结算表id进行检索" class="layui-input search_input" type="text" v-model="params.keyword">
+        </div>
+        <div class="layui-input-inline" style="width: 150px;">
+            <input type="text" v-model="params.rangeDate" name="rangeDate" class="layui-input search_input rangeDate" data-type="datetime"
+                placeholder="选择日期">
+        </div>
 
+
+        <a class="layui-btn search_btn" lay-submit lay-filter="searchForm" >查询</a>
+        <a class="layui-btn" id="exportExcel" style="float:right">导出报表</a>
+        <input type="hidden" name="isExport" v-model="isExport">
+    </form>
+</div>
 {% endblock %}
 
 
 <!-- table start -->
 {% block table %}
 <table class="layui-table">
-    <colgroup>
-        <col width="10%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-        <col width="15%">
-    </colgroup>
+{#    <colgroup>#}
+{#        <col width="10%">#}
+{#        <col width="15%">#}
+{#        <col width="15%">#}
+{#        <col width="15%">#}
+{#        <col width="15%">#}
+{#        <col width="15%">#}
+{#        <col width="15%">#}
+{#        <col width="15%">#}
+{#    </colgroup>#}
     <thead>
         <tr>
-            <th style="text-align:left;">收入ID</th>
+            <th style="text-align:left;">结算表id</th>
+            <th>收入ID</th>
             <th>公司名称</th>
             <th>归属时间</th>
             <th>收入金额</th>
@@ -38,26 +54,31 @@
             <th>结算比例</th>
             <th>结算金额</th>
             <th>操作</th>
+            <th>请款公司</th>
         </tr>
     </thead>
     <tbody>
 {#        <tr v-for="item in list"  style="color:red">      #}
          <tr v-for="item in list" v-bind:class="item.sstatus == 0 ? 'redline' : ''">
-
-            <td align="left">{{ item.income_id }}</td>   {#  收入id#}
+            <td align="left">{{ item.settle_id }}</td>
+            <td>{{ item.income_id }}</td>   {#  收入id#}
             <td>{{ item.name }}</td>
             <td>{{ item.aff_date }}</td>
             <td> {{ item.money }} </td>
-             <td v-if="item.status == 0"> 代开票 </td>
-             <td v-if="item.status == 1">未回款</td>
-             <td v-if="item.status == 2">已回款</td>
+             <td v-if="item.status == 0"> 未回款 </td>
+             <td v-if="item.status == 1">已回款</td>
             <td>{{ item.percentage }}</td>
             <td>{{ item.balance }}</td>
             <td>
 {#                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>#}
-                <a    v-if="item.sstatus == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.id"   ><i class="layui-icon"></i> 完成</a>
-                <a   class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.id" data-title="详细信息" data-area="600px,400px"><i class="iconfont icon-edit"></i>查看</a>
+                <a    v-if="item.sstatus == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.settle_id"   ><i class="layui-icon"></i> 完成</a>
+                <a   class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.cid" data-title="详细信息" data-area="600px,400px"><i class="iconfont icon-edit"></i>查看</a>
+                <p v-if=" item.sstatus == 1">{{ item.finished_time }}</p>
             </td>
+             <td>{{ item.pay_company }}</td>
+        </tr>
+        <tr>
+            <td colspan="10" align="center">总支出金额: {{ other.totalMoney }}</td>
         </tr>
     </tbody>
 </table>

@@ -1,0 +1,87 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}确认回款{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择时间</label>
+        <div class="layui-input-6">
+            <input class="layui-input" id="return_money_date" v-model="info.return_money_date"  name="return_money_date"  lay-verify="required" placeholder="请输入回款日期"  type="text">
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否已回款</label>
+        <div class="layui-input-6">
+            <input type="radio" v-model="info.money_status" name="money_status" value="0" title="未回款" lay-filter="radio" checked>
+            <input type="radio" v-model="info.money_status" name="money_status" value="1" title="已回款" lay-filter="radio">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+<!-- footer -->
+{% block footer%}
+<script type="text/javascript">
+
+// 初始化时数据加载
+{#function hook_init(vueObj) {#}
+{##}
+{#    let id = getQueryStr('id') || 0;#}
+{#    $.get('/apis/income/formInit?id=' + id, function(data) {#}
+{##}
+{#        app.other = data;#}
+{#        if( id == 0 ) {#}
+{#            app.info.media_type = 0;#}
+{#            app.info.status = 0;#}
+{#            app.info.income_id = data.income_id#}
+{#        }#}
+{#    });#}
+
+
+// 初始化UI
+function hook_init_ui(form, layer) {
+
+    {#form.on('radio(radio)', function(data){#}
+    {##}
+    {#    if(data.elem.name == 'media_type') {#}
+    {#        if (data.value == "1") {#}
+    {#            $('#cost').show();#}
+    {#        } else {#}
+    {#            $('#cost').hide();#}
+    {#        }#}
+    {#    }#}
+    {##}
+    {#    app.info[data.elem.name] = data.value;#}
+    {#{);#}
+    {##}
+    {#form.on('select(select)', function(data){#}
+    {##}
+    {#    app.info[data.elem.name] = data.value;#}
+    {#{);#}
+
+    layui.laydate.render({
+        elem: '#return_money_date',
+        type: 'date',
+        max: 0,
+        done: function (value, date, endDate) {
+            app.info[this.elem[0].name] = value;
+            console.log(value);
+        }
+    });
+}
+</script>
+{% endblock %}

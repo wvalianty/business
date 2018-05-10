@@ -1,0 +1,38 @@
+{% extends 'layout_form.html' %}
+
+<!-- title -->
+{% block title %}发票备注信息{% endblock %}
+
+<!-- form -->
+{% block form %}
+<form class="layui-form layui-form-pane" id="form">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注信息</label>
+        <div class="layui-input-6">
+            <textarea placeholder="请输入内容摘要" name="comments" v-model="info.comments" class="layui-textarea" lay-verify="required"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="id" v-model="info.id">
+            <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block footer %}
+<script type="text/javascript">
+function hook_init_ui(form, layer) {
+    layui.laydate.render({
+        elem: '#indate',
+        range: true,
+        done: function (value, date, endDate) {
+            app.info[this.elem[0].name] = value;
+        }
+    });
+}
+</script>
+{% endblock %}
