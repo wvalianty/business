@@ -53,6 +53,8 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                     res2 = await  Income.query(sql_res2)
                 except:
                     raise ValueError("/apis/invoiceApply_index/index，二次查询错误")
+                if i["comments"]:
+                    i["comments"] = i["comments"].replace('\n', '<br/>')
                 i["show"] = 1
                 i["rowspan"] = 1
                 i["name"] = res2[0]["name"]
@@ -76,7 +78,8 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                 tmp["info"] = i["info"]
                 tmp["finished"] = i["finished"]
                 tmp["finished_time"] = i["finished_time"]
-                tmp["comments"] = i["comments"]
+                if i["comments"]:
+                    tmp["comments"] = i["comments"].replace('\n', '<br/>')
                 tmp["name"] = res2[0]["name"]
                 tmp["aff_date"] = res2[0]["aff_date"]
                 tmp["income_id"] = res2[0]["income_id"]
@@ -96,7 +99,7 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                     else:
                         res.append(tmp)
 
-    if keyword and isSearch:
+    if keyword or (keyword and isSearch):
         search_res = []
         search_total = 0
         cname = keyword.strip()
@@ -105,19 +108,21 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                 search_res.append(sear)
         search_total = len(search_res)
         p = (math.ceil(search_total / pageSize), page)
-        if isExport:
+        print(isExport)
+        if isExport == 1:
             for item in search_res:
                 if item["finished"] == 0:
                     item["finished"] = "否"
                 if item["finished"] == 1:
                     item["finished"] = "是"
             return await export(res)
+
         return {
             'total': search_total,
             'page': p,
             'list': search_res
         }
-    if rangeDate and isSearch:
+    if rangeDate or (keyword and isSearch):
         search_res = []
         search_total = 0
         start_date = rangeDate.split(" - ")[0]
@@ -129,7 +134,7 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                 search_res.append(search_date)
         search_total = len(search_res)
         p = (math.ceil(search_total / pageSize), page)
-        if isExport:
+        if isExport == 1:
             for item in search_res:
                 if item["finished"] == 0:
                     item["finished"] = "否"

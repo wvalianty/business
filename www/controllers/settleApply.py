@@ -66,7 +66,7 @@ async def settleApply_index(*, keyword=None, rangeDate=None, isExport=None, isSe
         return dict(total=total, page=(0,0), list=())
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
-    sql_res = 'select settle.id settle_id,inc.id,inc.income_id,c.name,c.id cid ,inc.aff_date,inc.money,inc.money_status status,settle.balance,settle.status sstatus,settle.pay_company from settlement settle left join income inc on settle.income_id = inc.id inner join `client` c  on settle.client_id = c.id ' + where + 'order by settle.id desc limit %s,%s' %(limit[0],limit[1])
+    sql_res = 'select settle.id settle_id,inc.id,inc.income_id,c.name,c.id cid ,inc.aff_date,inc.money,inc.money_status status,settle.balance,settle.status sstatus,settle.pay_company,settle.finished_time from settlement settle left join income inc on settle.income_id = inc.id inner join `client` c  on settle.client_id = c.id ' + where + 'order by settle.id desc limit %s,%s' %(limit[0],limit[1])
     try:
         res = await Settlement.query(sql_res)
     except:
@@ -131,6 +131,7 @@ async def settleApply_identify(*,id):
     settle_id = int(id)
     settle = await Settlement.find(settle_id)
     settle["status"] = 1
+    settle["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     rows = await Settlement(**settle).update()
     if rows == 1:
         return returnData(1,"结算完成")

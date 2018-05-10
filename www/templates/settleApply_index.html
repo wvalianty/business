@@ -73,6 +73,7 @@
 {#                <a class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/client/form?id=' + item.id" data-title="编辑客户"><i class="iconfont icon-edit"></i> 编辑</a>#}
                 <a    v-if="item.sstatus == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/settleApply_identify?id='+item.settle_id"   ><i class="layui-icon"></i> 完成</a>
                 <a   class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/settleApply_look?action=look' + '&keyword=' + item.cid" data-title="详细信息" data-area="600px,400px"><i class="iconfont icon-edit"></i>查看</a>
+                <p v-if=" item.sstatus == 1">{{ item.finished_time }}</p>
             </td>
              <td>{{ item.pay_company }}</td>
         </tr>

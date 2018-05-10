@@ -70,7 +70,7 @@
                 <label v-bind:class="item.finished ?  '' : 'date_'  ">完成时间<br/>{{ item.finished_time }}</label>
             </td>
             <td v-if="item.show" v-bind:rowspan="item.rowspan">
-                {{ item.comments }}<br>
+                <p v-html="item.comments"></p><br>
                 <a   class="layui-btn layui-btn-mini edit-btn" v-bind:data-url="'/invoiceApply_comment?id=' + item.invid" data-title="添加备注" data-area="500px,250px"><i class="iconfont icon-edit"></i>备注</a>
             </td>
         </tr>
