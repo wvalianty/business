@@ -9,8 +9,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label">父级</label>
         <div class="layui-input-4">
-            <select name="pid" v-model="info.pid" lay-verify="required" lay-filter="select" lay-search>
-                <option value="">默认顶级</option>
+            <select name="pid" v-model="info.pid" lay-filter="select" lay-search>
+                <option value="0">默认顶级</option>
                 <template v-for="onemenu in other.ruleList">
                     <option :value="onemenu.id">{{onemenu.title}}</option>
                     <template v-if="'child' in onemenu" v-for="twomenu in onemenu.child">

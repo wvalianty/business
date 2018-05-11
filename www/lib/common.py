@@ -310,6 +310,9 @@ def replBatch(text, old, new):
         new {[type]} -- [要替换成的文本, 可以是字符串或list]
     """
 
+    if not text:
+        return text
+
     if not isinstance(old, list):
         old = [old]
 
