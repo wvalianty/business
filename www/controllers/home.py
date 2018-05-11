@@ -36,11 +36,11 @@ async def apis_main(*,page=1, pageSize=15):
         if i["inv_status"] == 0:
             i["inv_status"] = "未开票"
         elif i["inv_status"] == 1:
-            i["status"] = "不开票"
-        elif i["status"] == 2:
-            i["status"] = "已开票"
+            i["inv_status"] = "不开票"
+        elif i["inv_status"] == 2:
+            i["inv_status"] = "已开票"
         else:
-            i["status"] = "状态错误"
+            i["inv_status"] = "状态错误"
 
 
     return {
@@ -89,11 +89,11 @@ async def apis_main_operate(*,page=1,pageSize=15):
         if i["inv_status"] == 0:
             i["inv_status"] = "未开票"
         elif i["inv_status"] == 1:
-            i["status"] = "不开票"
-        elif i["status"] == 2:
-            i["status"] = "已开票"
+            i["inv_status"] = "不开票"
+        elif i["inv_status"] == 2:
+            i["inv_status"] = "已开票"
         else:
-            i["status"] = "状态错误"
+            i["inv_status"] = "状态错误"
 
 
 
