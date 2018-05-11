@@ -9,7 +9,7 @@ async def apis_main(*,page=1, pageSize=15):
     email = configs.user.name#
     page = int(page)
     pageSize = int(pageSize)
-    sql_re = 'select u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.name = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` = "INCOME"  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
+    sql_re = 'select u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.email = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` in  ("INCOME","SETTLEMENT")  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
     try:
         res = await Syslogs.query(sql_re)
     except:
@@ -33,12 +33,12 @@ async def apis_main(*,page=1, pageSize=15):
     other = dict(settle=settle, invoice=invoice)
 
     for i in res:
-        if i["status"] == 0:
-            i["status"] = "代开票"
-        elif i["status"] == 1:
-            i["status"] = "未回款"
+        if i["inv_status"] == 0:
+            i["inv_status"] = "未开票"
+        elif i["inv_status"] == 1:
+            i["status"] = "不开票"
         elif i["status"] == 2:
-            i["status"] = "已回款"
+            i["status"] = "已开票"
         else:
             i["status"] = "状态错误"
 
@@ -57,7 +57,7 @@ async def apis_main_operate(*,page=1,pageSize=15):
     email = configs.user.name  #
     page = int(page)
     pageSize = int(pageSize)
-    sql_re = 'select u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.name = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` = "INCOME"  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
+    sql_re = 'select u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.email = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` in  ("INCOME","SETTLEMENT")  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
     try:
         res = await Syslogs.query(sql_re)
     except:
@@ -86,12 +86,12 @@ async def apis_main_operate(*,page=1,pageSize=15):
     other = dict(settle=settle, invoice=invoice,expire_=expire_)
 
     for i in res:
-        if i["status"] == 0:
-            i["status"] = "代开票"
-        elif i["status"] == 1:
-            i["status"] = "未回款"
+        if i["inv_status"] == 0:
+            i["inv_status"] = "未开票"
+        elif i["inv_status"] == 1:
+            i["status"] = "不开票"
         elif i["status"] == 2:
-            i["status"] = "已回款"
+            i["status"] = "已开票"
         else:
             i["status"] = "状态错误"
 
