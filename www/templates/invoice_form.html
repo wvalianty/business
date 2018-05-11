@@ -72,6 +72,10 @@ function hook_init_ui(form, layer) {
             change: function(data, arr){
 
                 var selectVal = '';
+                if (arr.length == 0){
+
+                    return;
+                }
                 arr.forEach((item,index) => {
                     selectVal += item.val + ',';
                 });
