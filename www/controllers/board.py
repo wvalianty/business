@@ -39,7 +39,7 @@ async def export(lists):
         'media_type': '媒体类型',
         'income_company':'收款公司',
     }
-    return exportExcel('收入报表', fields, lists)
+    return exportExcel('业务报表', fields, lists)
 
 @get('/apis/board/index')
 async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
@@ -140,6 +140,8 @@ async def  board_info(*,id):
 # return returnData(1,"失败")
 @post("/apis/board/form")
 async def board_form(*,return_money_date,money_status,id):
+    if money_status and int(money_status) != 1:
+        return returnData(0,"选择未回款不能提交")
     if return_money_date and money_status and id:
         income = await  Income.find(id)
         income["return_money_date"] = return_money_date
