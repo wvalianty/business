@@ -27,19 +27,23 @@ selectField = "inv.id,inv.info,inv.inv_money, inv.finished,inv.income_id in_id, 
                 i.income_id, i.money, i.aff_date"
 
 @get('/apis/invoice/index')
-async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, status=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
     year = time.strftime('%Y')
     
     # 合计金额
     totalMoney = 0
-    lastDate = await getLastDate()
-    where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 'inv.is_delete', 'aff_date', lastDate)
+
+    where = "inv.is_delete = 0"
     if keyword:
         where = "{} and (i.income_id like '%%{}%%' or c.name like '%%{}%%')".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and finished = {}".format(where, status)
+    if rangeDate:
+        startDate, endDate = rangeDate.split(' - ')
+        if startDate and endDate:
+            where = "{} and aff_date >= '{}' and aff_date < '{}'".format(where, startDate, endDate)
 
     sql = sqlTpl.format('count(*) c', where)
     rs = await Invoice.query(sql)

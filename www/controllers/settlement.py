@@ -38,13 +38,16 @@ async def index(*, keyword=None, rangeDate=None, status=None, isSearch=None, pag
     # 合计结算金额
     totalBalance = 0
 
-    lastDate = await getLastDate()
-    where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 's.is_delete', 'aff_date', lastDate)
-    
+    where = "s.is_delete = 0"
     if keyword:
         where = "{} and i.income_id like '%%{}%%' or c.name like '%%{}%%'".format(where, keyword, keyword)
     if status and status.isdigit():
         where = "{} and s.status = {}".format(where, status)
+    if rangeDate:
+        startDate, endDate = rangeDate.split(' - ')
+        if startDate and endDate:
+            where = "{} and aff_date >= '{}' and aff_date < '{}'".format(
+                where, startDate, endDate)
 
     # 获得总条数和分页数
     sql = sqlTpl.format('count(*) c', where)
