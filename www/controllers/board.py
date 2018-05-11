@@ -39,7 +39,7 @@ async def export(lists):
         'media_type': '媒体类型',
         'income_company':'收款公司',
     }
-    return exportExcel('收入报表', fields, lists)
+    return exportExcel('业务报表', fields, lists)
 
 @get('/apis/board/index')
 async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):

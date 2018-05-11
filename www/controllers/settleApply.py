@@ -18,7 +18,7 @@ async def export(lists):
         'balance':"结算金额",
         'pay_company': '请款公司',
     }
-    return exportExcel('收入报表', fields, lists)
+    return exportExcel('结算申请', fields, lists)
 
 #结算搜索时间  暂时按结算添加时间
 @get('/apis/settleApply_index/index')
