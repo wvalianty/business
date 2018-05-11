@@ -26,29 +26,42 @@ async def settleApply_index(*, keyword=None, rangeDate=None, isExport=None, isSe
     page = int(page)
     pageSize = int(pageSize)
     where = ' where inc.money_status = 1 and settle.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
-    affField = "settle.add_date"
 
     if not isSearch:
-        sql_recentMonth = "select {} add_date from settlement settle order by id desc limit 0,1".format(affField)
-        time_ = await Settlement.query(sql_recentMonth)
+        sql_recentMonth = "SELECT aff_date FROM income ORDER BY id DESC LIMIT 0,1"
+        time_ = await Income.query(sql_recentMonth)
         if time_:
             time_ = obj2str(time_)
-            months_ = time_[0]["add_date"].split(" ")[0].split("-")
-            month_ = months_[1]
-            year = months_[0]
+            month_ = time_[0]["aff_date"]
         else:
-            return dict(total=0, page=(0, 0), list=())
-        startDate = year + "-" + month_ + "-01" + " 00:00:00"
-        endDate = year + "-" + month_ + "-31" + " 24:00:00"
-        where = "{} and {} >= '{}' and {} <= '{}'".format(where, affField, startDate, affField, endDate)
+            return {
+                "total": 0,
+                "page": (0, 0),
+                "list": (),
+                "other": {
+                    "totalMoney": 0
+                }
+            }
+        # startDate = year + "-" + month_ + "-01" + " 00:00:00"
+        # endDate = year + "-" + month_ + "-31" + " 24:00:00"
+        where = "{} and aff_date = '{}'".format(where, month_)
 
-    if keyword and not rangeDate:
+    if isSearch and keyword and not rangeDate:
         settle_id = int(keyword)
-        where = " {} and settle.id = {} " .format(where,settle_id)
-
+        if settle_id:
+            where = " {} and settle.id = {} " .format(where,settle_id)
+        else:
+            return {
+                "total": 0,
+                "page": (0, 0),
+                "list": (),
+                "other": {
+                    "totalMoney": 0
+                }
+            }
     if rangeDate and  isSearch:
         startDate, endDate = rangeDate.split(' - ')
-        where = "{} and {} >= '{}' and {} <= '{}'".format(where, affField, startDate, affField, endDate)
+        where = "{} and {} >= '{}' and {} <= '{}'".format(where, "aff_date", startDate, "aff_date", endDate)
 
 
     totalMoney = 0
@@ -56,14 +69,35 @@ async def settleApply_index(*, keyword=None, rangeDate=None, isExport=None, isSe
     try:
         reL = await Settlement.query(sql_total)
         if reL[0]["co"] == 0:
-            return dict(total=0, page=(0, 0), list=())
+            return {
+                "total": 0,
+                "page": (0, 0),
+                "list": (),
+                "other": {
+                    "totalMoney": 0
+                }
+            }
     except:
-        return dict(total=0, page=(0,0), list=())
+        return {
+                "total": 0,
+                "page": (0, 0),
+                "list": (),
+                "other": {
+                    "totalMoney": 0
+                }
+            }
         raise ValueError("查询数据库错误,/apis/settleApply_index/index")
     total = reL[0]["co"]
 
     if total == 0:
-        return dict(total=total, page=(0,0), list=())
+        return {
+                "total": 0,
+                "page": (0, 0),
+                "list": (),
+                "other": {
+                    "totalMoney": 0
+                }
+            }
     limit = ((page - 1) * pageSize, pageSize)
     p = (math.ceil(total / pageSize), page)
     sql_res = 'select settle.id settle_id,inc.id,inc.income_id,c.name,c.id cid ,inc.aff_date,inc.money,inc.money_status status,settle.balance,settle.status sstatus,settle.pay_company,settle.finished_time from settlement settle left join income inc on settle.income_id = inc.id inner join `client` c  on settle.client_id = c.id ' + where + 'order by settle.id desc limit %s,%s' %(limit[0],limit[1])
