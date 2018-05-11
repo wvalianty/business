@@ -16,7 +16,8 @@ var app = new Vue({
     el: '#layui_layout',
     data: {
         leftmenu: [],
-        username: ''
+        username: '',
+        main_ : ''
     }, 
     methods: {
         getLeftMenu: function () {
@@ -32,7 +33,7 @@ var app = new Vue({
 
                 self.leftmenu = res.leftmenu;
                 self.username = res.username;
-
+                self.main_ = res.main_;
             });
         },
         hasChild: function (item) {

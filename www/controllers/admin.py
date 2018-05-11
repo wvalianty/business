@@ -23,6 +23,7 @@ async def leftmenu(request):
     
     # 获得当前用户角色信息
     roleInfo = await Role.find(userInfo['role'])
+    role = userInfo['role']
 
     if not roleInfo:
         return {
@@ -44,11 +45,15 @@ async def leftmenu(request):
     order = "sort desc, id asc"
     ruleList = await Rule.findAll(field=selectField, where=where, orderBy=order)
     menuTree = ruleTree(ruleList).values()
-    
+    if role == 2:
+        main_ = "/main"
+    if role == 3:
+        main_ = "/main_operate"
     return {
         'status': 1,
         'msg': '查询成功',
         'leftmenu': list(menuTree),
-        'username': username
+        'username': username,
+        'main_':main_
     }
 

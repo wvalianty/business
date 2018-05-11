@@ -1,5 +1,5 @@
 from core.coreweb import get, post
-from lib.models import Syslogs,Settlement,Users,Income
+from lib.models import Syslogs,Settlement,Users,Income,Client
 import math,datetime,time,logging
 from lib.common import obj2str
 from config import configs
@@ -52,12 +52,12 @@ async def apis_main(*,page=1, pageSize=15):
 
 #datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-@get("/apis/main/operate")
+@get("/apis/main_operate/index")
 async def apis_main_operate(*,page=1,pageSize=15):
-    email = configs.user.name#
+    email = configs.user.name  #
     page = int(page)
     pageSize = int(pageSize)
-    sql_re = 'select u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.status from  syslog sy  inner join users u on u.name = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` = "INCOME"  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
+    sql_re = 'select u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.name = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` = "INCOME"  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
     try:
         res = await Syslogs.query(sql_re)
     except:
@@ -69,16 +69,21 @@ async def apis_main_operate(*,page=1,pageSize=15):
     else:
         total = len(res)
     wheres = ' status = 0 '
-    wherei = ' finished = 0 '
+    wherei = ' inv_status = 0 '
     try:
         settle = await Settlement.findAll(where=wheres)
         settle = len(settle)
-        invoice = await  Invoice.findAll(where=wherei)
-        invoice = len(invoice)
+        income = await  Income.findAll(where=wherei)
+        invoice = len(income)
     except:
         logging.ERROR("查询数据错误 数据库表 settlement invoice")
-        return dict(total=total, page=(0, 0), list=res,other=({"settle":"error","invoice":"error"}))
-    other = dict(settle=settle, invoice=invoice)
+        return dict(total=total, page=(0, 0), list=res, other=({"settle": "error", "invoice": "error"}))
+    week_ago = (datetime.datetime.now() - datetime.timedelta(hours=24 * 7)).strftime('%Y-%m-%d')
+    week_sql = "SELECT * FROM `client` WHERE indate_end > '{}'".format(week_ago)
+    clients = await Client.query(week_sql)
+    expire_ = len(clients)
+
+    other = dict(settle=settle, invoice=invoice,expire_=expire_)
 
     for i in res:
         if i["status"] == 0:
@@ -91,9 +96,10 @@ async def apis_main_operate(*,page=1,pageSize=15):
             i["status"] = "状态错误"
 
 
+
     return {
-        "total":1,
-        "page":(1,1),
-        "list":res,
-        "other":other
+        "total": 1,
+        "page": (1, 1),
+        "list": res,
+        "other": other
     }
