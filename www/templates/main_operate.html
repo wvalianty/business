@@ -76,19 +76,19 @@
         })
 
         $(function () {
+            $('a[data-url="/settlement"]').unbind('click').click(
+                function () {
+                    var url_ = $(this).attr("data-url");
+                    window.parent.click_from_main(url_);
+            })
+        })
+        
+        $(function () {
             $('a[data-url="/invoice"]').unbind('click').click(
             function () {
                 var url_ = $(this).attr("data-url");
                 window.parent.click_from_main(url_);
             })
-        })
-
-        $(function () {
-            $('a[data-url="/invoice"]').unbind('click').click(
-            function () {
-        var url_ = $(this).attr("data-url");
-        window.parent.click_from_main(url_);
-        })
         })
 </script>
 
@@ -191,7 +191,7 @@
             </table>
             <div id="right">
                 <a data-url="/client"><div id="test">您有{{ other.expire_ }}个合同还有7天到期</div></a>
-                <a data-url="/invoice"><div id="test">您有{{ other.invoice }}个发票申请待处理</div></a>
+                <a data-url="/settlement"><div id="test">您有{{ other.settle }}个结算申请带处理</div></a>
                 <a data-url="/invoice"><div id="test">您有{{ other.invoice }}个发票申请待处理</div></a>
             </div>
         <div>

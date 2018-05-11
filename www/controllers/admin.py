@@ -64,7 +64,7 @@ async def leftmenu(request):
             'main_': main_
         }
     if role == 1:
-        main_ = "/main"
+        main_ = "/main_operate"
         return {
             'status': 1,
             'msg': '查询成功',
