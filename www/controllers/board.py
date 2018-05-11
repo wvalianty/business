@@ -64,9 +64,9 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
 
         startDate = "%s-%s" % (currYear, str(currMonth).zfill(2))
         endDate = "%s-%s" % (endYear, str(endMonth).zfill(2))
-    else:
+    if rangeDate:
         startDate, endDate = rangeDate.split(' - ')
-    where = "{} and {} >= '{}' and {} < '{}'".format(where,affField, startDate, affField, endDate)
+        where = "{} and {} >= '{}' and {} < '{}'".format(where,affField, startDate, affField, endDate)
     if invStatus:
         where = "{} and inv_status={} " .format(where,int(invStatus))
     if mediaType:
