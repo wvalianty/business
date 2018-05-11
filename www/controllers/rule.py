@@ -88,7 +88,8 @@ async def form(**kw):
         route = kw.get('route', ''),
         icon = kw.get('icon', 0),
         menustatus = kw.get('menustatus', 0),
-        authopen = kw.get('authopen', 1)
+        authopen = kw.get('authopen', 1),
+        sort = kw.get('sort', 50)
     )
 
     if info['title'] == '':
@@ -99,7 +100,7 @@ async def form(**kw):
         action = '编辑'
         oldInfo = await Rule.find(id)
         info = dict(oldInfo, **info)
-
+    
     rows = await Rule(**info).save()
 
     return returnData(rows, action)
