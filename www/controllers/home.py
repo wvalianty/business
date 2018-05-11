@@ -79,7 +79,7 @@ async def apis_main_operate(*,page=1,pageSize=15):
         logging.ERROR("查询数据错误 数据库表 settlement invoice")
         return dict(total=total, page=(0, 0), list=res, other=({"settle": "error", "invoice": "error"}))
     week_ago = (datetime.datetime.now() - datetime.timedelta(hours=24 * 7)).strftime('%Y-%m-%d')
-    week_sql = "SELECT * FROM `client` WHERE indate_end > '{}'".format(week_ago)
+    week_sql = "SELECT * FROM `client` WHERE indate_end < '{}'".format(week_ago)
     clients = await Client.query(week_sql)
     expire_ = len(clients)
 
