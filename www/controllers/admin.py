@@ -47,13 +47,36 @@ async def leftmenu(request):
     menuTree = ruleTree(ruleList).values()
     if role == 2:
         main_ = "/main"
+        return {
+            'status': 1,
+            'msg': '查询成功',
+            'leftmenu': list(menuTree),
+            'username': username,
+            'main_': main_
+        }
     if role == 3:
         main_ = "/main_operate"
-    return {
-        'status': 1,
-        'msg': '查询成功',
-        'leftmenu': list(menuTree),
-        'username': username,
-        'main_':main_
-    }
+        return {
+            'status': 1,
+            'msg': '查询成功',
+            'leftmenu': list(menuTree),
+            'username': username,
+            'main_': main_
+        }
+    if role == 1:
+        main_ = "/main"
+        return {
+            'status': 1,
+            'msg': '查询成功',
+            'leftmenu': list(menuTree),
+            'username': username,
+            'main_': main_
+        }
+        return {
+            'status': 1,
+            'msg': '查询成功',
+            'leftmenu': list(menuTree),
+            'username': username,
+            'main_': main_
+        }
 
