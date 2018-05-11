@@ -1,5 +1,5 @@
 from core.coreweb import get, post
-from lib.models import Syslogs,Settlement,Users,Income,Client
+from lib.models import Syslogs,Settlement,Users,Income,Client,Invoice
 import math,datetime,time,logging
 from lib.common import obj2str
 from config import configs
@@ -21,11 +21,11 @@ async def apis_main(*,page=1, pageSize=15):
     else:
         total = len(res)
     wheres = ' status = 0 '
-    wherei = ' inv_status = 0 '
+    wherei = ' finished = 0 '
     try:
         settle = await Settlement.findAll(where=wheres)
         settle = len(settle)
-        income = await  Income.findAll(where=wherei)
+        income = await  Invoice.findAll(where=wherei)
         invoice = len(income)
     except:
         logging.ERROR("查询数据错误 数据库表 settlement invoice")
@@ -69,11 +69,11 @@ async def apis_main_operate(*,page=1,pageSize=15):
     else:
         total = len(res)
     wheres = ' status = 0 '
-    wherei = ' inv_status = 0 '
+    wherei = ' finished = 0 '
     try:
         settle = await Settlement.findAll(where=wheres)
         settle = len(settle)
-        income = await  Income.findAll(where=wherei)
+        income = await  Invoice.findAll(where=wherei)
         invoice = len(income)
     except:
         logging.ERROR("查询数据错误 数据库表 settlement invoice")
