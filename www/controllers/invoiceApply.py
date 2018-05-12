@@ -108,7 +108,6 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                 search_res.append(sear)
         search_total = len(search_res)
         p = (math.ceil(search_total / pageSize), page)
-        print(isExport)
         if isExport == 1:
             for item in search_res:
                 if item["finished"] == 0:
@@ -163,14 +162,37 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
 
 #inv.id
 #开发票时候有和的又有单开是不行的
-@get('/apis/finish')
-async def apis_finish(*,id):
-
+# @get('/apis/finish')
+# async def apis_finish(*,id):
+#     row_income = {}
+#     if id:
+#         invoice = await Invoice.find(int(id))
+#         invoice["finished"] = 1
+#         invoice["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         rows_f = await Invoice(**invoice).update()
+#         if rows_f == 1:
+#             income_ids = invoice["income_id"]
+#             for inc in income_ids.split(","):
+#                 income = await Income.find(int(inc))
+#                 income["inv_status"] = 2
+#                 rows = await Income(**income).update()
+#                 row_income[inc] = rows
+#             for k,v in row_income.items():
+#                 if v != 1:
+#                     return returnData(0,"开票")
+#         else:
+#             return returnData(0, "开票")
+#         return returnData(1,"开票")
+#     else:
+#         return returnData(0,"没有发票")
+#inv_id
+@post("/apis/invoice_finish/form")
+async def apis_finish(*,id,finished,finished_time):
     row_income = {}
-    if id:
+    if id and finished_time and  finished and int(finished) == 1:
         invoice = await Invoice.find(int(id))
         invoice["finished"] = 1
-        invoice["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        invoice["finished_time"] = finished_time
         rows_f = await Invoice(**invoice).update()
         if rows_f == 1:
             income_ids = invoice["income_id"]
@@ -186,43 +208,23 @@ async def apis_finish(*,id):
             return returnData(0, "开票")
         return returnData(1,"开票")
     else:
-        return returnData(0,"没有发票")
+        return returnData(0,"确定不开票或没有发票")
 
-    # if not id.isdigit() or int(id) <= 0:
-    #     return {
-    #         'msg': '确认失败,缺少请求参数'
-    #     }
-    # where = "id = %s" %(id)
-    # try:
-    #     invoices = await Invoice.findAll(where)
-    # except:
-    #     raise ValueError("/apis/finish，sql错误")
-    # invoices = obj2str(invoices)
-    # if len(invoices) == 1:
-    #     income_ids = invoices[0]["income_id"].split(",")
-    #     for i in income_ids:
-    #         wherei = " id = %s " %(i)
-    #         try:
-    #             incomes = await Income.findAll(where=wherei)
-    #             incomes = obj2str(incomes)
-    #             if incomes[0]["status"] != 0:
-    #                 return  returnData(0,"此收入状态有误")
-    #             incomes[0]["status"] = 1
-    #             r_status = await Income(**incomes[0]).update()
-    #         except:
-    #             raise ValueError("/apis/finish，sql错误")
-    #         if r_status != 1:
-    #             return returnData(0,"发票完成错误，/apis/finish")
-    #     invoices[0]["finished"] = 1
-    #     invoices[0]["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #     try:
-    #         rs = await Invoice(**invoices[0]).update()
-    #     except:
-    #         raise ValueError("/apis/finish，sql错误")
-    #     if rs == 1:
-    #         return returnData(1,"完成")
-    # else:
-    #     return returnData(0,"完成")
+@get("/apis/invoice_finish/info")
+async  def invoice_finish(*,id):
+    id = int(id)
+    invoice = await Invoice.find(id)
+    #存在问题存在数据库里面的时间为什么是下面这个格式的
+    # isinstance(item[field], datetime.date):
+    # item[field] = item[field].strftime("%Y-%m-%d")
+    res = dict(
+        id = invoice["id"],
+        finished = invoice["finished"],
+        finished_time = invoice["finished_time"].strftime("%Y-%m-%d")
+    )
+    return {
+        "info": res
+    }
 
 
 @get("/apis/invoiceApply_comment/info")

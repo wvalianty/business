@@ -66,7 +66,7 @@
             <td> {{ item.income_company }}</td>
             <td  v-if="item.show" v-bind:rowspan="item.rowspan">
 {#                <a  v-bind:id="item.id" class="layui-btn layui-btn-normal edit-btn" v-bind:data-url="'/invocieApply/form?id=' + item.id"  data-title="请确认"  data-area="280px,180px">完成</a>#}
-                <a v-if="item.finished == 0" class="layui-btn layui-btn-danger layui-btn-mini identify-btn" v-bind:data-url="'/apis/finish?id=' + item.invid "><i class="layui-icon"></i> 完成</a>
+                <a v-if="item.finished == 0" class="layui-btn layui-btn-danger layui-btn-mini edit-btn" v-bind:data-url="'/invoice_finish?id=' + item.invid "><i class="layui-icon"></i> 完成</a>
                 <label v-bind:class="item.finished ?  '' : 'date_'  ">完成时间<br/>{{ item.finished_time }}</label>
             </td>
             <td v-if="item.show" v-bind:rowspan="item.rowspan">

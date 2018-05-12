@@ -10,16 +10,16 @@
     <div class="layui-form-item">
         <label class="layui-form-label">选择时间</label>
         <div class="layui-input-6">
-            <input class="layui-input" id="return_money_date" v-model="info.return_money_date"  name="return_money_date"  lay-verify="required" placeholder="请输入回款日期"  type="text">
+            <input class="layui-input" id="finished_time" v-model="info.finished_time"  name="finished_time"  lay-verify="required" placeholder="请输入回款日期"  type="text">
         </div>
     </div>
 
 
     <div class="layui-form-item">
-        <label class="layui-form-label">是否已回款</label>
+        <label class="layui-form-label">确定是否开票</label>
         <div class="layui-input-6">
-            <input type="radio" v-model="info.money_status" name="money_status" value="0" title="未回款" lay-filter="radio" checked>
-            <input type="radio" v-model="info.money_status" name="money_status" value="1" title="已回款" lay-filter="radio">
+            <input type="radio" v-model="info.finished" name="finished" value="0" title="确定不开票" lay-filter="radio" checked>
+            <input type="radio" v-model="info.finished" name="finished" value="1" title="确定开票" lay-filter="radio">
         </div>
     </div>
 
@@ -54,27 +54,8 @@
 
 // 初始化UI
 function hook_init_ui(form, layer) {
-
-    {#form.on('radio(radio)', function(data){#}
-    {##}
-    {#    if(data.elem.name == 'media_type') {#}
-    {#        if (data.value == "1") {#}
-    {#            $('#cost').show();#}
-    {#        } else {#}
-    {#            $('#cost').hide();#}
-    {#        }#}
-    {#    }#}
-    {##}
-    {#    app.info[data.elem.name] = data.value;#}
-    {#{);#}
-    {##}
-    {#form.on('select(select)', function(data){#}
-    {##}
-    {#    app.info[data.elem.name] = data.value;#}
-    {#{);#}
-
     layui.laydate.render({
-        elem: '#return_money_date',
+        elem: '#finished_time',
         type: 'date',
         max: 0,
         done: function (value, date, endDate) {

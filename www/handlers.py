@@ -220,3 +220,9 @@ def money_identify(**kv):
     return {
         '__template__': 'board_money_identify.html'
     }
+
+@get("/invoice_finish")
+def invoice_finish(**kv):
+    return {
+        '__template__': 'invoice_finish.html'
+    }
