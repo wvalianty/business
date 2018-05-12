@@ -27,24 +27,24 @@ async def settleApply_index(*, keyword=None, rangeDate=None, isExport=None, isSe
     pageSize = int(pageSize)
     where = ' where inc.money_status = 1 and settle.is_delete = 0 and inc.is_delete = 0 and c.is_delete = 0 '
 
-    if not isSearch:
-        sql_recentMonth = "SELECT aff_date FROM income ORDER BY id DESC LIMIT 0,1"
-        time_ = await Income.query(sql_recentMonth)
-        if time_:
-            time_ = obj2str(time_)
-            month_ = time_[0]["aff_date"]
-        else:
-            return {
-                "total": 0,
-                "page": (0, 0),
-                "list": (),
-                "other": {
-                    "totalMoney": 0
-                }
-            }
-        # startDate = year + "-" + month_ + "-01" + " 00:00:00"
-        # endDate = year + "-" + month_ + "-31" + " 24:00:00"
-        where = "{} and aff_date = '{}'".format(where, month_)
+    # if not isSearch:
+    #     sql_recentMonth = "SELECT aff_date FROM income ORDER BY id DESC LIMIT 0,1"
+    #     time_ = await Income.query(sql_recentMonth)
+    #     if time_:
+    #         time_ = obj2str(time_)
+    #         month_ = time_[0]["aff_date"]
+    #     else:
+    #         return {
+    #             "total": 0,
+    #             "page": (0, 0),
+    #             "list": (),
+    #             "other": {
+    #                 "totalMoney": 0
+    #             }
+    #         }
+    #     # startDate = year + "-" + month_ + "-01" + " 00:00:00"
+    #     # endDate = year + "-" + month_ + "-31" + " 24:00:00"
+    #     where = "{} and aff_date = '{}'".format(where, month_)
 
     if isSearch and keyword and not rangeDate:
         settle_id = int(keyword)
