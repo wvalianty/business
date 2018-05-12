@@ -151,10 +151,10 @@
                                 <td>{{ item.operate }}</td>
                                 <td>
                                     {{ item.add_date }} &nbsp
-                                    <a class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.income_id)"><i class="layui-icon"></i>详情</a>
+                                    <a class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.sys_id)"><i class="layui-icon"></i>详情</a>
                                 </td>
                             </tr>
-                            <tr v-bind:id="item.income_id" style="display: none;">
+                            <tr v-bind:id="item.sys_id" style="display: none;">
                                 <td colspan="4" style="border:0px;padding: 0px;">
                                     <table style="width: 100%;">
                                         <thead>
