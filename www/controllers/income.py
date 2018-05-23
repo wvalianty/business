@@ -187,9 +187,9 @@ async def delete(*, id):
         return returnData(0, action, '缺少请求参数')
 
     try:
-        rows = await Income.delete(id, where="status<1")
+        rows = await Income.delete(id, where="money_status<1 and inv_status<2")
     except Exception as e:
-        return returnData(0, action , '删除失败')
+        return returnData(0, action)
     
     # 删除对应的未处理的发票单
     if rows:
