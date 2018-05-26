@@ -187,7 +187,8 @@ async def delete(*, id):
         return returnData(0, action, '缺少请求参数')
 
     try:
-        rows = await Income.delete(id, where="money_status<1 and inv_status<2")
+        where = "money_status<1 and inv_status<2 and id = %s" % id
+        rows = await Income.delete(None, where=where)
     except Exception as e:
         return returnData(0, action)
     
