@@ -66,7 +66,10 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
         endDate = "%s-%s" % (endYear, str(endMonth).zfill(2))
     if rangeDate:
         startDate, endDate = rangeDate.split(' - ')
-        where = "{} and {} >= '{}' and {} < '{}'".format(where,affField, startDate, affField, endDate)
+        if startDate == endDate:
+            where = " {} and {} = '{}' ".format(where, affField, startDate)
+        else:
+            where = " {} and {} >= '{}' and {} < '{}' ".format(where, affField, startDate, affField, endDate)
     if invStatus:
         where = "{} and inv_status={} " .format(where,int(invStatus))
     if mediaType:
@@ -81,7 +84,6 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
 
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
     sql_total = 'select count(*) cc from income inc inner join client c on inc.client_id = c.id %s' %(where)
-
     re = await Income.query(sql_total)
     total = re[0]["cc"]
     p = (math.ceil(total / pageSize), page)
