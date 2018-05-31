@@ -124,7 +124,7 @@ def totalLimitP(rs, page, pageSize, limitFlag = False):
     else:
         total = rs[0]['c']
     limit = "%s,%s" % ((page - 1) * pageSize, pageSize)
-    p = (math.ceil(total / pageSize), page)
+    p = (math.ceil(total / pageSize), page, pageSize)
 
     if limitFlag:
         limit = tuple([int(x) for x in limit.split(',')])

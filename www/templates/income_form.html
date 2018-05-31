@@ -28,7 +28,6 @@
                 <option value=""></option>
                 <option v-for="item in other.typeList" :value="item.type">{{item.type}}</option>
             </select>
-    
         </div>
     </div>
     <div class="layui-form-item">
@@ -52,7 +51,10 @@
     <div class="layui-form-item">
         <label class="layui-form-label">收款公司</label>
         <div class="layui-input-6">
-            <input class="layui-input" name="income_company" v-model="info.income_company" lay-verify="required" type="text">
+            <select name="income_company" v-model="info.income_company" lay-verify="required" lay-filter="select" lay-search>
+                <option value=""></option>
+                <option v-for="item in other.companyList" :value="item.company_name">{{item.company_name}}</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">

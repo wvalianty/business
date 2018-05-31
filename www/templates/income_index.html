@@ -79,13 +79,14 @@
             <td>{{ item.inv_status_text }}</td>
             <td>{{ item.media_type_text }}</td>
             <td>
-                <a class="layui-btn layui-btn-mini" :class="{'edit-btn': (item.money_status != 1 || item.media_type == 1), 'gray-btn':!(item.money_status != 1 || item.media_type == 1)}" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" ><i class="iconfont icon-edit" ></i> 编辑</a>
+                <a class="layui-btn layui-btn-mini" :class="{'edit-btn': (item.money_status != 1 || item.media_type == 1), 'gray-btn':!(item.money_status != 1 || item.media_type == 1)}" v-bind:data-url="'/income/form?id=' + item.id" data-title="编辑收入报表" ><i class="iconfont icon-edit layui-icon" ></i> 编辑</a>
                 <a class="layui-btn layui-btn-danger layui-btn-mini" v-bind:data-url="'/apis/income/del?id=' + item.id " 
                 :class="{'del-btn': item.money_status != 1, 'gray-btn':item.money_status==1}"><i class="layui-icon"></i> 删除</a>
             </td>
         </tr>
         <tr>
-            <td colspan="10" align="center">合计金额: {{ other.totalMoney }}</td>
+            <td colspan="4">&nbsp;</td>
+            <td colspan="6" align="left">合计金额: {{ other.totalMoney }}</td>
         </tr>
     </tbody>
 </table>

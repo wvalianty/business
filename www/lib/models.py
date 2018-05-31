@@ -142,3 +142,12 @@ class Role(Model):
     status = BooleanField(default=0)
     rules = TextField()
     add_date = DateTimeField(default=curr_datetime)
+
+
+class Company(Model):
+
+    __table__ = 'company'
+
+    id = IntegerField(primary_key=True)
+    company_name = StringField()
+    sort = IntegerField(default=100)

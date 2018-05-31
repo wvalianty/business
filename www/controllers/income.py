@@ -4,7 +4,7 @@
 "收入管理模块"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Income, Client, Business, IncomeNo, Invoice
+from lib.models import Income, Client, Business, IncomeNo, Invoice, Company
 from lib.common import obj2str, exportExcel, totalLimitP, returnData, addAffDateWhere
 
 
@@ -28,12 +28,12 @@ mediaTypeMap = (
 )
 
 @get('/apis/income/index')
-async def index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=10):
+async def index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, year=None, page=1, pageSize=50):
 
     page = int(page)
     pageSize = int(pageSize)
 
-    # 合计金额
+    # 合计金额, 只统计当前页面显示数据
     totalMoney = 0
 
     where = baseWhere = await addAffDateWhere(rangeDate, isSearch, 'i.is_delete')
@@ -118,12 +118,16 @@ async def formInit(*, id):
     # 获得所有业务类型，id,type
     typeList = await Business.findAll(field='id,type')
 
+    # 获得所有收款公司, id, company_name
+    companyList = await Company.findAll(field='id, company_name', orderBy='sort desc')
+
     res = {
         'moneyStatusMap': moneyStatusMap,
         'invStatusMap': invStatusMap,
         'mediaStatusMap': mediaTypeMap,
         'clientList': clientList,
-        'typeList': typeList
+        'typeList': typeList,
+        'companyList': companyList
     }
 
     return res
