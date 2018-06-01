@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+        <title>首页</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="format-detection" content="telephone=no">
+
+    <link rel="stylesheet" type="text/css" href="/static/common/layui/css/layui.css" media="all">
+        <link rel="stylesheet" type="text/css" href="/static/css/login.css" media="all">
+    <script type="text/javascript" src="/static/common/layui/layui.all.js"></script>
+    <script type="text/javascript" src="/static/js/login.js"></script>
+    <script src="/static/js/jparticle.jquery.js" ></script>
+    <script src="/static/js/sha1.min.js" ></script>
+    <script type="text/javascript" src="/static/common/layui/layui.js"></script>
+    <script type="text/javascript" src="/static/js/vue.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript" src="/static/js/listpage.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/common/global.css" media="all">
+</head>
+<body>
+<script>
+        function getHello(hour,minute) {
+            if (hour < 12 || hour == 12 && minute ==0) {
+                return "早上好！"
+            }
+            if (hour < 20 || hour == 12 && minute > 0) {
+                return "下午好！"
+            }
+            if (hour <= 24) {
+                return "晚上好！"
+            }
+        }
+        function getTwo(flag,num) {
+            //待解决 0分类问题
+            if (flag == "Hour"){
+                return "";
+            }
+            if (num < 10) {
+                return "0" + num.toString();
+            }
+            else {
+                return num.toString();
+            }
+        }
+        function getNowFormatDate() {
+            var date = new Date();
+            var month = (date.getMonth() + 1).toString();  //月
+            var strDate = date.getDate().toString();  //日
+            var year = date.getFullYear().toString();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+            var hello = getHello(hour,minute);
+            var strhour = hour.toString();
+            var strminte = minute.toString();
+            var currentdate = year + "/" + month + "/" + strDate + "</br>" + strhour + ":" + strminte + "</br>" + hello;
+            return currentdate;
+        }
+
+        $(function(){
+            var text = getNowFormatDate();
+            $("#hello").html(text);
+        })
+
+        $(function () {
+            $('a[data-url="/settleApply_index"]').unbind('click').click(
+            function () {
+                var url_ = $(this).attr("data-url");
+                window.parent.click_from_main(url_);
+            })
+        })
+
+        $(function () {
+            $('a[data-url="/invoiceApply_index"]').unbind('click').click(
+            function () {
+                var url_ = $(this).attr("data-url");
+                window.parent.click_from_main(url_);
+            })
+        })
+
+</script>
+
+
+<style>
+   #hello
+        {
+            border:2px solid #a1a1a1;
+            padding:10px 40px;
+            background:#dddddd;
+            border-radius:25px;
+            font-size: large;
+            text-align: center;
+            margin-top:10px;
+            margin-bottom: 30px;
+            margin-left: 10px;
+        }
+
+    #left {
+        width: 60%;
+    }
+
+       #test {
+        width: 200px;
+        height: 200px;
+        border-radius: 100px 100px;
+        border: 1px solid;
+        box-sizing: border-box;
+        padding: 90px 0px;
+        text-align: center;
+        background-color: #ce8483;
+        margin-top:20px;
+}
+    #right {
+        position: absolute;
+        left:70%;
+        top:10%;
+    }
+    .hidden_ {
+        display:none;
+    }
+</style>
+<div  id="left">
+        <div id = "hello"></div>
+        <div id="app">
+            <table   class="layui-table">
+                <colgroup>
+                    <col width="15%">
+                    <col width="20%">
+                    <col width="20%">
+                    <col width="25%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">操作人</th>
+                        <th>操作目标</th>
+                        <th>操作记录</th>
+                        <th>操作时间</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                        <template v-for="item in list">
+                            <tr >
+                                <td align="left">{{ item.name }}</td>
+                                <td>{{ item.income_id }}</td>
+                                <td>{{ item.operate }}</td>
+                                <td>
+                                    {{ item.add_date }} &nbsp
+                                    <a class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.sys_id)"><i class="layui-icon"></i>详情</a>
+                                </td>
+                            </tr>
+                            <tr v-bind:id="item.sys_id" style="display: none;">
+                                <td colspan="4" style="border:0px;padding: 0px;">
+                                    <table style="width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:left;">收入ID</th>
+                                                <th>公司名称</th>
+                                                <th>业务名称</th>
+                                                <th>收入金额</th>
+                                                <th>结算进度</th>
+                                            </tr>
+                                        </thead>
+
+                                            <tr>
+                                                <td>{{ item.income_id}}</td>
+                                                <td>{{ item.gongsi }}</td>
+                                                <td>{{ item.yewu  }}</td>
+                                                <td>{{ item.money }}</td>
+                                                <td>{{ item.inv_status }}</td>
+                                            </tr>
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </template>
+
+                </tbody>
+            </table>
+            <div id="right">
+                <a data-url="/settleApply_index"><div id="test">您有{{ other.settle }}个结算申请待处理</div></a>
+                <a data-url="/invoiceApply_index"><div id="test">您有{{ other.invoice }}个发票申请待处理</div></a>
+            </div>
+        <div>
+</div>
+<div id="page" class="page"></div>
+
+</body>
