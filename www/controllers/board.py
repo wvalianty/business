@@ -38,11 +38,12 @@ async def export(lists):
         'inv_status':"开票状态",
         'media_type': '媒体类型',
         'income_company':'收款公司',
+        'cost':'渠道成本',
     }
     return exportExcel('业务报表', fields, lists)
 
 @get('/apis/board/index')
-async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None, isSearch=None, page=1, pageSize=10):
+async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatus=None, mediaType=None, isExport=None,  page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
     totalMoney = 0
@@ -69,7 +70,7 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
         if startDate == endDate:
             where = " {} and {} = '{}' ".format(where, affField, startDate)
         else:
-            where = " {} and {} >= '{}' and {} < '{}' ".format(where, affField, startDate, affField, endDate)
+            where = " {} and {} >= '{}' and {} <= '{}' ".format(where, affField, startDate, affField, endDate)
     if invStatus:
         where = "{} and inv_status={} " .format(where,int(invStatus))
     if mediaType:
@@ -92,13 +93,37 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
             'totalMoney': round(totalMoney, 2)
         })
 
-    sql_re = 'SELECT inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
+    sql_re = 'SELECT inc.cost,inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:
         # item['status'] = statusMap[item['status']]
         item['media_type'] = mediaTypeMap[item['media_type']]
         totalMoney = totalMoney + item['money']
+
+
+    if isExport and int(isExport) == 1 and rangeDate:
+        startDate, endDate = rangeDate.split(' - ')
+        if startDate == endDate:
+            where_t = " {} and {} = '{}' ".format(where, affField, startDate)
+        else:
+            where_t = " {} and {} >= '{}' and {} <= '{}' ".format(where, affField, startDate, affField, endDate)
+        sql_re_t = 'SELECT inc.cost,inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where_t + 'order by  inc.income_id  desc'
+        res_t = await Income.query(sql_re_t)
+        res_t = obj2str(res_t)
+        for item in res_t:
+            if item["money_status"] == 0:
+                item["money_status"] = "未回款"
+            if item["money_status"] == 1:
+                item["money_status"] = "已回款"
+            if item["inv_status"] == 0:
+                item["inv_status"] = "未开票"
+            if item["inv_status"] == 1:
+                item["inv_status"] = "不开票"
+            if item["inv_status"] == 2:
+                item["inv_status"] = "已开票"
+        return await export(res_t)
+
     if isExport and int(isExport) == 1:
         for item in res:
             if item["money_status"] == 0:
