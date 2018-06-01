@@ -50,6 +50,9 @@ $(function(){
 
                     self.list = data.list;
                     self.page = data.page;
+                    if(typeof self.page[2] == 'undefined') {
+                        self.page[2] = 10;
+                    }
                     self.total = data.total;
                     if (typeof data.other != 'undefined') {
                         self.other = data.other
@@ -235,7 +238,7 @@ $(function(){
                     elem: 'page',
                     count: self.total,
                     curr: self.page[1],
-                    limit:10,
+                    limit: self.page[2],
                     groups: 5,
                     jump: function(obj, first){
                         //得到了当前页，用于向服务端请求对应数据

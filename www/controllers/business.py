@@ -46,6 +46,9 @@ async def index(*, keyword=None, rangeDate=None, isSearch=0, page=1, pageSize=10
         hkMoney = await Income.findNumber('sum(money)', where)
         item['hkMoney'] = round(hkMoney, 2) if hkMoney else 0
 
+        # 投放金额
+        item['tfMoney'] = round(item['tfMoney'], 2)
+
     return {
         'total': total,
         'page': p,
