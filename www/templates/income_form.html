@@ -81,6 +81,12 @@
             <input class="layui-input" v-model="info.cost" name="cost" type="number">
         </div>
     </div>
+    <div class="layui-form-item" id="cost_detail" v-show="info.media_type">
+        <label class="layui-form-label">渠道成本明细</label>
+        <div class="layui-input-6">
+            <input class="layui-input" v-model="info.cost_detail" name="cost_detail" type="text">
+        </div>
+    </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
             <input type="hidden" name="id" v-model="info.id">
