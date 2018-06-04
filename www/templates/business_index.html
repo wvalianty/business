@@ -16,6 +16,13 @@
             </select>
         </div>
         <div class="layui-input-inline" style="width: 150px;">
+            <select name="media_type">
+                <option value="">媒体类型</option>
+                <option value="0">自媒</option>
+                <option value="1">外媒</option>
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width: 150px;">
             <input type="text" v-model="params.rangeDate"  name="rangeDate" class="layui-input search_input rangeDate" data-type="month" placeholder="选择日期">
         </div>
         <a class="layui-btn search_btn" lay-submit lay-filter="searchForm">查询</a>
