@@ -52,12 +52,10 @@
                 <td>{{ item.operate_text }}</td>
                 <td>
                     {{ item.add_date }} <br/>
-                    <a class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id"> 详情</a>
-                </td>
-            </tr>
-            <tr style="display: none;">
-                <td colspan="4">
+                    <a v-if="item.is_read"  style="background-color:#333" class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a>
+                    <a v-if="! item.is_read"   style="background-color:#da400f"  class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a><br>
                     <table>
+{#                        <table class="decideNotShow" v-bind:class="{ active : isActive }">#}
                         <thead>
                             <tr>
                                 <td>收入ID</td>
@@ -79,6 +77,7 @@
                             </tr>
                         </tbody>
                     </table>
+{#                    <a class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" > 详情</a>#}
                 </td>
             </tr>
         </template>
@@ -91,9 +90,10 @@
 <script>
 
     function hook_updated(){
-    
-        $('.syslogInfo').click(function(){
-          
+
+        $('.syslogInfo').parent('td').children('table').hide();
+        $('.syslogInfo').unbind('click').click(function(){
+            $(this).parent('td').children('table').toggle();
             $(this).parents('tr').next().toggle();
             if($(this).parents('tr').hasClass('redline')){
                 $(this).parents('tr').removeClass('redline');
@@ -118,4 +118,12 @@
         });
     }
 </script>
+    <style>
+        .decideShow {
+            display: block;
+        }
+        .decideNotShow {
+            display:none;
+        }
+    </style>
 {% endblock %}

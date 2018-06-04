@@ -60,6 +60,7 @@
             <th>开票状态</th>
             <th>媒体类型</th>
             <th>收款公司</th>
+            <th>渠道成本</th>
         </tr>
     </thead>
     <tbody>
@@ -84,6 +85,7 @@
             </td>
             <td>{{ item.media_type }}</td>
             <td>{{ item.income_company }}</td>
+            <td>{{ item.cost }}</td>
 {#            <td>#}
 {#                <a class="layui-btn layui-btn-danger layui-btn-mini edit-btn" v-bind:data-url="'/board/money_identify?id='+item.income_id"   ><i class="layui-icon"></i> 确认回款</a>#}
 {#            </td>#}
@@ -95,7 +97,7 @@
 {#            </td>#}
         </tr>
         <tr>
-            <td colspan="12" align="center">合计金额: {{ other.totalMoney }}</td>
+            <td colspan="13" align="center">合计金额: {{ other.totalMoney }}</td>
         </tr>
     </tbody>
 </table>

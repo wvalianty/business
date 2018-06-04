@@ -4,9 +4,18 @@ import math,datetime,time,logging
 from lib.common import obj2str
 from config import configs
 
+
+operateMaps = {
+    'INSERT': '新增',
+    'UPDATE': '编辑',
+    'DELETE': '删除'
+}
+
 @get("/apis/main/index")
 async def apis_main(*,page=1, pageSize=15):
-    email = configs.user.name#
+    email = configs.user.name
+    user_info = await Users.findOne(where="email='%s'" % email)
+    ids = user_info['read_log_ids']
     page = int(page)
     pageSize = int(pageSize)
     sql_re = 'select sy.id sys_id,u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.email = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` in  ("INCOME","SETTLEMENT")  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
@@ -33,6 +42,11 @@ async def apis_main(*,page=1, pageSize=15):
     other = dict(settle=settle, invoice=invoice)
 
     for i in res:
+        i["operate"] = operateMaps[i['operate']]
+        if ids and i['sys_id'] and str(i['sys_id']) in ids:
+            i['is_read'] = 1
+        else:
+            i['is_read'] = 0
         if i["inv_status"] == 0:
             i["inv_status"] = "未开票"
         elif i["inv_status"] == 1:
@@ -54,7 +68,9 @@ async def apis_main(*,page=1, pageSize=15):
 
 @get("/apis/main_operate/index")
 async def apis_main_operate(*,page=1,pageSize=15):
-    email = configs.user.name  #
+    email = configs.user.name
+    user_info = await Users.findOne(where="email='%s'" % email)
+    ids = user_info['read_log_ids']
     page = int(page)
     pageSize = int(pageSize)
     sql_re = 'select sy.id sys_id,u.name,inc.income_id,sy.operate,sy.add_date,c.name gongsi,inc.name yewu,inc.money,inc.inv_status from  syslog sy  inner join users u on u.email = sy.username inner join income inc on inc.id = sy.affetced_id  inner join client c on c.id = inc.client_id  where sy.`table` in  ("INCOME","SETTLEMENT")  and u.is_delete = 0 and c.is_delete = 0 and inc.is_delete = 0 and sy.is_delete = 0   order by  sy.id desc limit 0,15  '
@@ -86,6 +102,11 @@ async def apis_main_operate(*,page=1,pageSize=15):
     other = dict(settle=settle, invoice=invoice,expire_=expire_)
 
     for i in res:
+        i["operate"] = operateMaps[i['operate']]
+        if ids and i['sys_id'] and str(i['sys_id']) in ids:
+            i['is_read'] = 1
+        else:
+            i['is_read'] = 0
         if i["inv_status"] == 0:
             i["inv_status"] = "未开票"
         elif i["inv_status"] == 1:
