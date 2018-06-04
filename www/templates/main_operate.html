@@ -157,8 +157,9 @@
                                 <td>{{ item.income_id }}</td>
                                 <td>{{ item.operate }}</td>
                                 <td>
-                                    {{ item.add_date }} &nbsp
-                                    <a class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.sys_id)"><i class="layui-icon"></i>详情</a>
+                                    {{ item.add_date }} <br>
+                                     <a  v-if="item.is_read"  style="background-color:#333"  class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.sys_id)">详情</a>
+                                    <a  v-if="! item.is_read"  style="background-color:#da400f"  class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.sys_id)">详情</a>
                                 </td>
                             </tr>
                             <tr v-bind:id="item.sys_id" style="display: none;">

@@ -4,9 +4,11 @@
 "系统操作日志"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Syslogs
+from lib.models import Syslogs,Users
 from lib.common import obj2str, returnData, totalLimitP
 from income import moneyStatusMap, invStatusMap
+from config import configs
+
 
 operateMaps = {
     'INSERT': '新增',
@@ -32,13 +34,15 @@ sqlTpl = "SELECT {} FROM syslog s \
         WHERE module = 'INCOME' and s.is_delete =0 and {}"
 
 # 搜索字段
-selectField = 's.id, s.username, s.`operate`, s.`module`, s.`add_date`, s.is_read, i.income_id, c.name company_name, i.name, i.money, i.money_status,i.inv_status'
-
+selectField = 's.id, s.username, s.`operate`, s.`module`, s.`add_date`,  i.income_id, c.name company_name, i.name, i.money, i.money_status,i.inv_status'
+#s.is_read,
 @get('/apis/syslogs/index')
 async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
-
+    email = configs.user.name
+    user_info = await Users.findOne(where="email='%s'" % email)
+    ids = user_info['read_log_ids']
     # 当前日期
     # currDate = time.strftime('%Y-%m-%d')
 
@@ -70,6 +74,10 @@ async def index(*, keyword=None, operate=None, module=None, page=1, pageSize=10)
 
     # 获得每个客户下的投放数和回款数
     for item in lists:
+        if ids and item['id'] and str(item['id']) in ids:
+            item['is_read'] = 1
+        else:
+            item['is_read'] = 0
         item['operate_text'] = operateMaps[item['operate']]
         item['module_text'] = moduleMaps[item['module']]
         item['money_status_text'] = moneyStatusMap[item['money_status']]
@@ -92,10 +100,16 @@ async def read(*, id):
     
     if not id.isdigit() or int(id) <= 0:
         return returnData(0, '标记已读', '缺少请求参数')
-    
-    info = await Syslogs.find(id)
-    info['is_read'] = 1
-    rows = await Syslogs(**info).update()
+
+    email = configs.user.name
+    user_info = await Users.findOne(where="email='%s'" % email)
+    ids = user_info['read_log_ids']
+    if ids:
+        ids = str(ids) + ',' +  str(id)
+    else:
+        ids = str(id)
+    user_info['read_log_ids'] = ids
+    rows = await Users(**user_info).update()
 
     return returnData(rows, '标记已读')
 

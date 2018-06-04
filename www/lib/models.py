@@ -114,6 +114,7 @@ class Users(Model):
     name = StringField()
     created_at =  DateTimeField()
     is_delete = IntegerField(default=0)
+    read_log_ids = StringField()
 
 class Rule(Model):
 
