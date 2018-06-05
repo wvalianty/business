@@ -124,3 +124,25 @@ async def apis_main_operate(*,page=1,pageSize=15):
         "list": res,
         "other": other
     }
+
+
+@get('/api/main/read')
+async def read_affirm(*,sys_id):
+    if sys_id:
+        email = configs.user.name
+        user_info = await Users.findOne(where="email='%s'" % email)
+        ids = user_info['read_log_ids']
+        user_info['read_log_ids'] = ids + ',' + str(sys_id)
+        row = await Users(**user_info).update()
+        if row == 1:
+            return {
+                "data":1
+            }
+        else:
+            return {
+                "data":0
+            }
+    else:
+        return {
+            "data": 0
+        }

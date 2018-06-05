@@ -94,6 +94,7 @@
         $('.syslogInfo').parent('td').children('table').hide();
         $('.syslogInfo').unbind('click').click(function(){
             $(this).parent('td').children('table').toggle();
+            {#$('.syslogInfo').parent('td').children('table').css('background-color','#333');#}
             $(this).parents('tr').next().toggle();
             if($(this).parents('tr').hasClass('redline')){
                 $(this).parents('tr').removeClass('redline');

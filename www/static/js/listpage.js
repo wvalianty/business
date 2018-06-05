@@ -198,7 +198,24 @@ $(function(){
                 }else {
                     $("#"+id).css('display','table-row');
                 }
-            }
+            },
+            redfun:function (sys_l_id) {
+                id = sys_l_id.toString();
+                url = "/api/main/read" + "?" + "sys_id=" + id.toString();
+                $.get(url,function (data) {
+                    if (data.data){
+                        if ( $("#"+id).css('display') == "table-row" ){
+                            $("#"+id).css('display','none');
+                        }else {
+                            $("#"+id).css('display','table-row');
+                        }
+                        document.location.reload();
+                    }else {
+                        alert("fail!")
+                    }
+                })
+
+            },
         },
         mounted: function () {
 
