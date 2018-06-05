@@ -201,7 +201,7 @@ $(function(){
             },
             redfun:function (sys_l_id) {
                 id = sys_l_id.toString();
-                url = "/api/main/read" + "?" + "sys_id=" + id.toString();
+                url = "/apis/main/read" + "?" + "sys_id=" + id.toString();
                 $.get(url,function (data) {
                     if (data.data){
                         if ( $("#"+id).css('display') == "table-row" ){

@@ -126,7 +126,7 @@ async def apis_main_operate(*,page=1,pageSize=15):
     }
 
 
-@get('/api/main/read')
+@get('/apis/main/read')
 async def read_affirm(*,sys_id):
     if sys_id:
         email = configs.user.name
