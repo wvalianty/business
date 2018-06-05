@@ -8,14 +8,18 @@ from lib.models import Business, Income, Settlement
 from lib.common import obj2str, returnData, addAffDateWhere, totalLimitP
 
 @get('/apis/business/index')
-async def index(*, keyword=None, rangeDate=None, isSearch=0, page=1, pageSize=10):
+async def index(*, keyword=None,media_type=None, rangeDate=None, isSearch=0, page=1, pageSize=10):
     page = int(page)
     pageSize = int(pageSize)
 
-    where = baseWhere = await addAffDateWhere(rangeDate, isSearch)
+    where = await addAffDateWhere(rangeDate, isSearch)
 
     if keyword and keyword.strip() != '':
         where = "{} and `business_type` like '%%{}%%'".format(where, keyword)
+    if media_type is not None and media_type.isdigit():
+        where = "{} and `media_type` = {}".format(where, media_type) 
+
+    baseWhere = where
 
     # 查询数据总数
     groupBy = 'aff_date,business_type'
@@ -39,7 +43,7 @@ async def index(*, keyword=None, rangeDate=None, isSearch=0, page=1, pageSize=10
     for item in lists:
        
         # 查询回款数
-        where = "%s and business_type = '%s' and money_status = 1" % (baseWhere, item.type)
+        where = "%s and business_type = '%s' and money_status = 1" % (baseWhere, item.type) 
         item['hkCount'] = await Income.findNumber('count(id)', where)
 
         # 回款金额

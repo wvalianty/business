@@ -146,6 +146,7 @@ async def form(**kw):
         inv_status=kw.get('inv_status', 0),
         media_type = kw.get('media_type', 0),
         cost = kw.get('cost', ''),
+        cost_detail=kw.get('cost_detail', ''),
         aff_date = kw.get('aff_date')
     )
 
@@ -276,7 +277,8 @@ async def export(lists):
         'money_status_text': '回款进度',
         'inv_status_text': '开票进度',
         'media_type_text': '媒体类型',
-        'cost': '渠道成本'
+        'cost': '渠道成本',
+        'cost_detail': '渠道成本明细'
     }
 
     return exportExcel('收入报表', fields, lists)

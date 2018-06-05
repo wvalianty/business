@@ -54,6 +54,7 @@ class Income(Model):
     inv_status = IntegerField()
     media_type = IntegerField()
     cost = StringField()
+    cost_detail = StringField()
     add_date = DateTimeField(default=curr_datetime)
     is_delete = IntegerField(default=0)
     income_company = StringField()
