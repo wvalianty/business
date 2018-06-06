@@ -93,6 +93,11 @@
 
         $('.syslogInfo').parent('td').children('table').hide();
         $('.syslogInfo').unbind('click').click(function(){
+
+            if ($(this).css('background-color') != '#333' ){
+                $(this).css('background-color','#333');
+            }
+
             $(this).parent('td').children('table').toggle();
             {#$('.syslogInfo').parent('td').children('table').css('background-color','#333');#}
             $(this).parents('tr').next().toggle();

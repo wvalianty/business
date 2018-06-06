@@ -181,41 +181,7 @@ $(function(){
                     return false;
                 });
             },
-            myfun:function (income_id) {
-                id = income_id.toString();
-                // $("#"+id).css('display','table-row');
-                // $("#"+id).css('width','100%');
-                //这里有问题，只能展示，不能隐藏
-                // if ( $("#"+id).hasClass('table-row')){
-                //     $("#"+id).css('display','none');
-                //      console.log("#"+id);
-                // }
-                // else {
-                //     $("#"+id).css('display','table-row');
-                // }
-                if ( $("#"+id).css('display') == "table-row" ){
-                    $("#"+id).css('display','none');
-                }else {
-                    $("#"+id).css('display','table-row');
-                }
-            },
-            redfun:function (sys_l_id) {
-                id = sys_l_id.toString();
-                url = "/apis/main/read" + "?" + "sys_id=" + id.toString();
-                $.get(url,function (data) {
-                    if (data.data){
-                        if ( $("#"+id).css('display') == "table-row" ){
-                            $("#"+id).css('display','none');
-                        }else {
-                            $("#"+id).css('display','table-row');
-                        }
-                        document.location.reload();
-                    }else {
-                        alert("fail!")
-                    }
-                })
 
-            },
         },
         mounted: function () {
 

@@ -158,8 +158,8 @@
                                 <td>{{ item.operate }}</td>
                                 <td>
                                     {{ item.add_date }} <br>
-                                     <a  v-if="item.is_read"  style="background-color:#333"  class="layui-btn  layui-btn-mini xiala-btn" v-on:click="myfun(item.sys_id)">详情</a>
-                                    <a  v-if="! item.is_read"  style="background-color:#da400f"  class="layui-btn  layui-btn-mini xiala-btn" v-on:click="redfun(item.sys_id)">详情</a>
+                                     <a  v-if="item.is_read"  style="background-color:#333"  class="layui-btn  layui-btn-mini xiala-btn">详情</a>
+                                    <a  v-if="! item.is_read"  style="background-color:#da400f"  class="layui-btn  layui-btn-mini xiala-btn">详情</a>
                                 </td>
                             </tr>
                             <tr v-bind:id="item.sys_id" style="display: none;">
@@ -195,9 +195,40 @@
                 <a data-url="/settlement"><div id="test">您有{{ other.settle }}个结算申请待处理</div></a>
                 <a data-url="/invoice"><div id="test">您有{{ other.invoice }}个发票申请待处理</div></a>
             </div>
-        <div>
+        </div>
 </div>
 <div id="page" class="page"></div>
+<script>
+    function hook_updated() {
+        $('.xiala-btn').unbind('click').bind('click',function () {
+            if ($(this).css('background-color') == 'rgb(51, 51, 51)'){
+                if ($(this).parent('td').parent('tr').next('tr').css('display') == 'none'){
+                    $(this).parent('td').parent('tr').next('tr').css('display','table-row');
+                }else {
+                    $(this).parent('td').parent('tr').next('tr').css('display','none');
+                }
+                return ;
+            }else{
+                var id = $(this).parent('td').parent('tr').next('tr').attr('id');
+                var url = "/apis/main/read" + "?" + "sys_id=" + id.toString();
+                $.get(url,function (data) {
+                    if (! data.data){
+                        alert("error and fail!");
+                        return;
+                    }
+                })
+                if ($(this).parent('td').parent('tr').next('tr').css('display') == 'none'){
+                    $(this).parent('td').parent('tr').next('tr').css('display','table-row');
+                }else {
+                    $(this).parent('td').parent('tr').next('tr').css('display','none');
+                }
+                if ($(this).css('background-color') == 'rgb(218, 64, 15)'){
+                    $(this).css('background-color','#333');
+                }
+            }
+        })
+    }
+</script>
 
 </body>
 </html>
