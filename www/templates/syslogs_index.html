@@ -52,8 +52,8 @@
                 <td>{{ item.operate_text }}</td>
                 <td>
                     {{ item.add_date }} <br/>
-                    <a v-if="item.is_read"  style="background-color:#333" class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a>
-                    <a v-if="! item.is_read"   style="background-color:#da400f"  class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a><br>
+                    <a v-if="item.is_read"  style="background-color:#333;position:absolute;right: 0px;top: 0;" class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a>
+                    <a v-if="! item.is_read"   style="background-color:#da400f;position:absolute;right: 0px;top: 0;"  class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a><br>
                     <table>
 {#                        <table class="decideNotShow" v-bind:class="{ active : isActive }">#}
                         <thead>

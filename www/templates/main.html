@@ -151,8 +151,8 @@
                                 <td>{{ item.operate }}</td>
                                 <td>
                                     {{ item.add_date }} <br>
-                                    <a  v-if="item.is_read"  style="background-color:#333"  class="layui-btn  layui-btn-mini xiala-btn">详情</a>
-                                    <a  v-if="! item.is_read"  style="background-color:#da400f"  class="layui-btn  layui-btn-mini xiala-btn">详情</a>
+                                    <a  v-if="item.is_read"  style="background-color:#333;position:absolute;right: 0px;top: 0;"  class="layui-btn  layui-btn-mini xiala-btn">详情</a>
+                                    <a  v-if="! item.is_read"  style="background-color:#da400f;position: absolute;right: 0px;top: 0;"  class="layui-btn  layui-btn-mini xiala-btn">详情</a>
                                 </td>
                             </tr>
                             <tr v-bind:id="item.sys_id" style="display: none;">
