@@ -188,7 +188,6 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
 #inv_id
 @post("/apis/invoice_finish/form")
 async def apis_finish(*,id,finished,finished_time):
-    print(id)
     row_income = {}
     if id and finished_time and  finished and int(finished) == 1:
         invoice = await Invoice.find(int(id))

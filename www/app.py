@@ -30,12 +30,49 @@ async  def auth_err(request):
     #return web.Response(body=b'<h1>please check your authority,please understand yourself in your  heart where there is a number,then contact the manager ,thankyou</h1>', content_type='text/html')
     return web.Response(body=b'<h1>right error or  backend function error</h1>', content_type='text/html')
 
+
+#单独判断请求apis的权限，如果有cookie，账号密码对上则ok
+async def api_auth(app,handler):
+    @asyncio.coroutine
+    def auth(request):
+        logging.info('check user: %s %s' % (request.method, request.path))
+        if request.path.startswith('/apis'):
+            cookie_str = request.cookies.get(COOKIE_NAME)
+            if cookie_str:
+                try:
+                    user = yield from cookie2user(cookie_str)
+                    if user:
+                        logging.info('set current user: %s' % user.email)
+                        return (yield from handler(request))
+                    else:
+                        return (yield from auth_err(request))
+                except:
+                    return (yield from auth_err(request))
+        else:
+            return (yield from handler(request))
+    return auth
+
+
 async def auth_factory(app, handler):
     @asyncio.coroutine
     def auth(request):
         logging.info('check user: %s %s' % (request.method, request.path))
         request.__user__ = None
-        if request.path.startswith('/static/') or request.path.startswith('/api/login') or request.path.startswith('/login/index')  or request.path.startswith('/apis'):
+        if request.path.startswith('/static/') or request.path.startswith('/api/login') or request.path.startswith('/login/index') or request.path.startswith('/apis'):
+            if request.path.startswith('/apis'):
+                cookie_str = request.cookies.get(COOKIE_NAME)
+                if cookie_str:
+                    try:
+                        user = yield from cookie2user(cookie_str)
+                        if user:
+                            logging.info('set current user: %s' % user.email)
+                            return (yield from handler(request))
+                        else:
+                            return (yield from auth_err(request))
+                    except:
+                        return (yield from auth_err(request))
+                else:
+                    return (yield from auth_err(request))
             return (yield from handler(request))
         cookie_str = request.cookies.get(COOKIE_NAME)
         if cookie_str:
@@ -155,9 +192,9 @@ async def response_factory(app, handler):
 async def init(loop):
     await orm.create_pool(loop=loop, host=db.host, port=db.port, user=db.user, password=db.password, db=db.database)
     app = web.Application(loop=loop, middlewares=[
-        auth_factory,logger_factory, data_factory, response_factory
+         auth_factory, logger_factory, data_factory, response_factory
     ])
-    #auth_factory,
+    #auth_factory,api_auth,
     init_jinja2(app)
     add_routes(app, 'handlers')
 
