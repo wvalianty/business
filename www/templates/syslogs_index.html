@@ -52,8 +52,8 @@
                 <td>{{ item.operate_text }}</td>
                 <td>
                     {{ item.add_date }} <br/>
-                    <a v-if="item.is_read"  style="background-color:#333" class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a>
-                    <a v-if="! item.is_read"   style="background-color:#da400f"  class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a><br>
+                    <a v-if="item.is_read"  style="background-color:#333;position:absolute;right: 0px;top: 0;" class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a>
+                    <a v-if="! item.is_read"   style="background-color:#da400f;position:absolute;right: 0px;top: 0;"  class="layui-btn layui-btn-mini syslogInfo"  :data-id="item.id" >详情</a><br>
                     <table>
 {#                        <table class="decideNotShow" v-bind:class="{ active : isActive }">#}
                         <thead>
@@ -93,7 +93,13 @@
 
         $('.syslogInfo').parent('td').children('table').hide();
         $('.syslogInfo').unbind('click').click(function(){
+
+            if ($(this).css('background-color') != '#333' ){
+                $(this).css('background-color','#333');
+            }
+
             $(this).parent('td').children('table').toggle();
+            {#$('.syslogInfo').parent('td').children('table').css('background-color','#333');#}
             $(this).parents('tr').next().toggle();
             if($(this).parents('tr').hasClass('redline')){
                 $(this).parents('tr').removeClass('redline');
