@@ -120,6 +120,9 @@ async def execute(sql, args, autocommit = True):
         if not autocommit:
             await conn.begin()
         try:
+            if not configs.user.name:
+                logging.info('用戶不存在')
+                return 0
             # 获得操作数据库的游标对象
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 await cur.execute(sql.replace('?', '%s'), args or ())
