@@ -115,24 +115,26 @@ async def apis_main_operate(*,page=1,pageSize=15):
             i["inv_status"] = "已开票"
         else:
             i["inv_status"] = "状态错误"
-
-
-
     return {
         "total": 1,
         "page": (1, 1),
         "list": res,
         "other": other
     }
-
-
 @get('/apis/main/read')
 async def read_affirm(*,sys_id):
     if sys_id:
         email = configs.user.name
         user_info = await Users.findOne(where="email='%s'" % email)
-        ids = user_info['read_log_ids']
-        user_info['read_log_ids'] = ids + ',' + str(sys_id)
+        ids = user_info["read_log_ids"]
+        if ids and str(sys_id)  in ids:
+            return {
+                "data":0
+             }
+        if ids:
+            user_info["read_log_ids"] = ids + ',' + str(sys_id)
+        else:
+            user_info["read_log_ids"] = str(sys_id)
         row = await Users(**user_info).update()
         if row == 1:
             return {
@@ -146,3 +148,4 @@ async def read_affirm(*,sys_id):
         return {
             "data": 0
         }
+
