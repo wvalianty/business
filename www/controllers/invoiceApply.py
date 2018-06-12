@@ -99,7 +99,7 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
                     else:
                         res.append(tmp)
 
-    if keyword or (keyword and isSearch):
+    if keyword  and isSearch:
         search_res = []
         search_total = 0
         cname = keyword.strip()

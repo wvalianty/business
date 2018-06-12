@@ -7,6 +7,17 @@ from core.coreweb import get, post
 from lib.models import Client, Income, Settlement,Invoice
 from lib.common import obj2str, returnData, totalLimitP, replLineBreak
 
+# ['timedelta']
+def sortFunc(*ll):
+    ll = list(ll)
+    length = len(ll)
+    for i in range(length):
+         for j in range(1,length-i):
+             if ll[i]["timedelta"] > ll[j]["timedelta"]:
+                 ll[i],ll[j] = ll[j],ll[i]
+    return ll
+
+
 @get('/apis/client/index')
 async def index(*, keyword=None, status=None, page=1, pageSize=10):
     page = int(page)
@@ -54,14 +65,16 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
         # 回款数
         item['hkCount'] = round(info['hkCount'], 2) if info['hkCount'] else 0
         item['invoice'] = replLineBreak(item['invoice'])
-
         # 合同是否有效
         item['indate_status'] = item['indate_end'] >= currDate
-
+        timedelta = datetime.datetime.strptime(item['indate_end'],'%Y-%m-%d') -  datetime.datetime.strptime( datetime.datetime.now().strftime('%Y-%m-%d'),'%Y-%m-%d')
+        item['timedelta'] = timedelta.days
+        # print(item['sortFlag'])  datetime.datetime.strptime(detester,’%Y-%m-%d') item['sortFlag'] =
+    res = sortFunc(*clients)
     return {
         'total': total,
         'page': p,
-        'list': clients
+        'list': res
     }
 
 @get('/apis/client/info')
