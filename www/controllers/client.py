@@ -11,12 +11,11 @@ from lib.common import obj2str, returnData, totalLimitP, replLineBreak
 def sortFunc(*ll):
     ll = list(ll)
     length = len(ll)
-    for i in range(length):
-         for j in range(1,length-i):
-             if ll[i]["timedelta"] > ll[j]["timedelta"]:
-                 ll[i],ll[j] = ll[j],ll[i]
+    for i in range(length-1):
+         for j in range(length-i-1):
+             if ll[j]["timedelta"] > ll[j+1]["timedelta"]:
+                 ll[j+1],ll[j] = ll[j],ll[j+1]
     return ll
-
 
 @get('/apis/client/index')
 async def index(*, keyword=None, status=None, page=1, pageSize=10):
