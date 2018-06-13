@@ -5,7 +5,7 @@
 import math, datetime, time
 from core.coreweb import get, post
 from lib.models import Income, Client, Settlement
-from lib.common import obj2str, totalLimitP, addAffDateWhere, returnData, replLineBreak
+from lib.common import obj2str, totalLimitP, addAffDateWhere, returnData, replLineBreak, isfloat
 import client, income
 
 
@@ -148,7 +148,7 @@ async def formInit(*, id=0):
             continue
         # 已结算金额
         settMoney = await Settlement.findNumber('sum(balance)', where="income_id=%s" % item['id']) or 0
-        if item['cost'].isdigit() and float(settMoney) >= float(item['cost']):
+        if isfloat(item['cost']) and float(settMoney) >= float(item['cost']):
             incomeIdList.remove(item)
 
     res = {

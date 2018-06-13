@@ -334,3 +334,16 @@ def replLineBreak(text, symbol='<br/>'):
     """
 
     return replBatch(text, ['\r\n', '\r', '\n'], symbol)
+
+
+def isfloat(value):
+    """检查字符串是否是浮点数
+    
+    Arguments:
+        value {[type]} -- [description]
+    """
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
