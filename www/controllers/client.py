@@ -39,7 +39,7 @@ async def index(*, keyword=None, status=None, page=1, pageSize=10):
     
     if total == 0:
         return dict(total = total, page = p, list = ())
-    clients = await Client.findAll(orderBy='id desc', where=where, limit=limit)
+    clients = await Client.findAll(orderBy='indate_end', where=where, limit=limit)
 
     # 将获得数据中的日期转换为字符串
     clients = obj2str(clients)
