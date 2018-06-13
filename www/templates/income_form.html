@@ -104,11 +104,8 @@
 // 初始化时数据加载
 function hook_init(vueObj) {
 
-    let id = getQueryStr('id') || 0;
-    $.get('/apis/income/formInit?id=' + id, function(data) {
-        
-        app.other = data;
-        if( id == 0 ) {
+    getFromInit(vueObj, 'income', function (app, id, data) {
+        if (id == 0) {
             app.info.media_type = 0;
             app.info.money_status = 0;
             app.info.inv_status = 0;

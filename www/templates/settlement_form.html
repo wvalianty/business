@@ -100,14 +100,9 @@
 
 // 初始化时数据加载
 function hook_init(vueObj) {
-
-    let id = getQueryStr('id') || 0;
-    $.get('/apis/settlement/formInit?id=' + id, function(data) {
-        
-        vueObj.other = data;
-
-        if(id == 0){
-            app.info.stype = 0;
+    getFromInit(vueObj, 'settlement', function(vueObj, id){
+        if (id == 0) {
+            vueObj.info.stype = 0;
         }
     });
 }
