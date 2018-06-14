@@ -93,7 +93,7 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
             'totalMoney': round(totalMoney, 2)
         })
 
-    sql_re = 'SELECT inc.cost,inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
+    sql_re = 'SELECT inc.comments,inc.cost,inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where + 'order by  inc.income_id  desc limit %s' %(limit)
     res = await Income.query(sql_re)
     res = obj2str(res)
     for item in res:
@@ -108,7 +108,7 @@ async def board_index(*, keyword=None, rangeDate=None, moneyStatus=None,invStatu
             where_t = " {} and {} = '{}' ".format(where, affField, startDate)
         else:
             where_t = " {} and {} >= '{}' and {} <= '{}' ".format(where, affField, startDate, affField, endDate)
-        sql_re_t = 'SELECT inc.cost,inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where_t + 'order by  inc.income_id  desc'
+        sql_re_t = 'SELECT inc.comments,inc.cost,inc.income_id,c.name,inc.business_type,inc.name cname,inc.aff_date,inc.money,inc.money_status,inc.inv_status,inc.media_type,inc.id income_table_id,inc.income_company,inc.return_money_date from income inc inner join client c on inc.client_id = c.id ' + where_t + 'order by  inc.income_id  desc'
         res_t = await Income.query(sql_re_t)
         res_t = obj2str(res_t)
         for item in res_t:
@@ -159,20 +159,25 @@ async def  board_info(*,id):
         id = income["id"],
         return_money_date = income["return_money_date"],
         # return_money_date = "2018-08-08",
-        money_status = income["money_status"]
+        money_status = income["money_status"],
+        comments = income["comments"]
     )
+    for k,v  in res.items():
+        if isinstance(v,datetime.date):
+            res[k] = v.strftime("%Y-%m-%d")
     return {
         "info":res
     }
 # return returnData(1,"失败")
 @post("/apis/board/form")
-async def board_form(*,return_money_date,money_status,id):
+async def board_form(*,return_money_date,money_status,id,comments):
     if money_status and int(money_status) != 1:
         return returnData(0,"选择未回款不能提交")
-    if return_money_date and money_status and id:
+    if return_money_date and money_status and id and comments:
         income = await  Income.find(id)
         income["return_money_date"] = return_money_date
         income["money_status"] = money_status
+        income["comments"] = comments
         rows = await Income(**income).update()
         if rows == 1:
             return returnData(1,"回款")
