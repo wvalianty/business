@@ -160,6 +160,7 @@ async def form(**kw):
         oldInfo = await Income.find(id)
         if oldInfo['money_status'] == 1:
             oldInfo['cost'] = info['cost']
+            oldInfo['cost_detail'] = info['cost_detail']
             info = oldInfo
         else:
             info['id'] = id

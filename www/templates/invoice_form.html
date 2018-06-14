@@ -51,11 +51,7 @@
 // 初始化时数据加载
 function hook_init(vueObj) {
 
-    let id = getQueryStr('id') || 0;
-    $.get('/apis/invoice/formInit?id=' + id, function(data) {
-        
-        vueObj.other = data;
-    });
+    getFromInit(vueObj, 'invoice');
 }
 
 // 初始化UI
