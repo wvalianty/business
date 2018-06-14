@@ -160,7 +160,32 @@ async def invoiceApply_index(*, keyword=None,rangeDate=None,isExport=None,isSear
         'list':res
     }
 
-
+#inv.id
+#开发票时候有和的又有单开是不行的
+# @get('/apis/finish')
+# async def apis_finish(*,id):
+#     row_income = {}
+#     if id:
+#         invoice = await Invoice.find(int(id))
+#         invoice["finished"] = 1
+#         invoice["finished_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         rows_f = await Invoice(**invoice).update()
+#         if rows_f == 1:
+#             income_ids = invoice["income_id"]
+#             for inc in income_ids.split(","):
+#                 income = await Income.find(int(inc))
+#                 income["inv_status"] = 2
+#                 rows = await Income(**income).update()
+#                 row_income[inc] = rows
+#             for k,v in row_income.items():
+#                 if v != 1:
+#                     return returnData(0,"开票")
+#         else:
+#             return returnData(0, "开票")
+#         return returnData(1,"开票")
+#     else:
+#         return returnData(0,"没有发票")
+#inv_id
 @post("/apis/invoice_finish/form")
 async def apis_finish(*,id,finished,finished_time):
     row_income = {}

@@ -59,6 +59,7 @@ class Income(Model):
     is_delete = IntegerField(default=0)
     income_company = StringField()
     return_money_date = DateTimeField()
+    comments = StringField()
 
 class Invoice(Model):
     __table__ = 'invoice'

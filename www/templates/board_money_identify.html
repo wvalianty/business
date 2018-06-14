@@ -24,6 +24,13 @@
     </div>
 
     <div class="layui-form-item">
+        <label class="layui-form-label">备注信息</label>
+        <div class="layui-input-6">
+            <textarea placeholder="请输入备注" name="comments" v-model="info.comments" class="layui-textarea" lay-verify="required"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
         <div class="layui-input-block">
             <input type="hidden" name="id" v-model="info.id">
             <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>

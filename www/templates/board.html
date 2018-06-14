@@ -76,6 +76,7 @@
             <td>
                 <a  v-if=" ! item.money_status"  class="layui-btn layui-btn-danger layui-btn-mini edit-btn" data-title="确认回款" v-bind:data-url="'/board/money_identify?id='+item.income_table_id"   ><i class="layui-icon"></i> 确认回款</a>
                 {{ item.money_status ? "已回款": "" }}<br>
+                {{ item.comments }} <br>
                 <p v-html="item.return_money_date"></p>
             </td>
             <td>
