@@ -4,7 +4,7 @@
 "结算单管理模块"
 import math, datetime, time
 from core.coreweb import get, post
-from lib.models import Income, Client, Settlement
+from lib.models import Income, Client, Settlement, Company
 from lib.common import obj2str, totalLimitP, addAffDateWhere, returnData, replLineBreak, isfloat
 import client, income
 
@@ -151,9 +151,13 @@ async def formInit(*, id=0):
         if isfloat(item['cost']) and float(settMoney) >= float(item['cost']):
             incomeIdList.remove(item)
 
+    # 获得所有收款公司, id, company_name
+    companyList = await Company.findAll(field='id, company_name', orderBy='sort desc')
+
     res = {
         'incomeIdList': incomeIdList,
         'clientList': clientList,
+        'companyList': companyList,
         'stypeMap': stypeMap
     }
 

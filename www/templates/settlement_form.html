@@ -51,7 +51,10 @@
     <div class="layui-form-item">
         <label class="layui-form-label">请款公司</label>
         <div class="layui-input-6">
-            <input class="layui-input" v-model="info.pay_company" :max="info.pay_company" lay-verify="required" type="text" name="pay_company" >
+            <select name="pay_company" v-model="info.pay_company" lay-verify="required" lay-filter="select" lay-search>
+                <option value=""></option>
+                <option v-for="item in other.companyList" :value="item.company_name">{{item.company_name}}</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
